@@ -1,0 +1,73 @@
+<mxfile host="Electron">
+  <diagram id="awx-gitlab-ssh" name="AWX + Ansible + GitLab">
+    <mxGraphModel dx="1664" dy="992" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1030" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="n1" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=24;align=left;verticalAlign=top;spacing=0;fontStyle=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="AWX + Ansible + GitLab — раздача открытых ключей (задача 2538)" vertex="1">
+          <mxGeometry height="42" width="1420" x="40" y="18" as="geometry" />
+        </mxCell>
+        <mxCell id="n2" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=0;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="Чек-лист задачи: ВМ → AWX → домен awx.* → связка AWX+Ansible+GitLab → репозиторий users_ssh → тесты добавления / блокировки / удаления" vertex="1">
+          <mxGeometry height="30" width="1420" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="n3" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=18;align=left;verticalAlign=top;spacing=0;fontStyle=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="1. Цепочка при добавлении открытого ключа" vertex="1">
+          <mxGeometry height="32" width="900" x="40" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="n4" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=11;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;1. Коммит&lt;/b&gt;&lt;br&gt;Инженер кладёт&lt;br&gt;&lt;b&gt;public&lt;/b&gt;-ключ в репозиторий&lt;br&gt;users_ssh и делает git push" vertex="1">
+          <mxGeometry height="135" width="215" x="40" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n5" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=11;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;2. GitLab&lt;/b&gt;&lt;br&gt;Ветка main.&lt;br&gt;Webhook на AWX&lt;br&gt;или Update on launch" vertex="1">
+          <mxGeometry height="135" width="215" x="280" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n6" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=11;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;3. AWX Project&lt;/b&gt;&lt;br&gt;Синхронизация&lt;br&gt;репозитория users_ssh&lt;br&gt;из GitLab" vertex="1">
+          <mxGeometry height="135" width="215" x="520" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n7" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=11;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;4. Job Template&lt;/b&gt;&lt;br&gt;Inventory + Credential&lt;br&gt;+ playbook —&lt;br&gt;запуск job" vertex="1">
+          <mxGeometry height="135" width="215" x="760" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n8" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=11;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;5. Ansible&lt;/b&gt;&lt;br&gt;модуль authorized_key&lt;br&gt;→ ключ попадает&lt;br&gt;на серверы из inventory" vertex="1">
+          <mxGeometry height="135" width="215" x="1000" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n9" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=11;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;6. Результат&lt;/b&gt;&lt;br&gt;Job в AWX, статус&lt;br&gt;коммита в GitLab,&lt;br&gt;логи прогона" vertex="1">
+          <mxGeometry height="135" width="215" x="1240" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="n10" edge="1" parent="1" source="n4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" target="n5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n11" edge="1" parent="1" source="n5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" target="n6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n12" edge="1" parent="1" source="n6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" target="n7" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n13" edge="1" parent="1" source="n7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" target="n8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n14" edge="1" parent="1" source="n8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" target="n9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n15" edge="1" parent="1" source="n9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;dashed=1;dashPattern=8 6;labelBackgroundColor=white;fontFamily=DejaVu Sans;fontSize=11;fontStyle=1;fontColor=000000;fillColor=#f5f5f5;strokeColor=#666666;" target="n5" value="commit status">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n16" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=18;align=left;verticalAlign=top;spacing=0;fontStyle=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="2. Структура репозитория users_ssh" vertex="1">
+          <mxGeometry height="32" width="700" x="40" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="n17" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;users_ssh (ветка main)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;b&gt;inventories/prod/hosts.yml&lt;/b&gt; — целевые серверы&lt;br&gt;&lt;b&gt;group_vars/all/users.yml&lt;/b&gt; — пользователи + их public key&lt;br&gt;&lt;b&gt;group_vars/vault.yml&lt;/b&gt; — секреты (Ansible Vault)&lt;br&gt;&lt;b&gt;playbooks/users_ssh.yml&lt;/b&gt; — точка входа для Job Template&lt;br&gt;&lt;b&gt;roles/users_ssh/tasks/main.yml&lt;/b&gt; — модуль authorized_key&lt;br&gt;&lt;b&gt;roles/users_ssh/templates/keys.j2&lt;/b&gt; — шаблон authorized_keys&lt;br&gt;&lt;b&gt;roles/users_ssh/defaults/main.yml&lt;/b&gt; — переменные по умолчанию&lt;br&gt;&lt;br&gt;Отдельная переменная &lt;b&gt;action&lt;/b&gt;: add | block | remove —&lt;br&gt;на неё завязаны тесты чек-листа." vertex="1">
+          <mxGeometry height="300" width="680" x="40" y="362" as="geometry" />
+        </mxCell>
+        <mxCell id="n18" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=18;align=left;verticalAlign=top;spacing=0;fontStyle=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="3. Как настраивается в AWX" vertex="1">
+          <mxGeometry height="32" width="700" x="755" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="n19" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;Project&lt;/b&gt; — SCM type: Git, URL git@…/users_ssh.git, ветка main,&lt;br&gt;&lt;b&gt;Update on launch — включить&lt;/b&gt;, чтобы AWX забирал сам.&lt;br&gt;&lt;br&gt;&lt;b&gt;Job Template&lt;/b&gt; — playbook playbooks/users_ssh.yml,&lt;br&gt;Inventory, Credential (Machine), Limit: группа или один хост.&lt;br&gt;&lt;br&gt;&lt;b&gt;Inventory Source = Git&lt;/b&gt; — состав серверов берётся из репозитория.&lt;br&gt;&lt;br&gt;&lt;b&gt;Credential&lt;/b&gt; — приватный ключ / пароль &lt;b&gt;только здесь&lt;/b&gt; (шифруется),&lt;br&gt;в git не попадает никогда.&lt;br&gt;&lt;br&gt;&lt;b&gt;Survey / extra vars&lt;/b&gt; — action и список пользователей." vertex="1">
+          <mxGeometry height="300" width="700" x="755" y="362" as="geometry" />
+        </mxCell>
+        <mxCell id="n20" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=18;align=left;verticalAlign=top;spacing=0;fontStyle=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="4. Как сделать правильно" vertex="1">
+          <mxGeometry height="32" width="900" x="40" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="n21" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=14;align=left;verticalAlign=top;spacing=8;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;1. В git — только public-ключи и данные пользователей.&lt;/b&gt; Приватные ключи, пароли и токены — в Credential AWX / Ansible Vault.&lt;br&gt;&lt;b&gt;2. Идемпотентность.&lt;/b&gt; Повторный прогон не должен ничего ломать. Блокировка и удаление — отдельными прогонами (action=block / remove), не смешивать с add.&lt;br&gt;&lt;b&gt;3. Права.&lt;/b&gt; ~/.ssh = 0700, authorized_keys = 0600, владелец — сам пользователь.&lt;br&gt;&lt;b&gt;4. exclusive&lt;/b&gt; в authorized_key включать, только если репозиторий — единственный источник правды по всем пользователям этого хоста, иначе затрёт чужие ключи.&lt;br&gt;&lt;b&gt;5. Быстрые исправления прав&lt;/b&gt; — тот же Job Template с Limit на конкретный хост, без правки репозитория.&lt;br&gt;&lt;b&gt;6. Обратная связь.&lt;/b&gt; Статус job попадает в GitLab commit status — видно, на какие серверы ключ реально применился." vertex="1">
+          <mxGeometry height="250" width="1415" x="40" y="742" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,100 @@
+<mxfile host="Electron">
+  <diagram id="radius-failover" name="Резервирование RADIUS">
+    <mxGraphModel dx="1885" dy="1124" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1440" pageHeight="1140" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="n1" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=24;align=left;verticalAlign=top;spacing=0;fontStyle=1;" value="Резервирование RADIUS — как должен работать (задача 2532)" vertex="1">
+          <mxGeometry height="45" width="1400" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="n2" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=0;" value="Площадки РТ (rocket 172.16.100.27) и РТЦ (rtc 192.168.160.88). BRAS — fastDPI / fastPCRF, параметры в fastpcrf.conf" vertex="1">
+          <mxGeometry height="30" width="1400" x="40" y="62" as="geometry" />
+        </mxCell>
+        <mxCell id="n3" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=18;align=left;verticalAlign=top;spacing=0;fontStyle=1;" value="1. Целевая схема с резервным каналом" vertex="1">
+          <mxGeometry height="32" width="700" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="n4" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;Абоненты&lt;/b&gt;&lt;br&gt;PPPoE / IPoE" vertex="1">
+          <mxGeometry height="80" width="150" x="40" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="n5" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;BRAS&lt;/b&gt;&lt;br&gt;fastDPI / fastPCRF&lt;br&gt;(fastpcrf.conf)&lt;br&gt;radius_server: primary&lt;br&gt;+ secondary" vertex="1">
+          <mxGeometry height="120" width="270" x="245" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="n6" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;RADIUS #1 — основной&lt;/b&gt;&lt;br&gt;BGInetAccess / BGInetAccounting&lt;br&gt;1812 / 1813 / 2001 UDP&lt;br&gt;домен РТ (rocket)" vertex="1">
+          <mxGeometry height="105" width="320" x="590" y="135" as="geometry" />
+        </mxCell>
+        <mxCell id="n7" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;RADIUS #2 — резерв (новый)&lt;/b&gt;&lt;br&gt;второй экземпляр, ТОТ ЖЕ домен&lt;br&gt;новый сервер + лицензия BGBilling&lt;br&gt;тот же shared-secret" vertex="1">
+          <mxGeometry height="120" width="320" x="590" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="n8" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;ProxySQL&lt;/b&gt;&lt;br&gt;порт 6033" vertex="1">
+          <mxGeometry height="80" width="165" x="985" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="n9" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;MySQL bg-core&lt;/b&gt;&lt;br&gt;абонентская база" vertex="1">
+          <mxGeometry height="80" width="175" x="1225" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="n10" edge="1" parent="1" source="n4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;endArrow=block;endFill=1;verticalAlign=middle;" target="n5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n11" edge="1" parent="1" source="n5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;endArrow=block;endFill=1;verticalAlign=middle;labelBackgroundColor=white;fontFamily=DejaVu Sans;fontSize=12;fontStyle=1;fontColor=000000;" target="n6" value="primary">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n12" edge="1" parent="1" source="n5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;endArrow=block;endFill=1;verticalAlign=middle;dashed=1;dashPattern=8 6;labelBackgroundColor=white;fontFamily=DejaVu Sans;fontSize=12;fontStyle=1;fontColor=000000;" target="n7" value="secondary">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n13" edge="1" parent="1" source="n6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;endArrow=block;endFill=1;verticalAlign=middle;" target="n8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n14" edge="1" parent="1" source="n7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;endArrow=block;endFill=1;verticalAlign=middle;dashed=1;dashPattern=8 6;" target="n8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n15" edge="1" parent="1" source="n8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=3;endArrow=block;endFill=1;verticalAlign=middle;" target="n9" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n16" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=12;align=center;verticalAlign=middle;spacing=8;strokeWidth=2;" value="&lt;b&gt;⚠ резервного сервера пока нет&lt;/b&gt;" vertex="1">
+          <mxGeometry height="42" width="320" x="590" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="n17" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;Главное ограничение&lt;/b&gt;&lt;br&gt;• Резервным нельзя сделать чужой сервер: у каждого RADIUS свой домен и своя база абонентов через ProxySQL — РТЦ не авторизует абонентов РТ (другой домен, другой secret). Поэтому #2 поднимается в том же домене.&lt;br&gt;• Резерв RADIUS не спасёт при падении ProxySQL или MySQL — тогда встанут всё равно. Тестировать падение по всей цепочке." vertex="1">
+          <mxGeometry height="105" width="1360" x="40" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="n18" parent="1" style="text;html=1;fontFamily=DejaVu Sans;fontSize=18;align=left;verticalAlign=top;spacing=0;fontStyle=1;" value="2. Логика переключения" vertex="1">
+          <mxGeometry height="32" width="700" x="40" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="n19" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=12;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;1. Штатно&lt;/b&gt;&lt;br&gt;Запрос уходит на primary&lt;br&gt;Ответ получен — работаем" vertex="1">
+          <mxGeometry height="115" width="255" x="40" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="n20" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=12;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;2. Нет ответа&lt;/b&gt;&lt;br&gt;Ждём response_timeout&lt;br&gt;(по умолчанию 30 с), затем&lt;br&gt;auth_resend_timeout и повтор" vertex="1">
+          <mxGeometry height="115" width="255" x="327" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="n21" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=12;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;3. DEAD&lt;/b&gt;&lt;br&gt;Попытки исчерпаны → сервер&lt;br&gt;помечен DEAD → новые запросы&lt;br&gt;на secondary, сессии живут" vertex="1">
+          <mxGeometry height="115" width="255" x="614" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="n22" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=12;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;4. Пинг primary&lt;/b&gt;&lt;br&gt;Каждые dead_timeout —&lt;br&gt;проверка основного&lt;br&gt;(Status-Server / keepalive)" vertex="1">
+          <mxGeometry height="115" width="255" x="901" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="n23" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=12;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;5. Возврат&lt;/b&gt;&lt;br&gt;primary ответил → новых&lt;br&gt;абонентов переключаем&lt;br&gt;на него" vertex="1">
+          <mxGeometry height="115" width="255" x="1188" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="n24" edge="1" parent="1" source="n19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;" target="n20" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n25" edge="1" parent="1" source="n20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;" target="n21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n26" edge="1" parent="1" source="n21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;" target="n22" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n27" edge="1" parent="1" source="n22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;endArrow=block;endFill=1;verticalAlign=middle;" target="n23" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n28" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=14;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;Ключевая формула&lt;/b&gt;&lt;br&gt;время переключения ≈ response_timeout + auth_resend_timeout&lt;br&gt;возврат на основной = radius_dead_timeout&lt;br&gt;&lt;b&gt;лиза абонента ≥ время переключения&lt;/b&gt;" vertex="1">
+          <mxGeometry height="145" width="660" x="40" y="785" as="geometry" />
+        </mxCell>
+        <mxCell id="n29" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;На что обратить внимание&lt;/b&gt;&lt;br&gt;• radius_dead_timeout = 3600 (в примере) → восстановившийся сервер не вернётся&lt;br&gt;  в Alive раньше часа. Для короткой лизы — меньше.&lt;br&gt;• radius_resend_count = 0 по умолчанию → повторов на стороне fastPCRF нет,&lt;br&gt;  их делает fastDPI после auth_resend_timeout." vertex="1">
+          <mxGeometry height="145" width="660" x="740" y="785" as="geometry" />
+        </mxCell>
+        <mxCell id="n30" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontFamily=DejaVu Sans;fontSize=13;align=left;verticalAlign=top;spacing=8;strokeWidth=2;" value="&lt;b&gt;Что нужно уточнить, чтобы дать конечный расчёт&lt;/b&gt;&lt;br&gt;• auth_resend_timeout из fastdpi.conf        • текущее значение radius_dead_timeout на BRAS&lt;br&gt;• поддерживает ли BGInet Status-Server (RFC 5997) — иначе сервер из состояния Dead не выйдет&lt;br&gt;• CoA-порт: в конфиге 3799, на BGInet в аудите 2001/udp — сверить&lt;br&gt;• IP второго RADIUS — появятся после поднятия экземпляра в домене (лицензия BGBilling)" vertex="1">
+          <mxGeometry height="125" width="1360" x="40" y="970" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

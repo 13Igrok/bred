@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта зависимостей 360pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: одна колонка-справочник; сверху сводка SPOF, затем схемы по контурам, внизу пробелы */
+:root {
+  --bg: #f5f6f4;
+  --surface: #ffffff;
+  --fg: #1c2321;
+  --muted: #5b6763;
+  --line: #d8ddd9;
+  --accent: #0f6b5c;
+  --crit: #b3401d;
+  --crit-bg: #fbeee8;
+  --warn: #8a5a00;
+  --warn-bg: #fdf4e1;
+  --font-body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141917; --surface: #1c2220; --fg: #e4e9e6; --muted: #9aa6a1; --line: #2f3834;
+    --accent: #5cc3ae; --crit: #f08a67; --crit-bg: #3a2119; --warn: #e3b55b; --warn-bg: #352a14;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141917; --surface: #1c2220; --fg: #e4e9e6; --muted: #9aa6a1; --line: #2f3834;
+  --accent: #5cc3ae; --crit: #f08a67; --crit-bg: #3a2119; --warn: #e3b55b; --warn-bg: #352a14;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; }
+header { display: grid; gap: 6px; margin-bottom: 20px; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0; text-wrap: balance; font-weight: 700; }
+h2 { font-size: 21px; margin: 0; text-wrap: balance; }
+h3 { font-size: 15px; margin: 0; }
+p { margin: 0; max-width: 72ch; }
+.lead { color: var(--muted); }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 26px; }
+nav a { font-size: 13px; text-decoration: none; color: var(--fg); border: 1px solid var(--line); background: var(--surface); padding: 5px 10px; border-radius: 999px; }
+nav a:hover, nav a:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+section { display: grid; gap: 12px; padding-block: 26px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; min-width: 640px; font-family: var(--font-body); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 2px solid var(--line); }
+.legend .l-spof::before { border-color: var(--crit); background: var(--crit-bg); }
+.legend .l-risk::before { border-color: var(--warn); background: var(--warn-bg); border-style: dashed; }
+.notes { display: grid; gap: 6px; margin: 0; padding-left: 18px; max-width: 80ch; }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+tr:last-child td { border-bottom: none; }
+td.mono { white-space: nowrap; }
+.spof { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.spof-item { display: grid; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--crit); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+.spof-item.warn { border-left-color: var(--warn); }
+.spof-item .what { font-weight: 600; }
+.spof-item .impact { color: var(--muted); font-size: 14px; }
+.chip { justify-self: start; font: 500 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; padding: 4px 7px; border-radius: 4px; background: var(--crit-bg); color: var(--crit); }
+.warn .chip { background: var(--warn-bg); color: var(--warn); }
+.src { font-size: 12.5px; color: var(--muted); }
+.callout { background: var(--warn-bg); border: 1px solid var(--warn); border-radius: 8px; padding: 12px 14px; max-width: 80ch; }
+footer { margin-top: 30px; font-size: 13px; color: var(--muted); }
+@media (max-width: 560px) { .wrap { padding-inline: 16px; } .spof { grid-template-columns: 1fr; } }
+</style>
+</head><body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Инфраструктура 360pro · снято с Wiki 2026-09-30</div>
+  <h1>Карта зависимостей критичных сервисов</h1>
+  <p class="lead">Пять биллингов, ERP, сеть, почта, телефония и платформа под ними. Схемы собраны из ~90 страниц <span class="mono">work/it/*</span> и <span class="mono">work/ops/*</span>. Стрелка «A → B» значит: A не работает или деградирует без B.</p>
+</header>
+
+<nav aria-label="Разделы">
+  <a href="#spof">Единые точки отказа</a>
+  <a href="#overview">Общая карта</a>
+  <a href="#billing">Биллинги</a>
+  <a href="#erp">ERP</a>
+  <a href="#mail">Почта</a>
+  <a href="#phone">Телефония</a>
+  <a href="#network">Сеть</a>
+  <a href="#platform">Платформа и бэкапы</a>
+  <a href="#gaps">Пробелы в Wiki</a>
+</nav>
+
+<section id="spof">
+  <h2>Единые точки отказа</h2>
+  <p class="lead">Отсортированы по числу сервисов, которые падают вместе с узлом.</p>
+  <div class="spof">
+    <div class="spof-item"><span class="chip">Периметр</span><div class="what">MikroTik CCR2004 · <span class="mono">185.221.44.2</span></div><div class="impact">Весь NAT (~40 сервисов), VPN, GRE до RegRu, СОРМ. Отказ = нет внешнего доступа, почты, ЛК, удалёнки.</div></div>
+    <div class="spof-item"><span class="chip">Хранение</span><div class="what">HPE MSA sv4 / sv5 · обе Degraded</div><div class="impact">136 из 170 ВМ, репликации нет: ядра биллингов, ERP, Exchange, 1С.</div></div>
+    <div class="spof-item"><span class="chip">Каталог</span><div class="what">dc1 · <span class="mono">192.168.160.60</span></div><div class="impact">Все FSMO; единственный LDAPS для почты и Bitrix; DNS для площадки 110.x (телефония Flash/РТЦ).</div></div>
+    <div class="spof-item"><span class="chip">Вход</span><div class="what">nginx · <span class="mono">192.168.161.6</span>, один контейнер</div><div class="impact">ERP снаружи, SOGo и почтовые клиенты, Vault, API Gateway (бот, мобильное приложение), GitLab, Grafana.</div></div>
+    <div class="spof-item"><span class="chip">Платформа</span><div class="what">K3s · VIP <span class="mono">192.168.161.101</span></div><div class="impact">Почта 360pro, Vault, API Gateway. node5 NotReady: запас по кворуму etcd — одна нода.</div></div>
+    <div class="spof-item"><span class="chip">Приложение</span><div class="what">BGERP · <span class="mono">192.168.160.31</span></div><div class="impact">Одна ВМ с локальным MySQL, без HA.</div></div>
+    <div class="spof-item warn"><span class="chip">По оператору</span><div class="what">RADIUS и NAS каждого биллинга</div><div class="impact">По одному боевому экземпляру; рестарт RADIUS = 5–10 мин Reject для всех абонентов оператора.</div></div>
+    <div class="spof-item warn"><span class="chip">Управление</span><div class="what">vCenter <span class="mono">.160.202</span> на node50, vSphere 6.7 EOL</div><div class="impact">Управление всей виртуализацией из одной ВМ на неподдерживаемой версии.</div></div>
+    <div class="spof-item warn"><span class="chip">Люди</span><div class="what">n8n, бэкапы, MFA RADIUS</div><div class="impact">n8n принадлежит одному сотруднику; bus-factor по бэкапам — 1; второй фактор VPN держится на одном RADIUS MultiFactor.</div></div>
+  </div>
+</section>
+
+<section id="overview">
+  <h2>Общая карта</h2>
+  <div class="legend"><span class="l-spof">единая точка отказа</span><span class="l-risk">известная проблема</span></div>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  INET([Интернет]) --> CCR["MikroTik CCR2004<br/>NAT · VPN · GRE · СОРМ"]
+  CCR --> NGINX["nginx 192.168.161.6<br/>вход 185.221.44.20"]
+  CCR --> RELAY["relay1 / relay2"]
+  CCR --> EXCH["Exchange ×5 операторов"]
+  CCR --> VPN["OpenVPN .161.26"]
+  CCR --> N8N["n8n .160.119"]
+  NGINX --> ERP["BGERP .160.31"]
+  NGINX --> K3S["K3s<br/>почта · Vault · API GW"]
+  NGINX --> GIT["GitLab .161.7"]
+  NGINX --> BITRIX["Bitrix24 .160.110"]
+  RELAY --> K3S
+  RELAY --> EXCH
+  ERP -- "SOAP :8080" --> BILL["BGBilling ×5"]
+  BILL -- "заявки оттока" --> ERP
+  K3S -- "API Gateway" --> BILL
+  N8N --> ERP
+  ERP -- LDAPS --> AD["AD dc1 .160.60<br/>dc2 .160.69"]
+  K3S -- LDAPS --> AD
+  BITRIX --> AD
+  VPN --> AD
+  BILL --> PXC["Percona XtraDB ×5"]
+  ERP --> VS["vSphere 6.7 · 8 хостов"]
+  BILL --> VS
+  EXCH --> VS
+  VS --> MSA["HPE MSA sv4 / sv5"]
+  classDef spof fill:#fbeee8,stroke:#b3401d,stroke-width:3px,color:#1c2321
+  classDef risk fill:#fdf4e1,stroke:#8a5a00,stroke-width:2px,stroke-dasharray:5 3,color:#1c2321
+  class CCR,NGINX,AD,MSA,K3S,ERP spof
+  class VS risk
+  </pre></div>
+</section>
+
+<section id="billing">
+  <h2>Биллинги</h2>
+  <p>Все пять операторов на BGBilling 9.2501, у каждого своя копия одной и той же цепочки. Разница только в адресах и типе BRAS.</p>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  AB([Абоненты]) --> NAS["BRAS / NAS<br/>Cisco ASR · ISG · СКАТ"]
+  NAS -- "RADIUS 1812/1813<br/>DHCP 67 / 10067" --> RAD["RADIUS / DHCP"]
+  RAD -- "ActiveMQ :61616" --> CORE["Ядро BGBilling 9.2501"]
+  CORE -- "CoA :3799" --> NAS
+  CORE --> PSQL["ProxySQL :6033"]
+  RAD --> PSQL
+  PSQL --> PXC["Percona XtraDB 5.7.44<br/>3 ноды + лог-нода"]
+  CORE -- "FTP каждые 20–30 мин" --> SORM["ПУ СОРМ-3"]
+  ERP["BGERP"] -- "SOAP :8080<br/>от имени пользователя" --> CORE
+  CORE -- "HTTP: заявки оттока" --> ERP
+  GW["API Gateway в K3s"] -- "JSON :8080" --> CORE
+  CORE --> LK["ЛК абонента<br/>nginx на ядре"]
+  classDef spof fill:#fbeee8,stroke:#b3401d,stroke-width:3px,color:#1c2321
+  class RAD,NAS spof
+  </pre></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Оператор</th><th>Ядро</th><th>RADIUS/DHCP</th><th>ProxySQL</th><th>Ноды PXC</th><th>BRAS / NAS</th></tr></thead>
+    <tbody>
+      <tr><td>RocketCom</td><td class="mono">172.16.100.24</td><td class="mono">172.16.100.27</td><td class="mono">172.16.100.26</td><td class="mono">160.128–.130, лог .131</td><td>СКАТ <span class="mono">172.16.100.5</span> + Cisco ASR <span class="mono">.100.10</span></td></tr>
+      <tr><td>ЮТК / Omicron</td><td class="mono">160.101</td><td class="mono">160.102</td><td class="mono">160.103</td><td class="mono">160.194–.196, лог .197</td><td>Cisco ASR <span class="mono">192.168.155.14</span> и др.</td></tr>
+      <tr><td>Омиплат</td><td class="mono">160.54</td><td class="mono">160.55</td><td class="mono">160.70</td><td class="mono">160.198/.199/.126, лог .127</td><td>Cisco ASR <span class="mono">192.168.155.3</span></td></tr>
+      <tr><td>Флэш</td><td class="mono">192.168.110.7</td><td class="mono">110.8</td><td class="mono">110.20</td><td class="mono">160.189/.193/.191</td><td>Cisco ISG <span class="mono">192.168.110.6</span></td></tr>
+      <tr><td>РТЦ</td><td class="mono">160.87</td><td class="mono">160.88</td><td class="mono">160.89</td><td class="mono">160.132–.134</td><td>СКАТ <span class="mono">10.58.0.7</span></td></tr>
+    </tbody>
+  </table></div>
+  <ul class="notes">
+    <li>Адреса без префикса — в сети <span class="mono">192.168.160.0/23</span>. Ядра и RADIUS — ВМ на node40/node50.</li>
+    <li>Если лежит ядро, уже авторизованные абоненты продолжают работать. Если лежит БД или RADIUS — новые авторизации не проходят.</li>
+    <li>Flash: ядро, RADIUS и ProxySQL в сети 110.x, а кластер БД в 160.x. Обрыв канала площадки бьёт сразу по биллингу и телефонии Flash.</li>
+    <li>ProxySQL rocket и flash live не проверялись.</li>
+  </ul>
+  <p class="src">Источник: systems/billing, systems/billing/installations, …/radius, …/network, …/sorm3-export, infra/databases</p>
+</section>
+
+<section id="erp">
+  <h2>ERP (BGERP)</h2>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  U([Сотрудники]) --> NG["nginx .161.6"] --> ERP["BGERP .160.31<br/>ВМ на node10"]
+  ERP --> DB["MySQL 8.0.28 локально<br/>bgerp + data1"]
+  ERP -- LDAPS --> AD["AD 360pro"]
+  ERP -- "SOAP :8080" --> BILL["BGBilling ×5"]
+  ERP -- ":587 через stunnel" --> EX["Exchange"]
+  ERP -- "SOCKS .161.12<br/>синхронно в транзакции" --> TG["Telegram"]
+  ERP -- AMI --> AST["Asterisk"]
+  ERP -- "раз в час" --> OLT["GetOLT .161.12"]
+  ERP -- IMAP --> LID["ящик лидов"]
+  ERP --> SMS["SMS-сервис"]
+  ZBX["Zabbix"] -- "webhook: заявки об авариях" --> ERP
+  N8N["n8n"] -- "SMS-очередь, SQL через MCP" --> ERP
+  GW["API Gateway"] -- ":9088" --> ERP
+  ERP -. "дамп каждые 4 ч" .-> BK["backonf"]
+  classDef spof fill:#fbeee8,stroke:#b3401d,stroke-width:3px,color:#1c2321
+  classDef risk fill:#fdf4e1,stroke:#8a5a00,stroke-width:2px,stroke-dasharray:5 3,color:#1c2321
+  class ERP,DB spof
+  class TG risk
+  </pre></div>
+  <ul class="notes">
+    <li><b>Telegram в транзакции:</b> недоступность Telegram или SOCKS-прокси даёт lock-timeout у всех пользователей ERP.</li>
+    <li><b>Два пароля:</b> ERP ходит в биллинг с прикладным паролем пользователя. Если в каком-то биллинге пароль разошёлся, карточка договора по нему молча пустая.</li>
+    <li>Без AD в ERP входят только аварийные локальные учётки.</li>
+  </ul>
+  <p class="src">Источник: systems/erp/integrations, systems/erp/databases, ops/passwords, systems/n8n</p>
+</section>
+
+<section id="mail">
+  <h2>Почта</h2>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  MX([Входящая почта]) --> R1["relay1 .161.32<br/>MX 10"]
+  MX --> R2["relay2 .161.33<br/>MX 15"]
+  R1 -- "360pro → :30025" --> MS["K3s mailserver<br/>Postfix · Dovecot · SOGo"]
+  R2 -- "360pro → :30025" --> MS
+  R1 -- "домены операторов :25" --> EX["Exchange ×5<br/>.161.50, .161.92–.95"]
+  R2 -- "домены операторов :25" --> EX
+  CL([Почтовые клиенты]) --> NG["nginx .161.6<br/>993 · 465 · 587 · 995"] --> MS
+  MS -- "LDAPS только dc1" --> DC1["dc1 .160.60"]
+  EX --> DCO["DC операторов .160.91–.95"]
+  MS --> PVC["Longhorn PVC ~800 Gi"]
+  DNS["PowerDNS ns1/ns2<br/>.161.18 / .161.19"] -.-> MX
+  classDef spof fill:#fbeee8,stroke:#b3401d,stroke-width:3px,color:#1c2321
+  classDef risk fill:#fdf4e1,stroke:#8a5a00,stroke-width:2px,stroke-dasharray:5 3,color:#1c2321
+  class DC1,NG spof
+  class PVC risk
+  </pre></div>
+  <ul class="notes">
+    <li>dc2 в настройках почты не прописан: при отказе dc1 вход в почту 360pro пропадает.</li>
+    <li>В <span class="mono">mynetworks</span> relay прописаны IP нод K3s. Новая нода без этой правки не сможет отправлять почту.</li>
+    <li>Hairpin NAT на CCR нет, поэтому FQDN Exchange прописаны в /etc/hosts.</li>
+    <li>Почтовый том (~800 Gi) и БД PowerDNS без бэкапа.</li>
+  </ul>
+  <p class="src">Источник: infra/mail, infra/mail/relay, infra/mail/exchange, infra/active-directory</p>
+</section>
+
+<section id="phone">
+  <h2>Телефония</h2>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  SIP(["SIP-транки<br/>Манго, Билайн"]) --> CC["call-center .160.35<br/>Asterisk 11 + Line24<br/>40 очередей"]
+  SIP --> AF["Asterisk 21 Flash<br/>.110.29"]
+  SIP --> AR["Asterisk 21 РТЦ<br/>.110.30"]
+  SIP --> AU["Asterisk 21 ЮТК<br/>.161.13"]
+  SIP --> AK["Asterisk 21 Rocket<br/>172.16.100.54"]
+  SIP --> AO["Asterisk 21 Омиплат<br/>.160.217"]
+  AF -- DNS --> DC["dc1 / dc2"]
+  AR -- DNS --> DC
+  FOP["FOP2 .161.11"] -- AMI --> AF & AR & AU & AK & AO
+  ERP["BGERP"] -- "AMI: дозвон" --> CC
+  ZBX["Zabbix"] -- "голосовые алерты" --> CC
+  CC --> PR["priority в K3s"]
+  CC -. "rsync записей" .-> BK["backonf"]
+  classDef risk fill:#fdf4e1,stroke:#8a5a00,stroke-width:2px,stroke-dasharray:5 3,color:#1c2321
+  class BK,DC risk
+  </pre></div>
+  <div class="callout"><b>Запись разговоров не бэкапится с 09.11.2025.</b> Записи за 09.11.2025–13.03.2026 потеряны. CDR шести серверов Asterisk тоже без бэкапа.</div>
+  <ul class="notes">
+    <li>Серверы площадки 110.x берут DNS только у dc1/dc2. Инцидент 2026-08-31: без DNS отвалился транк.</li>
+    <li>У Flash и РТЦ транк Манго с регистрацией, у Билайна — по IP без регистрации.</li>
+  </ul>
+  <p class="src">Источник: infra/telephony, infra/telephony/call-recordings, infra/backup</p>
+</section>
+
+<section id="network">
+  <h2>Сеть</h2>
+  <div class="diagram"><pre class="mermaid">
+flowchart LR
+  UP([Аплинк 185.221.44.1]) --> CCR["MikroTik CCR2004<br/>185.221.44.2"]
+  CCR -- "NAT 1:1 ~40 сервисов" --> DMZ["Серверы 192.168.160.0/23<br/>VLAN 666"]
+  CCR -- "LAG" --> N9K["Ядро ЮТК<br/>Nexus 9396 / 3064"]
+  N9K --> MX["Juniper MX480<br/>VPLS 777"]
+  MX --> ST["Станицы<br/>MPLS-PW"]
+  N9K --> UPL["Аплинки<br/>РТК · МТС · ТТК · Beeline · SEA-IX"]
+  CCR -- "GRE поверх IPsec" --> RR["RegRu 192.168.181.0/24<br/>K3s node5 · offsite"]
+  FC["FLASH CORE"] -. "резервный IPsec+GRE" .-> RR
+  CCR --> SORM["СОРМ-проброс"]
+  DMZ --> ISCSI["iSCSI 10.10.0.0/24"]
+  SITES["Площадки: Flash/РТЦ 192.168.110.0/24<br/>Rocket 172.16.100.0/24"] -. "NAT на своих роутерах" .-> UPL
+  classDef spof fill:#fbeee8,stroke:#b3401d,stroke-width:3px,color:#1c2321
+  class CCR spof
+  </pre></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Публичный адрес</th><th>Куда</th><th>Через nginx</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">185.221.44.20</td><td>nginx <span class="mono">192.168.161.6</span>: ERP, git, registry, grafana, bitrix, SOGo, Vault, API Gateway, Rocket.Chat, OpenVPN-портал</td><td>это он</td></tr>
+      <tr><td class="mono">185.221.44.15</td><td>n8n <span class="mono">192.168.160.119</span></td><td>нет</td></tr>
+      <tr><td class="mono">185.221.44.14</td><td>ONLYOFFICE <span class="mono">192.168.160.6</span></td><td>нет</td></tr>
+      <tr><td class="mono">185.221.44.109</td><td>speedtest <span class="mono">192.168.161.48</span></td><td>нет</td></tr>
+      <tr><td class="mono">185.221.44.26/.29/.38</td><td>bg-core / mob <span class="mono">192.168.161.173–.176</span></td><td>нет</td></tr>
+      <tr><td class="mono">185.221.44.9 / .17</td><td>relay1 / relay2</td><td>нет</td></tr>
+    </tbody>
+  </table></div>
+  <p class="src">Источник: infra/network, infra/nginx, infra/regru, infra/juniper-mx-vpls, infra/styki-s-operatorami (2022)</p>
+</section>
+
+<section id="platform">
+  <h2>Платформа и бэкапы</h2>
+  <div class="diagram"><pre class="mermaid">
+flowchart TB
+  MSA4["MSA sv4 · Degraded"] --> HOSTS["ESXi node10 / 20 / 40 / 50<br/>node30 legacy"]
+  MSA5["MSA sv5 · Degraded"] --> HOSTS
+  VC["vCenter .160.202<br/>ВМ на node50"] --> HOSTS
+  HOSTS --> VMS["136 из 170 ВМ<br/>ядра биллингов · ERP · Exchange · 1С"]
+  DBN["dbnode1–3<br/>локальный RAID10"] --> PXC["Кластеры Percona XtraDB"]
+  K3N["K3s node1–4<br/>.161.110–.140"] --> LH["Longhorn, 4 реплики"]
+  LH --> VAULT["Vault HA"]
+  LH --> MAIL["Почта 360pro"]
+  V14["Veeam_Omicron .160.14<br/>на SV5-B"] -.-> VMS
+  V99["Veeam2 .160.99<br/>на SV4-B"] -.-> VMS
+  BKF["backonf .160.11"] -.-> RR["offsite RegRu"]
+  VMS -. "ERP, конфиги BRAS/MikroTik" .-> BKF
+  VAULT -.-> BKF
+  classDef spof fill:#fbeee8,stroke:#b3401d,stroke-width:3px,color:#1c2321
+  classDef risk fill:#fdf4e1,stroke:#8a5a00,stroke-width:2px,stroke-dasharray:5 3,color:#1c2321
+  class MSA4,MSA5 spof
+  class VC,RR risk
+  </pre></div>
+  <ul class="notes">
+    <li>vSphere 6.7 — EOL. Хосты node60 и node203 есть в реестре, но не в vCenter.</li>
+    <li>Состав джоб Veeam неизвестен, содержимое offsite RegRu не проверено, restore-тестов не было.</li>
+    <li>Без бэкапа: CDR Asterisk, БД PowerDNS, Bitrix, Zabbix, почтовый том K3s.</li>
+  </ul>
+  <p class="src">Источник: infra/virtualization, infra/storage, infra/k3s, infra/backup</p>
+</section>
+
+<section id="gaps">
+  <h2>Пробелы и противоречия в Wiki</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Тема</th><th>Что не сходится</th></tr></thead>
+    <tbody>
+      <tr><td>Система биллинга</td><td>Старые страницы операторов (из Confluence) называют биллингом Микбилл 3.07/3.12; в бэкапах есть mikbill-дампы. Не помечено как устаревшее.</td></tr>
+      <tr><td>Vault</td><td>Старая ВМ vault 1.9.2 (NAT <span class="mono">.19 → 192.168.160.18</span>) против Vault в K3s. Какой живой — неясно.</td></tr>
+      <tr><td>Бэкап Percona</td><td><span class="mono">infra/backup</span>: «бэкапа нет (omiplat/rtc)»; страница 2024 года описывает ежечасный xtrabackup на <span class="mono">.160.135/.136</span>.</td></tr>
+      <tr><td>Не снято</td><td>ProxySQL rocket/flash, лог-ноды, BRAS Cisco (utc/omiplat/flash), СКАТ РТЦ, Veeam <span class="mono">.160.16</span>, сервер MSVPN, назначение <span class="mono">pxc-erp-cluster</span> (.161.21–23).</td></tr>
+      <tr><td>Схемы сети</td><td>Только картинки и drawio (2021, 2025); текстовой топологии ядра, OSPF и VPLS нет.</td></tr>
+      <tr><td>Размещение ВМ</td><td>По хостам и датасторам описано обобщённо, без привязки каждой ВМ.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>Собрано 2026-09-30 по Wiki.js (чтение ~90 страниц, без проверки на живых системах). При расхождении с Wiki верна Wiki.</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default",flowchart:{htmlLabels:true,curve:"basis"}});</script>
+</body></html>
