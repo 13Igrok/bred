@@ -1,0 +1,200 @@
+﻿"Время","Задание","Ошибка"
+"10/06/2026 12:17:33","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/06/2026 12:17:33","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/06/2026 12:17:33","sv3 Services","Job finished with error at 06.10.2026 13:23:35"
+"10/05/2026 22:33:05","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 22:33:05","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 22:33:05","sv3 Services","Job finished with error at 05.10.2026 22:33:17"
+"10/05/2026 22:22:52","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 22:22:52","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 22:22:52","sv3 Services","Job finished with error at 05.10.2026 22:23:04"
+"10/05/2026 22:12:39","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 22:12:39","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 22:12:39","sv3 Services","Job finished with error at 05.10.2026 22:12:52"
+"10/05/2026 21:00:15","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 21:00:15","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 21:00:15","sv3 Services","Job finished with error at 05.10.2026 22:02:27"
+"10/05/2026 08:41:49","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 08:41:49","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 08:41:49","sv3 Services","Job finished with error at 05.10.2026 8:42:01"
+"10/05/2026 08:31:33","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 08:31:33","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 08:31:33","sv3 Services","Job finished with error at 05.10.2026 8:31:46"
+"10/05/2026 08:21:06","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/05/2026 08:21:06","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/05/2026 08:21:06","sv3 Services","Job finished with error at 05.10.2026 8:21:18"
+"10/05/2026 01:26:25","sv3 BackConf","Agent: Failed to process method {Transform.CompileFIB}: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 1052672] [offset = 1071846576128]
+"
+"10/05/2026 01:26:25","sv3 BackConf","Job finished with error at 05.10.2026 5:11:50"
+"10/04/2026 21:00:04","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/04/2026 21:00:04","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/04/2026 21:00:04","sv3 Services","Job finished with error at 05.10.2026 8:11:05"
+"10/04/2026 19:36:54","sv3 BackConf","Agent: Failed to process method {Transform.CompileFIB}: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 1052672] [offset = 1108202807296]
+There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 1052672] [offset = 1108203859968]
+"
+"10/04/2026 19:36:54","sv3 BackConf","Job finished with error at 05.10.2026 1:16:25"
+"10/04/2026 14:51:49","sv3 BackConf","Agent: Failed to process method {Transform.CompileFIB}: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 1056768] [offset = 1107980947456]
+There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 1056768] [offset = 1107982004224]
+"
+"10/04/2026 14:51:49","sv3 BackConf","Job finished with error at 04.10.2026 19:26:53"
+"10/03/2026 22:37:37","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/03/2026 22:37:37","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/03/2026 22:37:37","sv3 Services","Agent: Failed to process method {Transform.CompileFIB}: The request could not be performed because of an I/O device error.
+Asynchronous request operation has failed. [requestsize = 1056768] [offset = 786248368128]
+"
+"10/03/2026 22:37:37","sv3 Services","Job finished with error at 04.10.2026 5:57:00"
+"10/03/2026 22:27:20","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/03/2026 22:27:20","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/03/2026 22:27:20","sv3 Services","Job finished with error at 03.10.2026 22:27:35"
+"10/03/2026 22:17:02","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/03/2026 22:17:02","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/03/2026 22:17:02","sv3 Services","Job finished with error at 03.10.2026 22:17:19"
+"10/03/2026 22:00:14","sv3 BackConf","Agent: Failed to process method {Transform.CompileFIB}: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 1056768] [offset = 1108085567488]
+"
+"10/03/2026 22:00:14","sv3 BackConf","Job finished with error at 04.10.2026 14:41:49"
+"10/03/2026 21:00:10","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/03/2026 21:00:10","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/03/2026 21:00:10","sv3 Services","Job finished with error at 03.10.2026 22:07:01"
+"10/02/2026 23:27:03","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/02/2026 23:27:03","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/02/2026 23:27:03","sv3 Services","Job finished with error at 02.10.2026 23:27:16"
+"10/02/2026 23:16:50","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/02/2026 23:16:50","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/02/2026 23:16:50","sv3 Services","Job finished with error at 02.10.2026 23:17:03"
+"10/02/2026 23:06:38","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/02/2026 23:06:38","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/02/2026 23:06:38","sv3 Services","Job finished with error at 02.10.2026 23:06:50"
+"10/02/2026 21:00:01","sv3 Exchange","Processing Ex2-flash.flash-telecom.ru Error: The request could not be performed because of an I/O device error.
+Asynchronous request operation has failed. [requestsize = 1028096] [offset = 900775936]
+Failed to download disk 'Ex2-Flash-flat.vmdk'.
+Shared memory connection was closed.
+Failed to upload disk '>'
+Agent failed to process method {DataTransfer.SyncDisk}.
+"
+"10/02/2026 21:00:01","sv3 Exchange","Job finished with error at 02.10.2026 23:33:46"
+"10/02/2026 21:00:01","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/02/2026 21:00:01","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/02/2026 21:00:01","sv3 Services","Job finished with error at 02.10.2026 22:56:37"
+"10/01/2026 22:00:00","sv3 BackConf","Failed to pre-process the job Error: Failed to call RPC function 'FcWriteFileEx': There is not enough space on the disk. Failed to write data to the file [G:\Backups\sv3 BackConf\sv3 BackConf.vbm_1_tmp]."
+"10/01/2026 22:00:00","sv3 BackConf","Error: Failed to call RPC function 'FcWriteFileEx': There is not enough space on the disk. Failed to write data to the file [G:\Backups\sv3 BackConf\sv3 BackConf.vbm_1_tmp]."
+"10/01/2026 22:00:00","sv3 BackConf","Job finished with error at 01.10.2026 22:00:19"
+"10/01/2026 22:00:00","netboxv2","Error: Failed to call RPC function 'FcWriteFileEx': There is not enough space on the disk. Failed to write data to the file [G:\Backups\netboxv2\netboxv2.vbm_1_tmp]."
+"10/01/2026 22:00:00","netboxv2","Job finished with error at 01.10.2026 22:00:13"
+"10/01/2026 13:55:36","sv3 Services","Virtual Machine gitlab.omicron is unavailable and will be skipped from processing"
+"10/01/2026 13:55:36","sv3 Services","Virtual Machine vault.omicron is unavailable and will be skipped from processing"
+"10/01/2026 13:55:36","sv3 Services","Processing Ansible Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing bi win-2016 Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing Grafana Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing Office_new Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing ns1.omicron.online Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing ns2.omicron.online Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing wgAll Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing vpn.rocket Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing vpn.omicron Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing vpn.flash Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing WireGuard Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing call-center Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing erp.omicron Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing vCenterMS Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing zabbix-core.global Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing bg-test Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing prometheus Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing KaspSecCenter Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing oms v2 Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing Bitrix_2 Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Processing VOICE_1 Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\sv3 Services\sv3 ServicesD2026-10-01T135536_A528.vib].
+"
+"10/01/2026 13:55:36","sv3 Services","Job finished with error at 01.10.2026 16:07:51"
+"10/01/2026 13:55:33","sv3 BackConf","Processing BackupConf Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 45056] [offset = 1708032]
+Failed to download disk 'BackupConf-flat.vmdk'.
+Shared memory connection was closed.
+Failed to upload disk 'vddkConnSpec>'
+Agent failed to process method {DataTransfer.SyncDisk}.
+"
+"10/01/2026 13:55:33","sv3 BackConf","Job finished with error at 01.10.2026 16:06:21"
+"10/01/2026 13:55:27","Share main","Processing share.360pro.online Error: Agent: Failed to process method {MetaExtent.OpenBackup}: There is not enough space on the disk."
+"10/01/2026 13:55:27","Share main","Job finished with error at 01.10.2026 16:06:09"
+"10/01/2026 13:55:24","netboxv2","Processing Netbox v2 Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 524288] [offset = 4096]
+Failed to open storage for read/write access. Storage: [G:\Backups\netboxv2\netboxv2D2026-10-01T135524_FEFA.vib].
+"
+"10/01/2026 13:55:24","netboxv2","Job finished with error at 01.10.2026 16:05:22"
+"10/01/2026 13:52:30","K3S","Processing K3S node3 Error: There is not enough space on the disk.
+Asynchronous request operation has failed. [requestsize = 225280] [offset = 632612999168]
+Failed to download disk 'K3S node3_1-flat.vmdk'.
+Shared memory connection was closed.
+Failed to upload disk '>'
+Agent failed to process method {DataTransfer.SyncDisk}.
+"
+"10/01/2026 13:52:30","K3S","Job finished with error at 01.10.2026 16:08:00"
+"10/01/2026 02:36:05","Share main","Processing share.360pro.online Error: Agent: Failed to process method {MetaExtent.PrepareForBackup}: There is not enough space on the disk."
+"10/01/2026 02:36:05","Share main","Job finished with error at 01.10.2026 2:36:35"

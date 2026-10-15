@@ -1,0 +1,178 @@
+﻿==========================================
+ VEEAM ОТЧЁТ  (2026-10-07_14-08)
+==========================================
+
+--- ЛИЦЕНЗИЯ ---
+
+
+Status         : Valid
+ExpirationDate : 12/31/2035 00:00:00
+Type           : Subscription
+Edition        : EnterprisePlus
+LicensedTo     : Lup1n3
+
+
+
+
+
+--- СЕРВЕРЫ (11) ---
+
+Name             Type   
+----             ----   
+Veeam2           Local  
+192.168.160.62   Windows
+vcenter.esxi.loc VC     
+node30.esxi.loc  ESXi   
+dbnode2.esxi.loc ESXi   
+dbnode1.esxi.loc ESXi   
+dbnode3.esxi.loc ESXi   
+node40.esxi.loc  ESXi   
+node10.esxi.loc  ESXi   
+node20.esxi.loc  ESXi   
+node50.esxi.loc  ESXi   
+
+
+
+
+--- ЗАДАНИЯ (17) ---
+
+Задание          Тип       Включено Расписание   Последний результат
+-------          ---       -------- ----------   -------------------
+k3s              Backup    False    Ежедневно в  None               
+CC               Backup    True     Ежедневно в  Success            
+1c               Backup    True     Ежедневно в  Success            
+ex-flash         Backup    True     Ежедневно в  None               
+NetboxSingleTime Backup    True     Ежедневно в  None               
+TacacsEveryday   Backup    True     Ежедневно в  Success            
+test             Backup    True     Ежедневно в  None               
+singleopnsense   Backup    True     Ежедневно в  None               
+AD               Backup    True     Ежедневно в  Success            
+Monitoring       Backup    True     Ежедневно в  Success            
+Access           Backup    True     Ежедневно в  Success            
+ReplicaWG        Replica   True     Ежедневно в  Success            
+Share            NasBackup True     Ежедневно в  Success            
+bg-core          Backup    True     Ежедневно в  Success            
+bg-radius        Backup    True     Ежедневно в  Success            
+bg-proxysql      Backup    True     Ежедневно в  Success            
+backconf         Backup    True     Ежедневно в  Success            
+
+
+
+
+--- РЕПОЗИТОРИИ (8) ---
+
+Репозиторий               Тип      Путь       Объём (ГБ) Свободно (ГБ)
+-----------               ---      ----       ---------- -------------
+Default Backup Repository WinLocal C:\Backup  79         30           
+AD                        WinLocal G:\Backups 599        453          
+CC                        WinLocal F:\Backups 3071       1790         
+1c                        WinLocal E:\Backups 6143       1914         
+Share                     WinLocal H:\Backups 1499       707          
+Access                    WinLocal V:\Backups 699        276          
+k3s                       WinLocal K:\Backups 699        0            
+Monitoring                WinLocal Q:\Backups 1499       1025         
+
+
+
+
+--- СЕССИИ (последние 50) ---
+
+Время               Задание        Результат Состояние Окончание           Длит. (мин)
+-----               -------        --------- --------- ---------           -----------
+10/07/2026 05:00:03 bg-proxysql    Success   Stopped   10/07/2026 05:04:54 4.8        
+10/07/2026 04:00:16 bg-radius      Success   Stopped   10/07/2026 04:06:46 6.5        
+10/07/2026 04:00:16 TacacsEveryday Success   Stopped   10/07/2026 04:02:41 2.4        
+10/07/2026 03:00:06 bg-core        Success   Stopped   10/07/2026 03:05:50 5.7        
+10/07/2026 02:00:20 Share          Success   Stopped   10/07/2026 02:13:36 13.3       
+10/06/2026 22:00:04 ReplicaWG      Success   Stopped   10/06/2026 22:03:39 3.6        
+10/06/2026 22:00:04 CC             Success   Stopped   10/06/2026 22:18:19 18.2       
+10/06/2026 21:00:18 AD             Success   Stopped   10/06/2026 21:10:15 10         
+10/06/2026 05:00:11 bg-proxysql    Success   Stopped   10/06/2026 05:05:20 5.1        
+10/06/2026 04:00:01 bg-radius      Success   Stopped   10/06/2026 04:06:51 6.8        
+10/06/2026 04:00:01 TacacsEveryday Success   Stopped   10/06/2026 04:02:12 2.2        
+10/06/2026 03:00:13 bg-core        Success   Stopped   10/06/2026 03:05:43 5.5        
+10/06/2026 02:00:04 Share          Success   Stopped   10/06/2026 02:13:36 13.5       
+10/05/2026 22:00:07 ReplicaWG      Success   Stopped   10/05/2026 22:03:07 3          
+10/05/2026 22:00:07 Monitoring     Success   Stopped   10/05/2026 22:45:43 45.6       
+10/05/2026 22:00:07 1c             Success   Stopped   10/05/2026 22:36:45 36.6       
+10/05/2026 21:00:17 AD             Success   Stopped   10/05/2026 21:08:42 8.4        
+10/05/2026 05:00:14 bg-proxysql    Success   Stopped   10/05/2026 05:08:15 8          
+10/05/2026 04:00:05 bg-radius      Success   Stopped   10/05/2026 04:06:32 6.5        
+10/05/2026 04:00:05 TacacsEveryday Success   Stopped   10/05/2026 04:03:24 3.3        
+10/05/2026 03:00:18 bg-core        Success   Stopped   10/05/2026 03:07:53 7.6        
+10/05/2026 02:00:08 Share          Success   Stopped   10/05/2026 02:25:18 25.2       
+10/05/2026 00:00:12 backconf       Success   Stopped   10/05/2026 00:19:06 18.9       
+10/04/2026 22:00:11 ReplicaWG      Success   Stopped   10/04/2026 22:04:58 4.8        
+10/04/2026 22:00:11 1c             Success   Stopped   10/04/2026 22:54:55 54.7       
+10/04/2026 22:00:11 CC             Success   Stopped   10/04/2026 22:17:41 17.5       
+10/04/2026 21:00:18 AD             Success   Stopped   10/04/2026 21:09:10 8.9        
+10/04/2026 05:00:15 bg-proxysql    Success   Stopped   10/04/2026 05:07:14 7          
+10/04/2026 04:00:06 bg-radius      Success   Stopped   10/04/2026 04:06:33 6.4        
+10/04/2026 04:00:06 TacacsEveryday Success   Stopped   10/04/2026 04:02:43 2.6        
+10/04/2026 03:00:20 bg-core        Success   Stopped   10/04/2026 03:06:00 5.7        
+10/04/2026 02:00:11 Share          Success   Stopped   10/04/2026 02:31:16 31.1       
+10/03/2026 22:00:02 Monitoring     Success   Stopped   10/03/2026 23:10:56 70.9       
+10/03/2026 22:00:02 ReplicaWG      Success   Stopped   10/03/2026 22:04:11 4.1        
+10/03/2026 22:00:02 1c             Success   Stopped   10/03/2026 23:06:09 66.1       
+10/03/2026 22:00:02 CC             Success   Stopped   10/03/2026 22:22:18 22.3       
+10/03/2026 21:00:16 AD             Success   Stopped   10/03/2026 21:08:59 8.7        
+10/03/2026 05:00:14 bg-proxysql    Success   Stopped   10/03/2026 05:05:51 5.6        
+10/03/2026 04:00:05 bg-radius      Success   Stopped   10/03/2026 04:08:08 8          
+10/03/2026 04:00:05 TacacsEveryday Success   Stopped   10/03/2026 04:02:37 2.5        
+10/03/2026 03:00:15 bg-core        Success   Stopped   10/03/2026 03:07:48 7.6        
+10/03/2026 02:00:05 Share          Success   Stopped   10/03/2026 02:13:55 13.8       
+10/03/2026 02:00:05 Access         Success   Stopped   10/03/2026 02:21:12 21.1       
+10/03/2026 00:00:10 backconf       Success   Stopped   10/03/2026 01:05:23 65.2       
+10/02/2026 22:00:04 1c             Success   Stopped   10/02/2026 22:52:56 52.9       
+10/02/2026 22:00:04 ReplicaWG      Success   Stopped   10/02/2026 22:03:26 3.4        
+10/02/2026 21:00:16 AD             Success   Stopped   10/02/2026 21:09:19 9          
+10/02/2026 05:00:02 bg-proxysql    Success   Stopped   10/02/2026 05:05:33 5.5        
+10/02/2026 04:00:15 bg-radius      Success   Stopped   10/02/2026 04:07:22 7.1        
+10/02/2026 04:00:15 TacacsEveryday Success   Stopped   10/02/2026 04:02:32 2.3        
+
+
+
+
+--- СВОДКА ---
+
+Задание          Всего сессий Успешно Предупрежд. Ошибок
+-------          ------------ ------- ----------- ------
+k3s                         0       0           0      0
+CC                         48      48           0      0
+1c                         59      59           0      0
+ex-flash                    0       0           0      0
+NetboxSingleTime            0       0           0      0
+TacacsEveryday             83      83           0      0
+test                        0       0           0      0
+singleopnsense              0       0           0      0
+AD                         83      83           0      0
+Monitoring                 35      35           0      0
+Access                     24      24           0      0
+ReplicaWG                  83      83           0      0
+Share                      83      83           0      0
+bg-core                    83      83           0      0
+bg-radius                  83      83           0      0
+bg-proxysql                83      83           0      0
+backconf                   24      24           0      0
+
+
+
+
+--- ОШИБКИ (последние 30) ---
+
+
+--- ДИСКИ ---
+
+Диск Занято ГБ Свободно ГБ Всего ГБ
+---- --------- ----------- --------
+C:   49.29     30.11       79.4    
+E:   4229      1914.93     6143.94 
+F:   1281.88   1790.05     3071.94 
+G:   146.19    453.74      599.94  
+H:   792.3     707.64      1499.94 
+K:   699.94    0           699.94  
+Q:   474.85    1025.09     1499.94 
+V:   423.11    276.83      699.94  
+
+
+
