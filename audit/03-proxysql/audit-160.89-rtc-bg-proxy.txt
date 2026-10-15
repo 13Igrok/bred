@@ -1,0 +1,37 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.89  (rtc-bg-proxy.rtc.local)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+ХОСТ
+  hostname : rtc-bg-proxy.rtc.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL   Uptime: 358 дней
+  Роль     : ProxySQL 2.4.7 — прокси MySQL перед БД BGBilling домена rtc/rocket-telecom
+             (rtc-bg-core 160.87). docker установлен, НЕ запущен.
+ДОСТУП
+  SSH порт 22 по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.89
+
+1. АДМИНСКИЕ УЧЁТКИ
+  sudo(27) пуста. omicron-sudo(gid 1001, вероятно NOPASSWD ALL), 11 членов:
+    aglukhov, epetrov, itronin, gmasich, ishatohin, userobaba, akudryaeva, oborovkov,
+    obobrovkov, root, ansible.
+  Действующие bash+sudo: root, gmasich(omiplat.ru), ansible(+docker, docker inactive).
+    pkuzmin — bash, НЕ в sudo. mpeshkov — readonly.
+  ~9 nologin ex-staff из 11.
+  [ВЫС] omicron-sudo=NOPASSWD с ~9 nologin — чистка.
+  [+]   SSH захардене (root off, пароли off). fail2ban АКТИВЕН. docker не запущен.
+
+2. ПОРТЫ (хостового фаервола НЕТ; всё на 0.0.0.0, снаружи доступно)
+  22 SSH; 6032 ProxySQL ADMIN; 6033 client(MySQL); 6070; 6080 web; 9100 node_exporter.
+  Внешняя проба (VPN): 22, 6032, 6033, 6080, 9100 — OPEN.
+
+3. НАХОДКИ
+  [ВЫС-1] ProxySQL admin (6032) открыт в сеть -> контроль прокси + креды БД BGBilling rtc.
+          Проверить admin-пароль (не admin/admin), bind localhost/mgmt, фаервол. (Не подбирал.)
+  [ВЫС-2] client 6033/web 6080 наружу — ограничить до app-хостов.
+  [ВЫС-3] omicron-sudo=NOPASSWD с ~9 nologin — чистка.
+  [СРЕД-4] Debian 11 EOL; 148 обновлений; unattended нет; хостового фаервола нет.
+  [+] ПЛЮСЫ: SSH захардене; fail2ban активен; docker не запущен.
+НЕ ПРОВЕРЕНО (RO): пароль admin ProxySQL, mysql_users/бэкенды, authorized_keys.
+==========================================================================

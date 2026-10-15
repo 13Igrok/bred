@@ -1,0 +1,95 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.135  (db-backup1.loc)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : db-backup1.loc  (в /etc/hosts не прописан -> sudo "unable to resolve host")
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-26   Uptime: 356 дней
+  Роль     : Сервер бэкапов БД. Приём дампов от СУБД-серверов по доменам
+             (flash/omiplat/rocket/rtc/utk) через выделенные учётки + rsyncuser.
+             Диск: / = 2.0T, занято 689G (36%).
+
+ДОСТУП
+  SSH порт 22 (НЕ 1221!) по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.135
+  mpeshkov uid 1018, группа omicron-readonly(1018) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл 38 байт (не читается из-под
+readonly; размер = подтверждённым NOPASSWD ALL на 160.110/160.35 -> вероятно то же).
+
+Члены omicron-sudo (9): epetrov, itronin, ishatohin, gmasich, userobaba, akudryaeva,
+  aglukhov, root, ansible
+
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), ansible(сервисный, + группа docker).
+  mpeshkov — только readonly.
+
+СЕРВИСНЫЕ SHELL-УЧЁТКИ (для приёма бэкапов):
+  backup      (uid34,  /bin/bash) — интерактивный shell + ~/.ssh; служебная (нужно nologin)
+  db-flash    (uid1011, /bin/sh)  \
+  db-omiplat  (uid1012, /bin/sh)   |
+  db-rocket   (uid1013, /bin/sh)   > пер-доменные аккаунты приёма дампов
+  db-rtc      (uid1014, /bin/sh)   |
+  db-utk      (uid1015, /bin/sh)  /
+  rsyncuser   (uid1016, /bin/sh, группа backup) — общий rsync-аккаунт
+
+Nologin uid>=1000: epetrov, itronin, ishatohin, userobaba, akudryaeva, aglukhov, nodeusr.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo раздут: 6 из 9 членов — nologin-учётки бывших сотрудников
+        (epetrov, itronin, ishatohin, userobaba, akudryaeva, aglukhov). САМЫЙ
+        «замусоренный» sudo из осмотренных. Под чистку.
+  [СРЕД] Учётка backup(uid34) имеет ИНТЕРАКТИВНЫЙ /bin/bash + ~/.ssh. Для приёмника
+        бэкапов лучше nologin/forced-command.
+  [СРЕД] db-*/rsyncuser (/bin/sh) — проверить, что вход ограничен forced-command
+        (rrsync) в authorized_keys, а не полноценный shell (из-под readonly не проверил —
+        ~/.ssh недоступны).
+  [i]   НЕТ внешних подрядчиков (atarasov/sgaregin/avk отсутствуют). ansible в docker,
+        но docker.service inactive (латентно).
+  [+]   SSH захардене: PermitRootLogin no, PasswordAuthentication no. sudo-группа пуста.
+        fail2ban АКТИВЕН. mpeshkov реально read-only.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (минимальная экспозиция)
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nftables/firewalld/ufw — все inactive), но слушающих служб мало.
+  TCP:
+  22/tcp     SSH (OpenSSH)     0.0.0.0   ключи-only, root off — ок (порт 22, не 1221)
+  9100/tcp   node_exporter     *         без аутентификации — ограничить
+  10050/tcp  zabbix-agent      0.0.0.0   ограничить Server=
+  UDP: только эфемерные. Веб/СУБД/rsync-daemon(873)/NFS портов НЕТ
+       -> приём бэкапов идёт по SSH (rsync-over-ssh/scp), не по открытым сервисам.
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  !!! КАТАЛОГИ БЭКАПОВ ПУСТЫ. /db-backups/{flash,omiplat,rocket,rtc,utk}/
+           (full/inc/hour/day/month) и /home/db-* НЕ содержат дампов (0 файлов, 308K).
+           При этом на / занято 689G (местоположение вне читаемых путей, вероятно /root
+           drwx------ или root-only область). ЛИБО бэкапы не приходят в ожидаемые пути,
+           ЛИБО складываются в другое место. СРОЧНО проверить, что бэкапы БД реально
+           выполняются и попадают сюда (риск: бэкапов по факту нет).
+
+  [ВЫС-2]  omicron-sudo раздут 6 nologin-учётками бывших сотрудников — под чистку.
+
+  [СРЕД-3] Учётка backup(uid34) с интерактивным /bin/bash; db-*/rsyncuser — проверить
+           forced-command (rrsync). Иначе учётка приёмника = полноценный вход в сеть бэкапов.
+
+  [СРЕД-4] Хостового фаервола нет (служб мало, но host-level порты открыты).
+           node_exporter(9100) без auth, zabbix(10050) без ограничения Server.
+
+  [НИЗ-5]  99 ожидающих обновлений; unattended-upgrades НЕ включён. Debian 12 (не EOL).
+
+  [+] ПЛЮСЫ: минимальная сетевая экспозиция (нет открытых сервисов приёма); SSH захардене;
+      fail2ban активен; нет внешних подрядчиков; mpeshkov реально read-only.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only / без sudo): omicron-sudo (NOPASSWD?), authorized_keys db-*/rsyncuser
+  (forced-command?), где именно 689G (нужен sudo/du по root-only путям), реальный график
+  и наличие дампов, /var/log.
+==========================================================================

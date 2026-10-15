@@ -1,0 +1,57 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.70  (proxysql-omiplat.omicron.local)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : proxysql-omiplat.omicron.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL   Uptime: 479 дней
+  Роль     : ProxySQL 2.4.4 — прокси MySQL перед БД BGBilling домена omiplat
+             (bg-core-omiplat 160.54). docker установлен, НЕ запущен.
+
+ДОСТУП
+  SSH порт 22 (НЕ 1221) по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл (вероятно NOPASSWD ALL).
+Члены omicron-sudo (12): aglukhov, epetrov, itronin, gmasich, ishatohin, userobaba,
+  akudryaeva, oborovkov, obobrovkov, root, gmasich-test1, ansible.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), ansible(+docker, docker inactive).
+  pkuzmin — bash, НЕ в sudo. mpeshkov — readonly.
+Nologin uid>=1000: aglukhov, epetrov, itronin, ishatohin, userobaba, akudryaeva,
+  oborovkov, obobrovkov, inebalzin, gmasich-test1.
+
+  [ВЫС] omicron-sudo = NOPASSWD ALL, ~9 nologin из 12. Плюс ТЕСТ-АККАУНТ 'gmasich-test1'
+        в sudo (тестовая учётка не должна быть в проде/админ-группе). Чистка.
+  [+]   SSH захардене (root off, пароли off). fail2ban АКТИВЕН. docker НЕ запущен.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive). Слушают на 0.0.0.0, НО с mgmt-VPN
+6032/6033 недоступны (сетевая фильтрация между сегментами — лучше, чем на flash/omicron proxysql).
+  22/tcp    SSH                        0.0.0.0  ключи-only, root off — ок
+  6032/tcp  ProxySQL ADMIN (MySQL-proto) 0.0.0.0 (с mgmt-VPN closed — фильтр)
+  6033/tcp  ProxySQL client (MySQL)    0.0.0.0 (с mgmt-VPN closed)
+  6070/tcp  ProxySQL SQLite3/restapi   0.0.0.0
+  9100/tcp  node_exporter              *
+  (6080 web здесь НЕТ)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  omicron-sudo = NOPASSWD ALL с ~9 nologin ex-staff + ТЕСТ-аккаунт gmasich-test1.
+           Чистка (особенно убрать тестовую учётку из админ-группы).
+  [ВЫС-2]  ProxySQL admin (6032) слушает на 0.0.0.0 (хоть и не виден с mgmt-VPN) — bind на
+           127.0.0.1/mgmt, проверить admin-пароль (не admin/admin), фаервол. (Не подбирал.)
+  [СРЕД-3] Debian 11 EOL; 156 обновлений; unattended нет; хостового фаервола нет.
+
+  [+] ПЛЮСЫ: 6032/6033 недоступны с mgmt-VPN (сегментация лучше, чем у flash/omicron proxysql);
+      SSH захардене; fail2ban активен; docker не запущен.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): пароль admin ProxySQL, mysql_users/бэкенды, authorized_keys.
+==========================================================================

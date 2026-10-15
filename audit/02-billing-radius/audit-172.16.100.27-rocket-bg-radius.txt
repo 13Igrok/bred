@@ -1,0 +1,96 @@
+==========================================================================
+ АУДИТ ХОСТА  172.16.100.27  (rocket-bg-radius.rocket.local)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo), доступ ПРЯМОЙ
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : rocket-bg-radius.rocket.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL, LTS завершилась 08.2026
+  Kernel   : 5.10.0-21-amd64   Virt: VMware VM   Uptime: 416 дней
+  Роль     : RADIUS/AAA-сервер интернет-абонентов (BGBilling Inet), домен rocket
+             Java (от root): BGInetAccess (RADIUS-auth), BGInetAccounting.
+             Аналог bg-radius-flash(110.8), omicron-bg-radius(160.102), bg-radius-omiplat(160.55).
+             ActiveMQ/nginx/СУБД НЕТ; docker НЕ запущен.
+
+ДОСТУП
+  SSH порт 22 напрямую по ключу id_peshkov_rsa (=Peshkov2.ppk). pivot не нужен.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@172.16.100.27
+  mpeshkov uid 1018, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Админ-права — кастомная omicron-sudo(gid 1001)
+через /etc/sudoers.d/omicron-sudo (содержимое read-only юзеру недоступно).
+
+Учётки с login-shell (bash) и sudo:
+  УЧЁТКА     UID   ВЛАДЕЛЕЦ / ДОМЕН              ПРАВА                  АКТИВНОСТЬ
+  root       0     -                             omicron-sudo
+  gmasich    1004  g.masich@omiplat.ru           omicron-sudo, bash     активен
+  rtaktarov  1006  r.taktarov@rocketcom.ru       omicron-sudo, bash
+  pkuzmin    1012  p.kuzmin@360pro.online        omicron-sudo, bash
+  ansible    1017  сервисный                     omicron-sudo + docker   docker.service НЕ запущен
+  mpeshkov   1018  m.peshkov@360pro.online (я)   только omicron-readonly
+
+  (нет avasilev и нет bitel — как и на прочих bg-radius.)
+
+ПОЛНЫЙ состав группы omicron-sudo (15 членов):
+  aglukhov, epetrov, itronin, gmasich, ishatohin, userobaba, akudryaeva,
+  oborovkov, obobrovkov, agluchov, vklimansky, root, pkuzmin, ansible, rtaktarov
+
+  ЗАМЕЧАНИЯ:
+  [!] ДУБЛЬ-ОПЕЧАТКА: одновременно 'aglukhov' И 'agluchov' в админ-группе. Обе nologin.
+  [!] 10 из 15 членов omicron-sudo — nologin ex-staff (aglukhov, epetrov, itronin,
+      ishatohin, userobaba, akudryaeva, oborovkov, obobrovkov, agluchov, vklimansky).
+      В админ-группе, логиниться не могут. ПОД ЧИСТКУ. (в passwd также nologin inebalzin.)
+  [!] Кросс-доменный админ-разброс: omiplat.ru (gmasich), rocketcom.ru (rtaktarov),
+      360pro.online (pkuzmin).
+  [!] ansible в группе docker -> латентный privesc до root (docker.service inactive).
+  [i] gmasich — «устаревший админ», фигурирует и на POWER-BI и на всех bg-*.
+  [+] SSH захардене: PermitRootLogin no, PasswordAuthentication no. SUID чист. fail2ban.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (внешняя доступность TCP проверена с рабочей машины через VPN — OPEN)
+--------------------------------------------------------------------------
+  TCP:
+  22/tcp     SSH (OpenSSH)          0.0.0.0    OPEN   ключи-only, root off — ок
+  1951/tcp   BGInet упр.-интерфейс  0.0.0.0    OPEN   !!! ВЫС-1: консоль БЕЗ АУТЕНТИФИКАЦИИ
+                                                       (подтверждено: "Help: help - show Help")
+  1952/tcp   BGInet сервис          0.0.0.0    OPEN
+  9100/tcp   node_exporter          *          OPEN   без аутентификации наружу
+  10050/tcp  zabbix-agent           0.0.0.0    OPEN   ограничить Server=
+  UDP:
+  1812/udp   RADIUS Authentication  0.0.0.0           AAA абонентов
+  1813/udp   RADIUS Accounting      0.0.0.0           учёт сессий
+  2001/udp   BGInet (NAS/COA?)      0.0.0.0
+  (nginx/ActiveMQ/СУБД портов нет)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Порт 1951/tcp — управляющий интерфейс BGInet БЕЗ аутентификации, открыт
+           на 0.0.0.0 и доступен СНАРУЖИ (подтверждено). Привязать к localhost/фаервол;
+           выяснить набор команд.
+
+  [ВЫС-2]  RADIUS 1812/1813 (+2001) UDP на 0.0.0.0 — доступны всей сети. Должны
+           приниматься только от NAS/BRAS. Ограничить фаерволом, проверить secret.
+
+  [ВЫС-3]  Java BGInetAccess/BGInetAccounting работают ОТ ROOT — RCE = сразу root.
+
+  [ВЫС-4]  omicron-sudo раздут (10 nologin из 15) + дубль aglukhov/agluchov;
+           ansible в docker. ДЕЙСТВИЕ: ревизия и чистка админ-доступа.
+
+  [СРЕД-5] 151 ожидающее обновление, из них 119 security; unattended нет; ядро
+           5.10.0-21; uptime 416 дней; Debian 11 EOL. ДЕЙСТВИЕ: обновиться + reboot.
+
+  [НИЗ-6]  node_exporter (9100) без аутентификации наружу; zabbix (10050) без
+           ограничения Server. ДЕЙСТВИЕ: ограничить фаерволом.
+
+  [+] Плюсы: SSH захардене; SUID чист; docker не запущен; нет лишних web/брокер сервисов.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (нужен доступ с sudo / вне фокуса):
+  содержимое sudoers/omicron-sudo (NOPASSWD?), RADIUS clients/secrets, набор команд
+  порта 1951, /var/log/auth.log, приватные authorized_keys.
+==========================================================================

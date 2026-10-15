@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сеть 360pro</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --text:#1d232b; --muted:#5d6875; --line:#8a95a3; --border:#d5dae1;
+  --core:#e3eefc; --core-b:#2f6fd0; --seg:#eef6ea; --seg-b:#4c9a3c; --site:#fdf2e3; --site-b:#c9812a;
+  --ext:#f1f1f4; --ext-b:#7b7f8c; --svc:#f3ecfb; --svc-b:#8757c7; --warn:#fdeaea; --warn-b:#c94040;
+  --label-bg:#f6f7f9;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14171c; --panel:#1b1f26; --text:#e3e7ec; --muted:#9aa4b0; --line:#6d7784; --border:#2d333c;
+  --core:#1b2b44; --core-b:#5b93e6; --seg:#1c2e1d; --seg-b:#6cbf5a; --site:#35291a; --site-b:#e0a050;
+  --ext:#23262d; --ext-b:#8e93a0; --svc:#2a2138; --svc-b:#a784e0; --warn:#3a1f22; --warn-b:#e06a6a;
+  --label-bg:#14171c;
+}}
+:root[data-theme="dark"]{
+  --bg:#14171c; --panel:#1b1f26; --text:#e3e7ec; --muted:#9aa4b0; --line:#6d7784; --border:#2d333c;
+  --core:#1b2b44; --core-b:#5b93e6; --seg:#1c2e1d; --seg-b:#6cbf5a; --site:#35291a; --site-b:#e0a050;
+  --ext:#23262d; --ext-b:#8e93a0; --svc:#2a2138; --svc-b:#a784e0; --warn:#3a1f22; --warn-b:#e06a6a;
+  --label-bg:#14171c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:24px 16px 8px;max-width:1240px;margin:0 auto}
+h1{margin:0 0 4px;font-size:24px}
+.meta{color:var(--muted);font-size:13px}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border)}
+nav .in{max-width:1240px;margin:0 auto;padding:8px 16px;display:flex;gap:6px;flex-wrap:wrap}
+nav a{color:var(--text);text-decoration:none;font-size:13px;padding:4px 10px;border:1px solid var(--border);border-radius:14px;background:var(--panel)}
+nav a:hover{border-color:var(--core-b)}
+nav button{margin-left:auto;font:inherit;font-size:13px;padding:4px 10px;border-radius:14px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}
+main{max-width:1240px;margin:0 auto;padding:8px 16px 48px}
+section{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px;margin:16px 0}
+h2{margin:0 0 4px;font-size:18px}
+.lead{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.svgwrap{overflow-x:auto}
+svg{display:block;min-width:900px;width:100%;height:auto}
+svg text{fill:var(--text);font-family:inherit}
+svg .t{font-weight:600;font-size:13px}
+svg .s{font-size:11.5px;fill:var(--muted)}
+svg .el{font-size:11px;fill:var(--muted)}
+svg .elbg{fill:var(--label-bg)}
+svg .edge{stroke:var(--line);stroke-width:1.5;fill:none}
+svg .edge.d{stroke-dasharray:5 4}
+svg .edge.hot{stroke:var(--core-b);stroke-width:2.2}
+svg .edge.bad{stroke:var(--warn-b)}
+svg .n{stroke-width:1.5;rx:7}
+.core{fill:var(--core);stroke:var(--core-b)} .seg{fill:var(--seg);stroke:var(--seg-b)}
+.site{fill:var(--site);stroke:var(--site-b)} .ext{fill:var(--ext);stroke:var(--ext-b)}
+.svc{fill:var(--svc);stroke:var(--svc-b)} .warn{fill:var(--warn);stroke:var(--warn-b)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;border:1.5px solid;display:inline-block}
+.notes{margin:10px 0 0;padding-left:18px;font-size:13.5px}
+.notes li{margin:2px 0}
+.bad{color:var(--warn-b)}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
+th,td{border-bottom:1px solid var(--border);padding:5px 8px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600}
+code{font-size:12.5px}
+@media (max-width:700px){ h1{font-size:20px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Сеть 360pro — схема</h1>
+  <div class="meta">Собрано 2026-09-30 из Wiki.js (≈420 страниц). Источник истины — Wiki; номера <code>[id]</code> — id страниц.
+    Текстовая версия с таблицами: <code>docs/infrastructure/network.md</code>. Для служебного пользования.</div>
+</header>
+<nav><div class="in">
+  <a href="#topo">Топология</a><a href="#vpn">VPN</a><a href="#pub">Публикация / NAT</a>
+  <a href="#dns">DNS</a><a href="#int">Интеграции</a><a href="#mgmt">Управление</a><a href="#issues">Проблемы</a>
+  <button id="themeBtn" type="button">Тема</button>
+</div></nav>
+<main>
+
+<section id="topo">
+  <h2>1. Площадки, ядро и сегменты</h2>
+  <p class="lead">Физика ядра в Wiki есть только во вложениях drawio/vsdx — пунктир означает связь, которая описана косвенно или не описана.</p>
+  <div class="svgwrap"><svg id="d-topo" viewBox="0 0 1200 800"></svg></div>
+  <ul class="notes">
+    <li>Пять операторов с отдельными AS: ЮТК AS210135, Омиплат AS48433, Рокет AS208142, Флэш AS48120, РТЦ AS43149 [103].</li>
+    <li>Ядро/ТСПУ — Краснодар, Комсомольская 40; офис — Российская 341/1 (192.168.156.0/24) [700].</li>
+    <li><b>Hairpin NAT на CCR2004 нет</b> — изнутри к своим белым IP через <code>/etc/hosts</code> или split-DNS [52].</li>
+    <li class="bad">Оценка [700]: CR (MX80) загружен &gt;80 %, «роутер на палочке» на AR неприемлем, P2P через стыковочные сети 155.40/155.41.</li>
+  </ul>
+</section>
+
+<section id="vpn">
+  <h2>2. VPN</h2>
+  <p class="lead">Всё входит через CCR2004 185.221.44.2; site-to-site к REG.RU — IPSec + GRE с резервом через Флэш.</p>
+  <div class="svgwrap"><svg id="d-vpn" viewBox="0 0 1200 470"></svg></div>
+  <ul class="notes">
+    <li>OpenVPN отдаёт маршруты: 10/8, 100.64/10, 172.16/12, 192.168.160/23, .110, .155, .156, .61, .158 [109] — через него инженер попадает в management 10.x.</li>
+    <li class="bad">WireGuard-хост на CentOS 8.3 (EOL), не в Ansible; инструкция [219] с <code>wg-quick down/up</code> рвёт все сессии [86].</li>
+    <li class="bad">В REG.RU анонсируется 192.168.160.0/24, а не /23 — .161.x из облака недоступны [696].</li>
+  </ul>
+</section>
+
+<section id="pub">
+  <h2>3. Публикация сервисов: NAT 1:1 и reverse-proxy</h2>
+  <p class="lead">Центральный nginx 192.168.161.6 (185.221.44.20): Let's Encrypt, GeoIP только RU, 33 vhost [49]. Остальное — прямой NAT 1:1 на CCR2004 [52].</p>
+  <div class="svgwrap"><svg id="d-pub" viewBox="0 0 1200 640"></svg></div>
+  <ul class="notes">
+    <li>Только из 192.168.0.0/16 и офиса 185.147.38.8: bg-test, bot-analys, bywin, erp-test, fop2, git, grafana, netbox, olt, pass, plan, registry.</li>
+    <li>ЛК/API биллингов — 2–3 слоя nginx: ядро → nginx-&lt;оператор&gt; 192.168.181.20–.25 (REG.RU) → фронт .161.173/.175/.176; по две A-записи (свой вход + 194.67.117.0/24) [98].</li>
+    <li>Исходящий прокси <code>socks.loc</code> = 192.168.161.12 (SOCKS5 :1080, HTTP :3128) через Hysteria2 — ERP и Zabbix для Telegram [777].</li>
+  </ul>
+</section>
+
+<section id="dns">
+  <h2>4. DNS</h2>
+  <p class="lead">Split-horizon: снаружи — PowerDNS ns1/ns2, изнутри — AD DNS на DC1/DC2 с серыми адресами и зоной <code>.loc</code>.</p>
+  <div class="svgwrap"><svg id="d-dns" viewBox="0 0 1200 400"></svg></div>
+  <ul class="notes">
+    <li>Почта 360pro.online: MX 10 relay1 / 15 relay2; SPF <code>ip4:185.221.44.9 ip4:185.221.44.17</code>; DMARC <code>p=reject</code>; DKIM <code>mail</code> [40][43].</li>
+    <li class="bad">Из 192.168.110.0/24 внешние резолверы недоступны → авария Флэш 2026-08-31 (транк Манго, вход в биллинг 20–40 с) [772].</li>
+    <li>DNS для абонентов (DHCP/PPPoE/RADIUS) и владельцы зон omiplat.ru / rocketcom.ru / flash-telecom.ru в Wiki не описаны.</li>
+  </ul>
+</section>
+
+<section id="int">
+  <h2>5. Внешние интеграции</h2>
+  <p class="lead">Центр — BGERP 192.168.160.31. Подписи на линиях — протокол.</p>
+  <div class="svgwrap"><svg id="d-int" viewBox="0 0 1200 700"></svg></div>
+  <table>
+    <tr><th>Оператор</th><th>Ядро BGBilling</th><th>RADIUS</th><th>ProxySQL</th><th>Asterisk 21</th></tr>
+    <tr><td>rocket</td><td>172.16.100.24</td><td>.27</td><td>.26</td><td>172.16.100.54</td></tr>
+    <tr><td>utc (ЮТК)</td><td>192.168.160.101</td><td>.102</td><td>.103</td><td>192.168.161.13</td></tr>
+    <tr><td>omiplat</td><td>192.168.160.54</td><td>.55</td><td>.70</td><td>192.168.160.217</td></tr>
+    <tr><td>flash</td><td>192.168.110.7</td><td>.8</td><td>.20</td><td>192.168.110.29</td></tr>
+    <tr><td>rtc</td><td>192.168.160.87</td><td>.88</td><td>.89</td><td>192.168.110.30</td></tr>
+  </table>
+</section>
+
+<section id="mgmt">
+  <h2>6. Управление сетевым оборудованием</h2>
+  <p class="lead">Централизованной AAA нет — локальные учётки на устройствах [700]. Jump-хосты не описаны; доступ — через OpenVPN.</p>
+  <div class="svgwrap"><svg id="d-mgmt" viewBox="0 0 1200 520"></svg></div>
+  <table>
+    <tr><th>MGMT-сеть</th><th>Что</th></tr>
+    <tr><td>192.168.155.0/24, 192.168.162.0/24 (VLAN 666)</td><td>OAM: ядро, BRAS, Nexus, OAM-свитч .230</td></tr>
+    <tr><td>10.23.64.0/23 (VLAN 55)</td><td>UTK MGMT</td></tr>
+    <tr><td>10.110.0–2.0/24</td><td>ЮТК: станицы, Миллерово, Бейсуг, Ростов</td></tr>
+    <tr><td>10.120.0.0/24</td><td>Омиплат</td></tr>
+    <tr><td>10.130.0–3.0/24, 10.25.1.0/24</td><td>Рокет (вкл. MPLS_Rocket CCR1036)</td></tr>
+    <tr><td>10.140.0–1.0/24</td><td>Флэш <span class="bad">(пересекается с ЮТК)</span></td></tr>
+    <tr><td>10.230.0.0/24</td><td>Степной, Новоджерелиевская, Родниковская, Молодёжный</td></tr>
+    <tr><td>10.58.x</td><td>РТЦ</td></tr>
+  </table>
+</section>
+
+<section id="issues">
+  <h2>7. Противоречия, пробелы, риски</h2>
+  <table>
+    <tr><th>Тип</th><th>Что</th><th>Страницы</th></tr>
+    <tr><td>Противоречие</td><td>192.168.110.0/24: «call-центры» vs вся площадка Флэша</td><td>46, 52 / 97, 103, 222</td></tr>
+    <tr><td>Противоречие</td><td>OLT ЮТК в 192.168.161.2–5/.84 (пересекается с DMZ) vs 10.110.0.x</td><td>655 / 700</td></tr>
+    <tr><td>Противоречие</td><td>Сервер MSVPN: .161.25 / .160.118 / 185.221.44.118 / «неизвестен»</td><td>52, 217, 86</td></tr>
+    <tr><td>Противоречие</td><td>Бордеры MX480 / MX80 / MX-80 / MX204 — не сведено</td><td>655, 700, 97, 103</td></tr>
+    <tr><td>Противоречие</td><td>Wiki.js «наружу не опубликован», но wiki-js.360pro.online → 185.221.44.20 отвечает снаружи</td><td>47, 49</td></tr>
+    <tr><td>Противоречие</td><td>192.168.160.34: 1c_omiplat vs 1С:КА2 ЮТК</td><td>746 / 59</td></tr>
+    <tr><td>Пробел</td><td>BGP (пиры, анонсы, RTBH), OSPF/MPLS/VPLS текстом, топология ядра</td><td>541, 699, 751</td></tr>
+    <tr><td>Пробел</td><td>Jump-хосты, AAA, перечень MGMT-VLAN, бэкап OLT/SNR/Huawei/Nexus</td><td>700, 643</td></tr>
+    <tr><td>Пробел</td><td>OTRS; что развёрнуто в REG.RU; полный NAT-список (вне Wiki)</td><td>98, 52</td></tr>
+    <tr><td class="bad">Риск</td><td>Сбер-эквайринг <code>/sber</code> в BGBilling без фильтра по IP</td><td>98</td></tr>
+    <tr><td class="bad">Риск</td><td>n8n: PostgreSQL :5432 на всех интерфейсах; воркфлоу «MCP server» — произвольный SQL к БД ERP</td><td>772</td></tr>
+    <tr><td class="bad">Риск</td><td>Открытые учётные данные в Wiki и в nginx <code>proxy_set_body</code></td><td>98, 217, 219, 369, 370, 574, 579, 680, 700 …</td></tr>
+    <tr><td class="bad">Риск</td><td>EOL: vSphere 6.7, WireGuard CentOS 8.3; бэкап записей звонков не работает с 2025-11-09</td><td>54, 86, 51</td></tr>
+  </table>
+</section>
+
+<div class="legend">
+  <span><i class="sw core"></i>ядро / периметр</span><span><i class="sw seg"></i>внутренний сегмент</span>
+  <span><i class="sw site"></i>площадка / оператор</span><span><i class="sw svc"></i>сервис / сервер</span>
+  <span><i class="sw ext"></i>внешнее</span><span><i class="sw warn"></i>проблема</span>
+  <span>— — связь не описана / логическая</span>
+</div>
+</main>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+  function draw(id,nodes,edges){
+    var svg=document.getElementById(id), gE=el('g',{},svg), gL=el('g',{},svg), gN=el('g',{},svg), map={};
+    nodes.forEach(function(n){
+      var lines=n.s||[]; n.h=n.h||(26+lines.length*15); map[n.id]=n;
+      var g=el('g',{},gN);
+      el('rect',{x:n.x,y:n.y,width:n.w,height:n.h,rx:7,class:'n '+(n.c||'svc')},g);
+      var t=el('text',{x:n.x+n.w/2,y:n.y+18,'text-anchor':'middle',class:'t'},g); t.textContent=n.t;
+      lines.forEach(function(s,i){var st=el('text',{x:n.x+n.w/2,y:n.y+34+i*15,'text-anchor':'middle',class:'s'},g);st.textContent=s;});
+    });
+    function clip(n,dx,dy){var cx=n.x+n.w/2,cy=n.y+n.h/2;if(!dx&&!dy)return[cx,cy];
+      var t=Math.min(dx?(n.w/2)/Math.abs(dx):1e9,dy?(n.h/2)/Math.abs(dy):1e9);return[cx+dx*t,cy+dy*t];}
+    edges.forEach(function(e){
+      var a=map[e[0]],b=map[e[1]],o=e[3]||{};
+      var ax=a.x+a.w/2+(o.ax||0),ay=a.y+a.h/2,bx=b.x+b.w/2+(o.bx||0),by=b.y+b.h/2;
+      var f=o.via?o.via[0]:[bx,by]; var p1=clip({x:a.x+(o.ax||0),y:a.y,w:a.w,h:a.h},f[0]-ax,f[1]-ay),p2=clip({x:b.x+(o.bx||0),y:b.y,w:b.w,h:b.h},ax-bx,ay-by);
+      var d;
+      if(o.via){d='M'+p1[0]+','+p1[1];o.via.forEach(function(v){d+=' L'+v[0]+','+v[1];});
+        var last=o.via[o.via.length-1];p2=clip({x:b.x,y:b.y,w:b.w,h:b.h},last[0]-(b.x+b.w/2),last[1]-(b.y+b.h/2));d+=' L'+p2[0]+','+p2[1];}
+      else d='M'+p1[0]+','+p1[1]+' L'+p2[0]+','+p2[1];
+      el('path',{d:d,class:'edge'+(o.dash?' d':'')+(o.hot?' hot':'')+(o.bad?' bad':'')},gE);
+      if(e[2]){
+        var mx,my; if(o.via){var v=o.via[Math.floor((o.via.length-1)/2)];mx=v[0];my=v[1];} else {mx=(p1[0]+p2[0])/2;my=(p1[1]+p2[1])/2;}
+        mx+=o.lx||0; my+=o.ly||0;
+        var parts=e[2].split('\n'), w=Math.max.apply(null,parts.map(function(p){return p.length;}))*6+8;
+        el('rect',{x:mx-w/2,y:my-9,width:w,height:parts.length*13+4,rx:3,class:'elbg'},gL);
+        parts.forEach(function(p,i){var t=el('text',{x:mx,y:my+3+i*13,'text-anchor':'middle',class:'el'},gL);t.textContent=p;});
+      }
+    });
+  }
+
+  /* 1. Топология */
+  draw('d-topo',[
+    {id:'inet',x:300,y:16,w:600,c:'ext',t:'Интернет · стыки [539]',s:['РТК 40G×2, МТС, ТТК, Beeline, Kuban Telekom, ЭР-Телеком, Okko, Freedom, IOLO…']},
+    {id:'ddos',x:940,y:16,w:230,c:'ext',t:'Anti-DDoS Ростелеком',s:['Рокет + ЮТК (вкл. 185.221.44.0/25)','Флэш — не подключён']},
+    {id:'mx',x:30,y:130,w:250,c:'core',t:'Juniper MX480 · Border',s:['192.168.155.11 [655]','(в [700] CR = MX80, загрузка >80 %)']},
+    {id:'nx',x:320,y:130,w:260,c:'core',t:'Cisco Nexus · SW_CORE',s:['C9396PX 192.168.155.9','C3064PQ 192.168.155.10']},
+    {id:'ccr',x:630,y:130,w:290,c:'core',t:'MikroTik CCR2004 «VPLS_Core»',s:['185.221.44.2/26 → gw 185.221.44.1','NAT 1:1 (~40) · VPN · NetFlow/syslog']},
+    {id:'regru',x:960,y:250,w:210,c:'ext',t:'REG.RU (облако)',s:['ВМ 192.168.181.0/24','nginx-операторов .181.20–.25']},
+    {id:'bras',x:30,y:260,w:250,c:'core',t:'BRAS Cisco ASR',s:['ЮТК 192.168.155.4 (ASR1002-X)','.14/.34/.222/.17/.19 · Омиплат .155.3']},
+    {id:'vc2',x:320,y:260,w:260,c:'core',t:'CCR1036 VPLS_CORE_2',s:['192.168.155.40','MPLS-PW / VPLS (OSPF + LDP)']},
+    {id:'oam',x:630,y:260,w:290,c:'core',t:'OAM-свитч 192.168.155.230',s:['маршрутизирует сегменты без SVI:','156 · 110 · 158 · 200']},
+    {id:'s1',x:30,y:400,w:170,c:'seg',t:'DMZ-серверы',s:['192.168.160.0/23','VLAN 666, gw .160.1']},
+    {id:'s2',x:228,y:400,w:170,c:'seg',t:'OAM',s:['192.168.155.0/24','192.168.162.0/24']},
+    {id:'s3',x:426,y:400,w:170,c:'seg',t:'Офис · рабочие станции',s:['192.168.156.0/24','Российская 341/1']},
+    {id:'s4',x:624,y:400,w:170,c:'seg',t:'MSVPN / VDI',s:['192.168.163.0/24 (VLAN 669)','192.168.164.0/24 (VLAN 673)']},
+    {id:'s5',x:822,y:400,w:170,c:'seg',t:'VPN-клиенты',s:['OVPN 192.168.200.0/24','WG .158.0/24 · IPSec .21.0/24']},
+    {id:'s6',x:1020,y:400,w:170,c:'seg',t:'UTK MGMT',s:['10.23.64.0/23','VLAN 55']},
+    {id:'st',x:30,y:560,w:290,c:'site',t:'Узлы в станицах (ЮТК/Омиплат/Рокет)',s:['MikroTik AR (CCR1009/2004/2116) + OLT','BDCOM · C-DATA · Gateray','MGMT 10.110 / 10.120 / 10.130 / 10.230','Ростов: 61-Rostov-AR1 CCR2116']},
+    {id:'fl',x:345,y:560,w:260,c:'site',t:'Флэш · AS48120',s:['192.168.110.0/24','MX-80 .110.11 · ядро-свитч .110.254','ISG/ASR .110.6/.16','MGMT 10.140.x · FLASH CORE']},
+    {id:'rk',x:630,y:560,w:260,c:'site',t:'Рокет · AS208142',s:['172.16.100.0/24 · бордер MX204','СКАТ FastDPI .5/.10 · Cisco .48/.102','стыки 172.16.100.9 (SEA-IX, МТС…)','MGMT 10.130.x']},
+    {id:'rt',x:915,y:560,w:255,c:'site',t:'РТЦ · AS43149',s:['ядро — Пенза; Саратовская обл.','СКАТ 10.58.0.7','MGMT 10.58.x','(в Wiki — только картинки)']},
+  ],[
+    ['inet','mx','',{}],['inet','nx','стыки',{}],['inet','ccr','sfp12 · белые',{}],
+    ['mx','nx','',{dash:1}],['nx','ccr','LAG\nsfp10+11',{ly:-30}],
+    ['mx','bras','',{dash:1}],['nx','vc2','',{dash:1}],['ccr','oam','',{}],['ccr','regru','IPSec+GRE осн.\n10.10.200.1/.2',{hot:1}],
+    ['oam','s1','',{}],['oam','s2','',{}],['oam','s3','',{}],['oam','s4','',{}],['oam','s5','',{}],['ccr','s6','VLAN 55',{via:[[900,340],[1105,340]]}],
+    ['vc2','st','MPLS-PW / VPLS\n(CCR2004 sfp1)',{dash:1,via:[[380,370],[214,370],[214,535]],ly:115}],
+    ['nx','fl','To_Flash',{dash:1,via:[[610,186],[610,535]],ly:120}],
+    ['fl','regru','GRE резерв\n10.10.200.5/.6',{dash:1,via:[[475,745],[1180,745],[1180,300]],lx:-360}],
+  ]);
+
+  /* 2. VPN */
+  var vy=[20,100,180,260,340], vr=[
+    ['OpenVPN','185.221.44.2:1194/udp','192.168.161.26','Debian 13 · OpenVPN 2.6.14','192.168.200.0/24','дин. .200–.253, фикс. .30–.199','LDAP DC .160.60','+ RADIUS MultiFactor .161.100'],
+    ['WireGuard','185.221.44.2:24000/udp','192.168.160.2 wireguard.omicron','CentOS 8.3 (EOL)','192.168.158.0/24','32 активных пира','ключи + ipset','callcenter_users, contractors_voicebot'],
+    ['MSVPN (PPTP/L2TP/SSTP)','msvpn.360pro.online','192.168.160.118 ?','адрес противоречив [52][217][86]','192.168.163/24 · 164/24','VDI RDS · Remote Staff','AD-группа','VPN_Allow_To_MSVPN'],
+    ['IPSec','CCR2004','CCR2004 br_VPN_IPSec','','192.168.21.0/24','','—',''],
+    ['Site-to-site REG.RU','IPSec + GRE','осн.: CCR2004 ↔ 194.67.117.201','рез.: FLASH CORE ↔ 194.67.117.232','192.168.181.0/24','metric 10 / 100','скрипт снимает маршруты','алерты → Zabbix .160.104']
+  ], vn=[], ve=[];
+  vr.forEach(function(r,i){
+    var y=vy[i], warn=(i===1||i===2);
+    vn.push({id:'a'+i,x:20,y:y,w:230,c:'ext',t:r[0],s:[r[1]]});
+    vn.push({id:'b'+i,x:320,y:y,w:290,c:warn?'warn':'svc',t:r[2],s:r[3]?[r[3]]:[]});
+    vn.push({id:'c'+i,x:680,y:y,w:230,c:'seg',t:r[4],s:r[5]?[r[5]]:[]});
+    vn.push({id:'d'+i,x:960,y:y,w:220,c:'core',t:r[6],s:r[7]?[r[7]]:[]});
+    ve.push(['a'+i,'b'+i,'',{}],['b'+i,'c'+i,'',{}],['c'+i,'d'+i,'',{dash:1}]);
+  });
+  vn.push({id:'loc',x:20,y:420,w:1160,h:34,c:'ext',t:'Эта машина: профиль «360pro-m.peshkov (2).ovpn» → remote 185.221.44.2 1194 udp, auth-user-pass, AES-256-GCM (NM-подключение «360pro»)'});
+  draw('d-vpn',vn,ve);
+
+  /* 3. Публикация */
+  var pn=[
+    {id:'in',x:20,y:270,w:150,c:'ext',t:'Интернет',s:['GeoIP: только RU']},
+    {id:'nat',x:220,y:230,w:190,c:'core',t:'CCR2004',s:['NAT 1:1 (~40 правил)','hairpin NAT нет']},
+  ], pe=[['in','nat','',{}]];
+  var nat=[
+    ['.20','nginx 192.168.161.6','core'],['.15','n8n 192.168.160.119','svc'],['.22','GitLab 192.168.160.44 (22→8822)','svc'],
+    ['.19','Vault 192.168.160.18','svc'],['.26 / .29 / .38','фронт ЛК/API .161.173/.175/.176','svc'],['.14','ONLYOFFICE 192.168.160.6','svc'],
+    ['.109','speedtest 192.168.161.48','svc'],['.9 / .17 / .101–.108','relay1/relay2 (SMTP)','svc'],['.32–.36','Exchange','svc'],
+    ['.4','block-proxy (должники, 444/445/446)','svc'],['.7','nomoney (block.*)','svc'],['.2:1194 / :24000','OpenVPN / WireGuard','svc'],
+    ['.2:33022–36115','SSH/iLO СОРМ, СХД «Яровая»','warn']
+  ];
+  nat.forEach(function(r,i){var id='p'+i;pn.push({id:id,x:445,y:12+i*47,w:350,h:38,c:r[2],t:'185.221.44'+r[0]+'  →  '+r[1]});pe.push(['nat',id,'',{hot:i===0}]);});
+  var be=[
+    ['Confluence wiki / Jira','192.168.161.42 :8090 / :8080'],['git / registry','192.168.161.7 :8030 / :5000'],['erp / erp-test','192.168.160.31 / .76 :9088'],
+    ['bg-test','192.168.110.13:8080'],['grafana · netbox · oms','.160.19 · .161.5 · .160.68'],['bitrix','192.168.160.110'],
+    ['chat / meet / turn','Rocket.Chat 192.168.161.110:3300'],['mail(SOGo) · gw01 · priority','K3s :31080 · :30880 · :30882'],
+    ['pass (Vault)','192.168.161.101:30200'],['openvpn · fop2 · watcher','.161.26:8080 · .161.11 · .161.55'],['aixflow, olt, plan, bywin…','192.168.161.12']
+  ];
+  be.forEach(function(r,i){var id='q'+i;pn.push({id:id,x:860,y:12+i*56,w:320,c:'svc',t:r[0],s:[r[1]]});pe.push(['p0',id,'',{via:[[828,31],[828,12+i*56+20.5]]}]);});
+  draw('d-pub',pn,pe);
+
+  /* 4. DNS */
+  draw('d-dns',[
+    {id:'ext',x:20,y:40,w:220,c:'ext',t:'Внешние клиенты'},
+    {id:'int',x:20,y:250,w:220,c:'seg',t:'Внутренние клиенты / серверы',s:['офис, ядра BGBilling, n8n','resolv: timeout:2 attempts:2']},
+    {id:'pdns',x:330,y:20,w:330,c:'core',t:'PowerDNS (Docker)',s:['ns1 185.221.44.13 / 192.168.161.18','ns2 185.221.44.37 / 192.168.161.19','рекурсия закрыта · админка dns.360pro.online']},
+    {id:'regns',x:330,y:140,w:330,c:'ext',t:'ns1/ns2.reg.ru',s:['omicron.online']},
+    {id:'dc',x:330,y:240,w:330,c:'core',t:'AD DNS: DC1 192.168.160.60 · DC2 .69',s:['split-horizon: серые A-записи','зона .loc (socks.loc, omiplat.proxy.loc)']},
+    {id:'z1',x:740,y:20,w:440,c:'svc',t:'360pro.online (публ.) + PTR 44.221.185.in-addr.arpa',s:['MX relay1/relay2 · SPF · DMARC reject · DKIM mail']},
+    {id:'z2',x:740,y:130,w:440,c:'ext',t:'omiplat.ru, rocketcom.ru, flash-telecom.ru…',s:['у регистраторов — в Wiki не описано']},
+    {id:'z3',x:740,y:220,w:440,c:'svc',t:'Внутренние записи',s:['mail / autodiscover / gw01 → 192.168.161.6','speedtest → .161.48 (снаружи 185.221.44.109)','*.core.loc — NXDOMAIN, только через hosts']},
+    {id:'z4',x:740,y:330,w:440,c:'warn',t:'192.168.110.0/24: внешние резолверы недоступны',s:['авария Флэш 2026-08-31']},
+  ],[
+    ['ext','pdns','',{}],['ext','regns','',{}],['int','dc','',{hot:1}],['pdns','z1','',{}],['regns','z2','',{dash:1}],['dc','z3','',{}],['dc','z4','',{dash:1,bad:1}]
+  ]);
+
+  /* 5. Интеграции */
+  draw('d-int',[
+    {id:'erp',x:470,y:310,w:260,c:'core',t:'BGERP 3.0',s:['192.168.160.31:9088 · тест .76']},
+    {id:'bot',x:20,y:20,w:260,c:'ext',t:'Голосовой бот · моб. приложения',s:['gw01.*, mob.*']},
+    {id:'gw',x:440,y:20,w:320,c:'svc',t:'API Gateway (K3s)',s:['bot-bff :30880 · mobile-bff :30881','priority :30882 (только с .160.35)']},
+    {id:'va',x:880,y:20,w:300,c:'svc',t:'voice-analytics',s:['192.168.161.12:8090']},
+    {id:'getolt',x:880,y:105,w:300,c:'svc',t:'GetOLT v2',s:['192.168.161.12 · Telnet к OLT']},
+    {id:'zbx',x:880,y:215,w:300,c:'svc',t:'Zabbix 7.2',s:['192.168.160.104']},
+    {id:'n8n',x:880,y:310,w:300,c:'warn',t:'n8n 2.0.3',s:['192.168.160.119 · PostgreSQL :5432 открыт','SMS-центр → /webhook/cbsms']},
+    {id:'tg',x:880,y:430,w:300,c:'ext',t:'Telegram',s:['через socks.loc 192.168.161.12']},
+    {id:'ad',x:880,y:520,w:300,c:'core',t:'AD DC .160.60/.69'},
+    {id:'mail',x:720,y:620,w:460,c:'svc',t:'Почта',s:['relay1/2 .161.32/.33 → K3s :30025 (360pro) / Exchange :25']},
+    {id:'bank',x:20,y:110,w:260,c:'ext',t:'Банки · ЮKassa · Смотрёшка',s:['колбэки через lk/api-vhost → :8080','/sber — без фильтра по IP!']},
+    {id:'bg',x:20,y:280,w:260,c:'svc',t:'BGBilling ×5',s:['ядра: см. таблицу ниже','ActiveMQ :61616 ↔ RADIUS','БД через ProxySQL :6033']},
+    {id:'rad',x:20,y:450,w:260,c:'svc',t:'RADIUS (по оператору)',s:['1812/1813 UDP · CoA 3799']},
+    {id:'bras',x:20,y:600,w:260,c:'core',t:'BRAS / СКАТ DPI'},
+    {id:'bx',x:330,y:215,w:150,c:'svc',t:'Bitrix24',s:['192.168.160.110']},
+    {id:'sms',x:630,y:190,w:160,c:'ext',t:'SMS-сервис'},
+    {id:'c1',x:310,y:440,w:200,c:'svc',t:'1С:КА2 ЮТК',s:['192.168.160.34 · hs/erp']},
+    {id:'ast',x:330,y:590,w:320,c:'svc',t:'Asterisk / Line24',s:['Line24 .160.35 · 5× Asterisk 21 PJSIP','FOP2 .161.11 (AMI) · транки Манго, Билайн']},
+  ],[
+    ['bot','gw','HTTPS',{}],['gw','va','',{dash:1}],['gw','getolt','REST',{}],['gw','bg','JSON',{lx:30}],['gw','erp','/login.do',{ly:-40}],
+    ['bank','bg','HTTPS',{}],['bg','erp','HTTP ↔',{lx:-40}],['bg','rad','ActiveMQ',{}],['bras','rad','RADIUS',{}],
+    ['bx','erp','bitrix-erp-sync\n(в разработке)',{dash:1,ly:-8}],['erp','sms','HTTP API',{}],['erp','getolt','HTTP · 1/час',{lx:-40,ly:10}],
+    ['zbx','erp','webhook',{lx:40}],['n8n','erp','HTTP',{}],['n8n','zbx','API',{}],['erp','tg','via socks.loc',{}],['erp','ad','LDAPS',{}],
+    ['erp','mail','SMTP :587 · IMAP lid@',{lx:40}],['erp','c1','hs/erp (в разработке)',{dash:1,lx:-30}],['erp','ast','AMI / HTTP',{ly:30}],
+  ]);
+
+  /* 6. Управление */
+  draw('d-mgmt',[
+    {id:'eng',x:20,y:30,w:210,c:'ext',t:'Инженер',s:['удалённо / офис .156']},
+    {id:'ovpn',x:290,y:30,w:230,c:'svc',t:'OpenVPN .161.26',s:['маршрут 10/8, .155, .160/23']},
+    {id:'ccr',x:580,y:30,w:260,c:'core',t:'CCR2004 / OAM-свитч',s:['WinBox 8291 · SSH :1221','только из 192.168.0.0/16, 10.58.0.0/24']},
+    {id:'dev1',x:900,y:20,w:280,c:'core',t:'Ядро / BRAS / Nexus',s:['OAM 192.168.155.0/24, .162.0/24']},
+    {id:'dev2',x:900,y:120,w:280,c:'site',t:'AR MikroTik + OLT в узлах',s:['10.110 / 120 / 130 / 140 / 230 · 10.58','UTK MGMT 10.23.64.0/23']},
+    {id:'aaa',x:580,y:125,w:260,c:'warn',t:'AAA: только локальные учётки',s:['AD-группы oltsradius, mikrotikradius','как AAA не используются']},
+    {id:'ans',x:20,y:240,w:260,c:'svc',t:'Ansible 192.168.160.42',s:['ночью 2–4: backup_Cisco/Huwik/','MikF/O/R/U/SNR','статус после 2024-04 неизвестен']},
+    {id:'share',x:20,y:410,w:260,c:'svc',t:'\\\\192.168.160.62\\…\\bkp',s:['копия бэкапов Ansible']},
+    {id:'bc',x:330,y:240,w:250,c:'svc',t:'backconf 192.168.160.11',s:['FTP от MikroTik-скрипта · SSH :7183','MikroTik 60 дн. · BRAS 7 дн.','offsite → REG.RU']},
+    {id:'nb',x:330,y:410,w:250,c:'svc',t:'NetBox 192.168.161.5',s:['IPAM · netbox.360pro.online']},
+    {id:'mon',x:630,y:320,w:260,c:'svc',t:'Мониторинг',s:['Zabbix .160.104 · Prometheus .160.45','Grafana .160.19 · Observium .160.68','NetFlow 9995–9999 · SNMP v2']},
+    {id:'erp',x:630,y:450,w:260,c:'core',t:'ERP',s:['аварии по метке erp_type','процессы «ИТ / Сетевые инженеры»']},
+    {id:'getolt',x:940,y:320,w:240,c:'svc',t:'GetOLT v2 · 192.168.161.12',s:['Telnet к OLT каждые 30 мин']},
+  ],[
+    ['eng','ovpn','',{hot:1}],['ovpn','ccr','',{hot:1}],['ccr','dev1','',{}],['ccr','dev2','',{}],['aaa','dev2','',{dash:1,bad:1}],
+    ['ans','dev1','SSH (плейбуки)',{via:[[150,205],[866,205],[866,50]],lx:-300}],['ans','share','',{}],
+    ['dev2','bc','FTP (скрипт)',{dash:1,lx:-120,ly:25}],['mon','dev2','SNMP / NetFlow',{lx:-20}],['getolt','dev2','Telnet',{dash:1}],['mon','erp','webhook',{}],
+  ]);
+
+  var btn=document.getElementById('themeBtn'), root=document.documentElement;
+  try{var s=localStorage.getItem('theme'); if(s) root.setAttribute('data-theme',s);}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    var nx=cur==='dark'?'light':'dark'; root.setAttribute('data-theme',nx); try{localStorage.setItem('theme',nx);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

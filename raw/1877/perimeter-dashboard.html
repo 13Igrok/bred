@@ -1,0 +1,402 @@
+<title>Аудит периметра 360pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#eef1f5; --surface:#ffffff; --surface-2:#f6f8fb;
+  --ink:#18212e; --muted:#5c6a7c; --faint:#8b97a7; --border:#dde3ea; --border-strong:#c6cfdb;
+  --accent:#0d7d88; --accent-ink:#0a5b63;
+  --crit:#c31d33; --crit-bg:#fbe7ea;
+  --high:#c26a06; --high-bg:#fbeedd;
+  --med:#8a6d12; --med-bg:#f7f0d8;
+  --ok:#1c8a5a; --ok-bg:#e0f2e8;
+  --na:#7a8698; --na-bg:#eceff3;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 6px 20px rgba(20,30,45,.05);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+:root:not([data-theme="light"]){
+@media (prefers-color-scheme:dark){
+  --ground:#0d1118; --surface:#141b25; --surface-2:#1a2330;
+  --ink:#e7edf5; --muted:#9aa7ba; --faint:#6b7889; --border:#26313f; --border-strong:#33414f;
+  --accent:#2fb9c6; --accent-ink:#7fd8e0;
+  --crit:#ff5d6c; --crit-bg:#33161c;
+  --high:#ffa04a; --high-bg:#33230f;
+  --med:#e6c24d; --med-bg:#2e2810;
+  --ok:#48cf88; --ok-bg:#14291d;
+  --na:#8593a6; --na-bg:#1b232e;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+}}
+:root[data-theme="dark"]{
+  --ground:#0d1118; --surface:#141b25; --surface-2:#1a2330;
+  --ink:#e7edf5; --muted:#9aa7ba; --faint:#6b7889; --border:#26313f; --border-strong:#33414f;
+  --accent:#2fb9c6; --accent-ink:#7fd8e0;
+  --crit:#ff5d6c; --crit-bg:#33161c;
+  --high:#ffa04a; --high-bg:#33230f;
+  --med:#e6c24d; --med-bg:#2e2810;
+  --ok:#48cf88; --ok-bg:#14291d;
+  --na:#8593a6; --na-bg:#1b232e;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.55;
+  -webkit-font-smoothing:antialiased;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 22px 72px}
+a{color:var(--accent-ink)}
+h1,h2,h3{text-wrap:balance;margin:0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent-ink);font-weight:600}
+header.top{border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:26px;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+header.top h1{font-size:31px;font-weight:700;letter-spacing:-.01em;margin-top:6px}
+header.top .sub{color:var(--muted);font-size:13.5px;margin-top:6px;max-width:60ch}
+.themebtn{font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--muted);
+  border:1px solid var(--border);border-radius:7px;padding:7px 11px;cursor:pointer}
+.themebtn:hover{border-color:var(--border-strong);color:var(--ink)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:30px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:15px 16px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .n{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.kpi .l{color:var(--muted);font-size:12px;margin-top:7px;line-height:1.3}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.kpi.c::before{background:var(--crit)} .kpi.h::before{background:var(--high)}
+.kpi.e::before{background:var(--med)} .kpi.n0::before{background:var(--na)}
+.kpi.c .n{color:var(--crit)} .kpi.h .n{color:var(--high)}
+
+section{margin-bottom:34px}
+.sechead{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sechead h2{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.sechead .hint{color:var(--faint);font-size:12.5px}
+
+/* systemic findings */
+.finds{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.find{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px 13px 14px;
+  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;box-shadow:var(--shadow)}
+.find .code{font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 7px;border-radius:6px;
+  white-space:nowrap;letter-spacing:.02em}
+.find .body strong{display:block;font-weight:600;font-size:14px;margin-bottom:2px}
+.find .body span{color:var(--muted);font-size:12.8px}
+.sev-crit .code{background:var(--crit-bg);color:var(--crit)}
+.sev-high .code{background:var(--high-bg);color:var(--high)}
+.sev-med .code{background:var(--med-bg);color:var(--med)}
+
+/* controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;
+  position:sticky;top:0;background:var(--ground);padding:10px 0;z-index:5}
+.search{flex:1;min-width:200px;font-family:var(--mono);font-size:13px;background:var(--surface);
+  color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:9px 12px}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:11.5px;font-weight:500;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);border-radius:20px;padding:6px 11px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;user-select:none}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+.chip[aria-pressed="true"]{border-color:var(--border-strong);color:var(--ink);background:var(--surface-2)}
+.chip[data-sev="crit"] .dot{background:var(--crit)} .chip[data-sev="high"] .dot{background:var(--high)}
+.chip[data-sev="med"] .dot{background:var(--med)} .chip[data-sev="ok"] .dot{background:var(--ok)}
+.chip[data-sev="na"] .dot{background:var(--na)}
+
+/* table */
+.tbl-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+thead th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;padding:11px 14px;background:var(--surface-2);border-bottom:1px solid var(--border);
+  position:sticky;top:60px}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{border-left:3px solid transparent}
+tr.crit{border-left-color:var(--crit)} tr.high{border-left-color:var(--high)}
+tr.med{border-left-color:var(--med)} tr.ok{border-left-color:var(--ok)} tr.na{border-left-color:var(--na)}
+.ip{font-family:var(--mono);font-weight:600;white-space:nowrap;font-size:13px}
+.hn{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.cls{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.note{color:var(--ink);font-size:12.8px}
+.pill{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill.crit{background:var(--crit-bg);color:var(--crit)} .pill.high{background:var(--high-bg);color:var(--high)}
+.pill.med{background:var(--med-bg);color:var(--med)} .pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.na{background:var(--na-bg);color:var(--na)}
+.acc{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);color:var(--muted);white-space:nowrap}
+.acc.root{color:var(--crit);border-color:var(--crit)}
+.empty{padding:26px;text-align:center;color:var(--faint);font-size:13px}
+
+/* two-col lower */
+.cols{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+.panel h2{font-size:17px;margin-bottom:12px}
+ol.top{margin:0;padding-left:0;list-style:none;counter-reset:t}
+ol.top li{counter-increment:t;display:grid;grid-template-columns:auto 1fr;gap:11px;padding:8px 0;border-bottom:1px dashed var(--border)}
+ol.top li:last-child{border-bottom:none}
+ol.top li::before{content:counter(t,decimal-leading-zero);font-family:var(--mono);font-weight:600;color:var(--crit);font-size:12px;padding-top:2px}
+ol.top li b{font-weight:600} ol.top li .m{color:var(--muted);font-size:12.5px}
+ul.plan{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.plan li{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:13px}
+ul.plan li .k{font-family:var(--mono);font-weight:600;color:var(--accent-ink)}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color:var(--faint);font-size:12px;
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:var(--mono)}
+@media (max-width:820px){
+  .kpis{grid-template-columns:repeat(2,1fr)} .finds{grid-template-columns:1fr} .cols{grid-template-columns:1fr}
+  thead th{position:static} .hn{display:none}
+}
+@media (prefers-reduced-motion:no-preference){tbody tr{transition:background .12s}}
+tbody tr:hover{background:var(--surface-2)}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">Внутренний аудит инфраструктуры · read-only</div>
+    <h1>Аудит периметра 360pro / omicron</h1>
+    <div class="sub">Админ-учётки и порты по ~80 узлам (домены flash · omicron · omiplat · rocket · rtc). Метод: SSH-ключ, внешние пробы портов с VPN и pivot fwatcher. 07–14.09.2026.</div>
+  </div>
+  <button class="themebtn" id="themebtn" type="button">тема: авто</button>
+</header>
+
+<div class="kpis" id="kpis"></div>
+
+<section>
+  <div class="sechead"><span class="eyebrow">01</span><h2>Сквозные проблемы</h2><span class="hint">повторяются по многим узлам — устранять централизованно</span></div>
+  <div class="finds" id="finds"></div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">02</span><h2>Инвентарь узлов</h2><span class="hint" id="tblcount"></span></div>
+  <div class="controls">
+    <input class="search" id="search" type="text" placeholder="поиск: IP, имя хоста, находка…" aria-label="Поиск по узлам">
+    <div class="chips" id="chips">
+      <span class="chip" data-sev="crit" role="button" tabindex="0" aria-pressed="true"><span class="dot"></span>крит</span>
+      <span class="chip" data-sev="high" role="button" tabindex="0" aria-pressed="true"><span class="dot"></span>высок</span>
+      <span class="chip" data-sev="med" role="button" tabindex="0" aria-pressed="true"><span class="dot"></span>средн</span>
+      <span class="chip" data-sev="ok" role="button" tabindex="0" aria-pressed="true"><span class="dot"></span>ок</span>
+      <span class="chip" data-sev="na" role="button" tabindex="0" aria-pressed="true"><span class="dot"></span>нет доступа</span>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Важн.</th><th>Адрес / хост</th><th>Класс</th><th>Доступ</th><th>Ключевая находка</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>Ничего не найдено по текущему фильтру.</div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">03</span><h2>Приоритеты</h2></div>
+  <div class="cols">
+    <div class="panel">
+      <h2>Топ критических точек</h2>
+      <ol class="top" id="topcrit"></ol>
+    </div>
+    <div class="panel">
+      <h2>Первоочередной план</h2>
+      <ul class="plan" id="plan"></ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>78 отчётов · ~/Документы/linux/audit-*.txt</span>
+  <span id="fcount"></span>
+</footer>
+</div>
+
+<script>
+const SEVLABEL={crit:"крит",high:"высок",med:"средн",ok:"ок",na:"н/д"};
+const ACCLABEL={root:"NOPASSWD root",ro:"read-only",none:"нет"};
+// access: root = mpeshkov имеет sudo NOPASSWD; ro = read-only; none = shell недоступен
+const H=[
+ // A — BGBilling ядра
+ {ip:"192.168.110.7",hn:"bg-core-flash",cls:"A · BGBilling ядро",sev:"crit",acc:"ro",note:"ActiveMQ 5.15.5 CVE-2023-46604 (61616 наружу); 214 world-writable платёжных JSP; /opt/dump.sql читаем; TFTP 0777; Debian 11 EOL"},
+ {ip:"192.168.160.101",hn:"omicron-bg-core",cls:"A · BGBilling ядро",sev:"crit",acc:"ro",note:"ActiveMQ 5.18.1 уязвим (61616/STOMP/MQTT/AMQP наружу); java от root; Debian 11 EOL"},
+ {ip:"192.168.160.54",hn:"bg-core-omiplat",cls:"A · BGBilling ядро",sev:"crit",acc:"ro",note:"ActiveMQ 5.15.5; WildFly mgmt 9990 в сети; 226 обновлений; Debian 11 EOL"},
+ {ip:"172.16.100.24",hn:"rocket-bg-core",cls:"A · BGBilling ядро",sev:"crit",acc:"ro",note:"ActiveMQ 5.17.3 уязвим CVE-2023-46604; брокер наружу; Debian 11 EOL"},
+ {ip:"192.168.160.87",hn:"rtc-bg-core",cls:"A · BGBilling ядро",sev:"crit",acc:"ro",note:"ActiveMQ 5.17.3 уязвим; 194 обновления; Debian 11 EOL"},
+ // B — bg-radius
+ {ip:"192.168.110.8",hn:"bg-radius-flash",cls:"B · RADIUS/BGInet",sev:"high",acc:"ro",note:"BGInet 1951 — управляющая консоль БЕЗ auth; RADIUS 1812/1813 наружу; java от root; Debian 11 EOL"},
+ {ip:"192.168.160.102",hn:"omicron-bg-radius",cls:"B · RADIUS/BGInet",sev:"high",acc:"ro",note:"1951 без auth; RADIUS наружу; дубль aglukhov/agluchov в sudo"},
+ {ip:"192.168.160.55",hn:"bg-radius-omiplat",cls:"B · RADIUS/BGInet",sev:"high",acc:"ro",note:"1951 без auth; RADIUS наружу; дубль-опечатка учётки в sudo"},
+ {ip:"172.16.100.27",hn:"rocket-bg-radius",cls:"B · RADIUS/BGInet",sev:"high",acc:"ro",note:"1951 без auth; RADIUS наружу; 151 обновление"},
+ {ip:"192.168.160.88",hn:"rtc-bg-radius",cls:"B · RADIUS/BGInet",sev:"high",acc:"ro",note:"1951 без auth; RADIUS наружу; 173 обновления"},
+ // C — ProxySQL
+ {ip:"192.168.110.20",hn:"proxysql-flash",cls:"C · ProxySQL",sev:"high",acc:"ro",note:"ProxySQL admin 6032 в сети (креды БД биллинга); Debian 11 EOL"},
+ {ip:"192.168.160.103",hn:"omicron-bg-proxy",cls:"C · ProxySQL",sev:"high",acc:"ro",note:"admin 6032 в сети; omicron-sudo ~8 nologin; Debian 11 EOL"},
+ {ip:"192.168.160.70",hn:"proxysql-omiplat",cls:"C · ProxySQL",sev:"med",acc:"ro",note:"admin 6032 отфильтрован с mgmt-VPN; ТЕСТ-аккаунт gmasich-test1 в sudo"},
+ {ip:"192.168.160.89",hn:"rtc-bg-proxy",cls:"C · ProxySQL",sev:"high",acc:"ro",note:"admin 6032/client 6033/web 6080 в сети; Debian 11 EOL"},
+ {ip:"172.16.100.26",hn:"proxysql-rocket",cls:"C · ProxySQL",sev:"na",acc:"none",note:"ключ mpeshkov не заведён; ProxySQL admin 6032 открыт снаружи"},
+ // D — gateways
+ {ip:"192.168.161.172",hn:"nginx-proxy-flash",cls:"D · API-шлюз",sev:"high",acc:"ro",note:"api.flash-telecom.ru → BGBilling 110.7 по HTTP (платежи Сбербанк/TV/mob)"},
+ {ip:"192.168.161.173",hn:"nginx-proxy-omiplat",cls:"D · API-шлюз",sev:"high",acc:"ro",note:"api/lk/mob.omiplat.ru → BGBilling; stub_status 8098 без auth; PII-executer наружу"},
+ {ip:"192.168.161.175",hn:"nginx-proxy-rtc",cls:"D · API-шлюз",sev:"high",acc:"ro",note:"api/lk.rocket-telecom.ru → BGBilling 160.87; stub_status 8098 без auth"},
+ {ip:"192.168.161.176",hn:"nginx-proxy-utc",cls:"D · API-шлюз",sev:"high",acc:"ro",note:"api/lk/mob.omicron.online → BGBilling 160.101; есть rate-limit (лучше прочих)"},
+ {ip:"192.168.161.174",hn:"nginx-proxy-rocket",cls:"D · API-шлюз",sev:"med",acc:"ro",note:"НЕ настроен (conf.d пуст, только дефолт nginx) — заготовка"},
+ // E — call-centers
+ {ip:"192.168.160.35",hn:"call-center",cls:"E · Call-центр",sev:"high",acc:"root",note:"CentOS 7 EOL; firewalld off; Asterisk AMI 5038 + MySQL в сети; omicron-sudo с внешним atarasov@cc.ru"},
+ {ip:"192.168.160.219",hn:"callcenter-deb2",cls:"E · Call-центр",sev:"high",acc:"ro",note:"ITGRIX; нет хостового фаервола; MariaDB в сети; fail2ban упал"},
+ {ip:"192.168.110.29",hn:"CALLCENTERFLASH",cls:"E · Call-центр",sev:"high",acc:"ro",note:"AMI 5038 + MySQL в сети; ufw пропускает лишнее; fail2ban упал"},
+ {ip:"192.168.160.217",hn:"CALLCENTEROMIPLAT",cls:"E · Call-центр",sev:"high",acc:"ro",note:"AMI 5038 в сети; 219 обновлений; MySQL на localhost (плюс)"},
+ {ip:"172.16.100.54",hn:"CALLCENTERROCKET",cls:"E · Call-центр",sev:"high",acc:"ro",note:"AMI 5038 в сети; 219 обновлений"},
+ {ip:"192.168.110.30",hn:"CALLCENTERRTC",cls:"E · Call-центр",sev:"high",acc:"ro",note:"MySQL 3306 И AMI 5038 в сети; 218 обновлений"},
+ {ip:"192.168.161.13",hn:"CALLCENTERUTK",cls:"E · Call-центр",sev:"high",acc:"ro",note:"AMI 5038 в сети; omicron-sudo с двумя внешними (atarasov+sgaregin)"},
+ {ip:"192.168.161.11",hn:"fop2",cls:"E · Телефония",sev:"med",acc:"ro",note:"FOP2 веб только по HTTP (без TLS); демон 4445 в сети"},
+ {ip:"192.168.161.8",hn:"rustdesk",cls:"E · Удал.доступ",sev:"med",acc:"ro",note:"RustDesk-сервер; проверить принудительность ключа (не открытый ли релей); портал по HTTP"},
+ // F — mail
+ {ip:"192.168.161.32",hn:"relay1",cls:"F · Почта",sev:"med",acc:"ro",note:"Postfix+SOGo, мульти-IP; проверить open-relay и AUTH/TLS на 587/465"},
+ {ip:"192.168.161.33",hn:"relay2",cls:"F · Почта",sev:"high",acc:"ro",note:"ДВУХДОМНЫЙ: интернет-нога 155.x + внутренняя 161.x = мост периметр↔внутрь; open-relay?"},
+ // G — DNS
+ {ip:"192.168.161.18",hn:"ns1.omicron.online",cls:"G · DNS PowerDNS",sev:"high",acc:"ro",note:"PowerDNS; MySQL зон + API 8080/8081 в сегменте; docker+ansible=privesc; Debian 11 EOL; только через pivot"},
+ {ip:"192.168.161.19",hn:"ns2.omicron.online",cls:"G · DNS PowerDNS",sev:"high",acc:"ro",note:"реплика ns1: MySQL+API в сегменте; docker=privesc; Debian 11 EOL"},
+ // H — k3s
+ {ip:"192.168.161.110",hn:"k3s-node1",cls:"H · Kubernetes",sev:"med",acc:"ro",note:"control-plane (6443/10250/etcd) наружу, но с auth/mTLS; docker активен=privesc; пропатчен"},
+ {ip:"192.168.161.120",hn:"k3s-node2",cls:"H · Kubernetes",sev:"med",acc:"ro",note:"control-plane наружу с auth; docker не запущен; 0 обновлений"},
+ {ip:"192.168.161.130",hn:"k3s-node3",cls:"H · Kubernetes",sev:"med",acc:"ro",note:"control-plane наружу с auth; docker не запущен; 0 обновлений"},
+ {ip:"192.168.161.140",hn:"k3s-node4",cls:"H · Kubernetes",sev:"med",acc:"ro",note:"4-й server etcd — чётный кворум (пересмотреть HA); auth/mTLS ок"},
+ // I — docker web
+ {ip:"192.168.161.7",hn:"git (GitLab)",cls:"I · Docker web",sev:"crit",acc:"ro",note:"Docker Registry 5000 АНОНИМЕН по сети (/v2/_catalog отдаёт репозитории); вендор valeriy+sgaregin с root; docker активен"},
+ {ip:"192.168.161.12",hn:"sv1",cls:"I · Docker web",sev:"crit",acc:"ro",note:"Squid 3128 ОТКРЫТЫЙ прокси + SOCKS 1080; MySQL/PG/Redis/Mongo и Vite dev-серверы в сеть (~27 контейнеров)"},
+ {ip:"192.168.161.15",hn:"commerce.360pro",cls:"I · Docker web",sev:"high",acc:"ro",note:"ejabberd XMPP 5222 в сети; docker активен + ansible = живой privesc"},
+ {ip:"192.168.160.119",hn:"n8n.360pro",cls:"I · Docker web",sev:"high",acc:"ro",note:"PostgreSQL 5432 опубликован docker наружу (ufw не защищает); проверить auth n8n (RCE-ноды)"},
+ {ip:"192.168.161.5",hn:"netbox",cls:"I · Docker web",sev:"med",acc:"ro",note:"NetBox 8080 (auth включена); БД внутри docker; ansible+docker=privesc"},
+ {ip:"192.168.160.100",hn:"wiki2",cls:"I · Docker web",sev:"med",acc:"ro",note:"wiki за nginx (403 на IP); unattended ВКЛЮЧЁН; docker+ansible=privesc"},
+ // J — monitoring
+ {ip:"192.168.160.104",hn:"zabbix-core",cls:"J · Мониторинг",sev:"crit",acc:"ro",note:"Zabbix веб+server 10051 наружу → RCE на всех хостах с агентом; omicron-sudo 16 членов (максимум)"},
+ {ip:"192.168.160.45",hn:"prometheus",cls:"J · Мониторинг",sev:"high",acc:"root",note:"Prometheus 9090 + Alertmanager 9093 БЕЗ аутентификации; fail2ban выключен; 158 обновлений"},
+ {ip:"192.168.160.19",hn:"grafana",cls:"J · Мониторинг",sev:"med",acc:"root",note:"Grafana 13 (auth включена) по HTTP; docker активен + ansible = privesc; 0 обновлений"},
+ {ip:"192.168.160.68",hn:"oms",cls:"J · Сеть/NOC",sev:"high",acc:"ro",note:"Observium+RANCID (креды всех сетевых устройств) + vsftpd PLAIN FTP наружу"},
+ // K — access/AAA
+ {ip:"192.168.161.26",hn:"OpenVPN",cls:"K · VPN/AAA",sev:"high",acc:"root",note:"VPN-шлюз; веб-портал управления VPN (gunicorn/python) от ROOT в сети — проверить auth/MFA"},
+ {ip:"192.168.161.100",hn:"MultiFactorRA",cls:"K · VPN/AAA",sev:"high",acc:"ro",note:"MFA RADIUS-адаптер; inebalzin (ex-staff) в НАТИВНОЙ группе sudo; ufw активен; 198 обновлений"},
+ {ip:"192.168.160.118",hn:"msVPN",cls:"K · VPN/AAA",sev:"high",acc:"none",note:"Windows RRAS VPN; PPTP (1723) ВКЛЮЧЁН (устаревший); mgmt-порты (RDP/WinRM/SMB) наружу"},
+ {ip:"192.168.161.96",hn:"tacacs.360pro",cls:"K · VPN/AAA",sev:"high",acc:"ro",note:"TACACS+ — админ-доступ ко ВСЕМ сетевым устройствам; 205 обновлений; ограничить :49"},
+ // L — voice
+ {ip:"192.168.161.17",hn:"voice1",cls:"L · Голос.аналитика",sev:"high",acc:"root",note:"Postgres/Redis голосовых данных в сети; вендор valeriy+sgaregin с root; sgaregin в docker"},
+ {ip:"192.168.161.45",hn:"voice2",cls:"L · Голос.аналитика",sev:"high",acc:"ro",note:"близнец voice1: БД в сети; вендор valeriy+sgaregin root; sgaregin в docker; 195 обновлений"},
+ {ip:"192.168.161.4",hn:"voiceops",cls:"L · Голос.аналитика",sev:"med",acc:"ro",note:"ops-узел, экспозиция минимальна (0 обновлений); но valeriy/sgaregin в sudo"},
+ // M — storage/other
+ {ip:"192.168.160.135",hn:"db-backup1",cls:"M · Бэкапы",sev:"crit",acc:"ro",note:"СЕРВЕР БЭКАПОВ БД: каталоги /db-backups ПУСТЫ (при 689G занятых) — бэкапы БД не складываются"},
+ {ip:"192.168.160.136",hn:"db-backup2",cls:"M · Бэкапы",sev:"crit",acc:"ro",note:"второй бэкап-сервер ПУСТ (2.5G/491G) — бэкапов БД по факту НЕТ (системная проблема)"},
+ {ip:"192.168.160.31",hn:"erp (BGERP)",cls:"M · ERP",sev:"crit",acc:"root",note:"дампы БД ERP в /opt world-readable (читаемы read-only юзером); MySQL+mysqld_exporter в сети; Debian 11 EOL"},
+ {ip:"192.168.160.11",hn:"samba (RHEL)",cls:"M · Сеть/хранилище",sev:"high",acc:"none",note:"конфиги Mikrotik + шара key; анонимная SMB-энумерация шар (чтение запрещено)"},
+ {ip:"192.168.161.49",hn:"bitrix-to-erp",cls:"M · Интеграция",sev:"high",acc:"ro",note:"внешний подрядчик avk@it-solution.ru с sudo; десктоп GNOME на сервере; интеграция не развёрнута"},
+ {ip:"192.168.160.110",hn:"bitrix.360pro",cls:"M · Битрикс24",sev:"high",acc:"root",note:"CentOS 9; omicron-sudo=NOPASSWD ALL ПОДТВЕРЖДЁН; fail2ban упал ~5 мес; MySQL на всех интерфейсах"},
+ {ip:"192.168.161.55",hn:"fwatcher",cls:"M · Инфра/pivot",sev:"high",acc:"root",note:"Flussonic Watcher 26.02 + PIVOT в сегмент 161.x (Exchange); Watcher API/RTSP наружу"},
+ {ip:"192.168.161.56",hn:"fstreamer",cls:"M · Инфра",sev:"med",acc:"root",note:"заявлен как стример, но пустой (клон шаблона); omicron-sudo=NOPASSWD с 3 nologin"},
+ // N — web/appliance no OS
+ {ip:"192.168.161.48",hn:"speedtest",cls:"N · Веб-сервис",sev:"ok",acc:"ro",note:"ЭТАЛОН гигиены: nftables АКТИВЕН (единственный) + unattended включён + 0 обновлений"},
+ {ip:"192.168.160.6",hn:"office.omicron",cls:"N · Веб (ASP.NET)",sev:"med",acc:"none",note:"nginx→ASP.NET, валидный TLS, форс-HTTPS, логин; SSH нет — аудит ОС невозможен"},
+ {ip:"192.168.160.215",hn:"katan.360pro",cls:"N · Веб (SPA)",sev:"med",acc:"none",note:"приложение Katan; self-signed TLS; 80 без редиректа; SSH нет"},
+ // O — VMware
+ {ip:"192.168.160.202",hn:"vcenter.esxi.loc",cls:"O · VMware",sev:"high",acc:"none",note:"vCenter 6.7 EOL; mgmt 443/5480/9443/22 наружу; нужны кред SSO"},
+ {ip:"192.168.160.21",hn:"vcsa.omicron.loc",cls:"O · VMware",sev:"na",acc:"none",note:"vCenter — ВЫКЛЮЧЕН (100% потерь пинга)"},
+ {ip:"192.168.160.22",hn:"(неизв.)",cls:"O · VMware?",sev:"na",acc:"none",note:"выключен; PTR нет; рядом с vcsa"},
+ // P — Windows/иное
+ {ip:"192.168.160.113",hn:"NPS/PROFILE",cls:"P · Windows",sev:"na",acc:"none",note:"Windows NPS (RADIUS/сет.политики); RDP/WinRM/SMB; нужны доменные кред"},
+ {ip:"192.168.160.46",hn:"POWER-BI",cls:"P · Windows",sev:"na",acc:"none",note:"Power BI + MS SQL/MySQL; WinRM; нужны доменные кред"},
+ {ip:"172.16.100.45",hn:"SCAT",cls:"P · Биллинг/DPI",sev:"high",acc:"none",note:"платформа SCAT; TLS-серт scat.test ПРОСРОЧЕН; SSH-пароль включён; ключ не подходит"},
+ // недоступные / нет ключа
+ {ip:"192.168.110.17",hn:"(неизв.)",cls:"— Нет доступа",sev:"na",acc:"none",note:"Debian 12, только SSH:1221 (publickey+password); ключ mpeshkov не заведён"},
+ {ip:"192.168.161.71",hn:"(неизв.)",cls:"— Нет доступа",sev:"na",acc:"none",note:"Debian 12, только SSH:1221; ключ не заведён; вход по паролю включён"},
+ {ip:"192.168.161.72",hn:"(неизв.)",cls:"— Нет доступа",sev:"na",acc:"none",note:"Debian 12, только SSH:1221; ключ не заведён"},
+ {ip:"192.168.110.110",hn:"(неизв.)",cls:"— Нет доступа",sev:"na",acc:"none",note:"Debian 11 EOL, только SSH:22; ключ не заведён; пароль включён"},
+ {ip:"172.16.100.25",hn:"(неизв.)",cls:"— Нет доступа",sev:"na",acc:"none",note:"Debian 12, только SSH:1221; ключ mpeshkov не заведён (rocket-сегмент)"},
+ {ip:"192.168.155.253",hn:"(DMZ Ubuntu)",cls:"— DMZ/периметр",sev:"na",acc:"none",note:"Ubuntu+Apache в сегменте 155.x (интернет); вне omicron-парка; ключ не подходит; веб HTTP"},
+ {ip:"192.168.161.135",hn:"OPNsense",cls:"K · Фаервол",sev:"high",acc:"none",note:"OPNsense (FreeBSD) фаервол + ntopng; GUI по HTTP:80; своя база — нужен админ OPNsense"},
+ {ip:"192.168.160.2",hn:"(сетевое устр-во)",cls:"— Недоступно",sev:"na",acc:"none",note:"жив, но все порты закрыты/фильтрованы — вероятно шлюз/фаервол без mgmt в сегменте"},
+ {ip:"185.221.44.3",hn:"(публичный IP)",cls:"— Недоступно",sev:"na",acc:"none",note:"публичный адрес; пингуется, портов нет; принадлежность не подтверждена"},
+ {ip:"bit.360pro.online",hn:"→ 161.161",cls:"— Мёртвая DNS",sev:"na",acc:"none",note:"DNS-запись указывает на выключенный/несуществующий 161.161 (dangling)"}
+];
+
+const SYS=[
+ {code:"S1",sev:"crit",t:"Бэкапы БД не работают",d:"db-backup1/2 (160.135/136): каталоги /db-backups пусты — резервных копий БД по факту нет."},
+ {code:"S2",sev:"crit",t:"omicron-sudo = NOPASSWD: ALL",d:"Полный root без пароля по всему парку; группа раздута до 16 членов, забита nologin ex-staff + внешними подрядчиками."},
+ {code:"S3",sev:"crit",t:"ActiveMQ CVE-2023-46604",d:"RCE 10.0 на всех 5 bg-core, OpenWire 61616 в сети, java от root."},
+ {code:"S4",sev:"high",t:"Внешние подрядчики с root",d:"valeriy@bgbilling.ru, sgaregin@example.com, avk@it-solution.ru, atarasov@cc.ru — sudo/docker на git, voice, bitrix-to-erp, call-центрах."},
+ {code:"S5",sev:"high",t:"docker + ansible = privesc",d:"ansible в группе docker при активном docker = root на ~12 узлах; ufw не фильтрует docker-published порты."},
+ {code:"S6",sev:"high",t:"Нет хостового фаервола",d:"nftables/firewalld/ufw неактивны почти везде. Единственный эталон — speedtest (161.48)."},
+ {code:"S7",sev:"high",t:"СУБД и admin-интерфейсы в сети",d:"ProxySQL 6032, MySQL/PG/Redis/Mongo, mysqld_exporter, Zabbix/Prometheus/Alertmanager без auth."},
+ {code:"S8",sev:"high",t:"EOL-ОС",d:"Debian 11 (все bg-*, ProxySQL, DNS, erp), CentOS 7 (call-center), vCenter 6.7 — без патчей безопасности."},
+ {code:"S9",sev:"med",t:"fail2ban выключен точечно",d:"prometheus (выкл), bitrix / callcenter-deb2 / CALLCENTERFLASH (в состоянии failed)."},
+ {code:"S10",sev:"med",t:"unattended-upgrades почти нигде",d:"Включён лишь на speedtest, wiki2, bitrix-to-erp. Отставание 130–260 security-обновлений на узел."},
+ {code:"S11",sev:"med",t:"'debian' и nologin в sudo",d:"Установочная учётка debian в native sudo на Debian 13-хостах; ex-staff nologin в omicron-sudo повсеместно."},
+ {code:"S12",sev:"med",t:"Экспортеры без ограничений",d:"node_exporter (9100) и zabbix-agent (10050) без ограничения Server= почти на каждом хосте."}
+];
+
+const TOP=[
+ {t:"db-backup1/2 — бэкапы БД не складываются",m:"бизнес-риск: восстанавливаться не из чего"},
+ {t:"GitLab 161.7 — анонимный Docker Registry 5000",m:"исходники и секреты доступны по сети без auth"},
+ {t:"sv1 161.12 — открытый Squid-прокси + все СУБД в сеть",m:"анонимизация/пивот + MySQL/PG/Redis/Mongo"},
+ {t:"zabbix-core 160.104 — веб+server наружу",m:"RCE на всех хостах с агентом"},
+ {t:"erp/BGERP 160.31 — дампы БД ERP world-readable",m:"утечка бизнес-данных «в покое»"},
+ {t:"bg-core ×5 — ActiveMQ CVE-2023-46604",m:"61616 наружу, java от root"},
+ {t:"oms + samba + tacacs — ключи от сетевого оборудования",m:"RANCID/конфиги Mikrotik/TACACS+ + plain FTP"},
+ {t:"omicron-sudo=NOPASSWD с ex-staff и подрядчиками",m:"по всему парку — единая точка отказа"},
+ {t:"bg-core-flash 110.7 — платёжные JSP world-writable",m:"+ dump.sql + TFTP 0777"},
+ {t:"msVPN 160.118 — PPTP включён",m:"устаревший VPN-протокол на периметре"}
+];
+
+const PLAN=[
+ ["A","Восстановить бэкапы БД — проверить задания на всех СУБД-серверах (сегодня)"],
+ ["B","Закрыть анонимный Docker Registry (161.7) и открытый Squid/SOCKS (161.12)"],
+ ["C","Ревизия omicron-sudo: убрать nologin, тест-акк, вынести внешних подрядчиков; отменить NOPASSWD"],
+ ["D","Обновить ActiveMQ на bg-core + закрыть 61616/брокер фаерволом"],
+ ["E","СУБД/admin-интерфейсы с 0.0.0.0 → localhost; DOCKER-USER для docker-портов"],
+ ["F","Мониторинг (Zabbix/Prometheus/Alertmanager) за auth/reverse-proxy/фаервол"],
+ ["G","Вынести ansible из группы docker на активных docker-хостах"],
+ ["H","Развернуть nftables (как на speedtest) и unattended-upgrades по парку"],
+ ["I","План миграции с Debian 11 / CentOS 7 / vCenter 6.7 (EOL)"],
+ ["J","Точечно: 110.7 JSP/dump/TFTP · oms FTP · msVPN PPTP · erp дампы · починить fail2ban · серты"]
+];
+
+// ---- render ----
+const $=s=>document.querySelector(s);
+function esc(x){return x.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+function renderKPIs(){
+ const n=s=>H.filter(h=>h.sev===s).length;
+ const eol=H.filter(h=>/EOL/.test(h.note)).length;
+ const noacc=H.filter(h=>h.acc==="none").length;
+ const k=[
+   {n:H.length,l:"узлов в инвентаре",cls:""},
+   {n:n("crit"),l:"критических",cls:"c"},
+   {n:n("high"),l:"высокой важности",cls:"h"},
+   {n:eol,l:"на EOL-ОС",cls:"e"},
+   {n:noacc,l:"без доступа к ОС",cls:"n0"}
+ ];
+ $("#kpis").innerHTML=k.map(x=>`<div class="kpi ${x.cls}"><div class="n">${x.n}</div><div class="l">${x.l}</div></div>`).join("");
+}
+function renderFinds(){
+ $("#finds").innerHTML=SYS.map(f=>`<div class="find sev-${f.sev}"><span class="code">${f.code}</span><div class="body"><strong>${esc(f.t)}</strong><span>${esc(f.d)}</span></div></div>`).join("");
+}
+const active=new Set(["crit","high","med","ok","na"]);
+function renderRows(){
+ const q=$("#search").value.trim().toLowerCase();
+ const order={crit:0,high:1,med:2,ok:3,na:4};
+ const list=H.filter(h=>active.has(h.sev)&&(!q||(h.ip+" "+h.hn+" "+h.cls+" "+h.note).toLowerCase().includes(q)))
+   .sort((a,b)=>order[a.sev]-order[b.sev]||a.cls.localeCompare(b.cls,'ru'));
+ $("#rows").innerHTML=list.map(h=>`<tr class="${h.sev}">
+   <td><span class="pill ${h.sev}">${SEVLABEL[h.sev]}</span></td>
+   <td><div class="ip">${esc(h.ip)}</div><div class="hn">${esc(h.hn)}</div></td>
+   <td class="cls">${esc(h.cls)}</td>
+   <td><span class="acc ${h.acc==='root'?'root':''}">${ACCLABEL[h.acc]}</span></td>
+   <td class="note">${esc(h.note)}</td></tr>`).join("");
+ $("#empty").hidden=list.length>0;
+ $("#tblcount").textContent=`показано ${list.length} из ${H.length}`;
+ $("#fcount").textContent=`отфильтровано: ${list.length}`;
+}
+function renderTop(){
+ $("#topcrit").innerHTML=TOP.map(x=>`<li><div><b>${esc(x.t)}</b><div class="m">${esc(x.m)}</div></div></li>`).join("");
+ $("#plan").innerHTML=PLAN.map(x=>`<li><span class="k">${x[0]}</span><span>${esc(x[1])}</span></li>`).join("");
+}
+// chips
+$("#chips").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;toggle(c)});
+$("#chips").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const c=e.target.closest(".chip");if(c){e.preventDefault();toggle(c)}}});
+function toggle(c){const s=c.dataset.sev;const on=c.getAttribute("aria-pressed")==="true";c.setAttribute("aria-pressed",String(!on));on?active.delete(s):active.add(s);renderRows()}
+$("#search").addEventListener("input",renderRows);
+// theme toggle: авто → светлая → тёмная → авто
+const tb=$("#themebtn");const modes=[["","авто"],["light","светлая"],["dark","тёмная"]];let mi=0;
+tb.addEventListener("click",()=>{mi=(mi+1)%3;const[v,l]=modes[mi];v?document.documentElement.setAttribute("data-theme",v):document.documentElement.removeAttribute("data-theme");tb.textContent="тема: "+l});
+
+renderKPIs();renderFinds();renderTop();renderRows();
+</script>

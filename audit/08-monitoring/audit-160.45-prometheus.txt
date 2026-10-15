@@ -1,0 +1,67 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.45  (prometheus)
+ Дата: 2026-09-14   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : prometheus
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-21   Uptime: 357 дней
+  Роль     : Сервер метрик Prometheus 2.54.1 + Alertmanager + экспортеры (пара к grafana
+             192.168.160.19). node_exporter, blackbox_exporter.
+
+ДОСТУП
+  SSH порт 22 (НЕ 1221) по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.45
+  mpeshkov uid 1015 в omicron-sudo -> NOPASSWD root (не readonly!).
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001).
+ПОДТВЕРЖДЕНО: /etc/sudoers.d/omicron-sudo = %omicron-sudo ALL=(ALL) NOPASSWD: ALL.
+Члены omicron-sudo (10): epetrov, itronin, ishatohin, gmasich, userobaba, akudryaeva,
+  aglukhov, root, ansible, mpeshkov.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), ansible(+docker, docker inactive),
+  mpeshkov. mpeshkov — "Individual access".
+Nologin uid>=1000 (в т.ч. в sudo): epetrov, itronin, ishatohin, userobaba, akudryaeva,
+  aglukhov, inebalzin + сервисные alertmanager/nodeusr/blackbox.
+
+  [ВЫС] omicron-sudo = NOPASSWD ALL, ~6 nologin ex-staff в составе — сильно раздут. Чистка.
+  [СРЕД] fail2ban НЕ активен (в отличие от большинства парка) — включить.
+  [+]    SSH захардене (root off, пароли off). ufw АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+ufw активен. Внешняя доступность (проба VPN): 22, 9090, 9093, 9100, 9115 — OPEN.
+  22/tcp    SSH                     0.0.0.0  ключи-only, root off — ок
+  9090/tcp  Prometheus 2.54.1       *        БЕЗ аутентификации (API отвечает анонимно)
+  9093/tcp  Alertmanager           *        БЕЗ аутентификации (GET / -> 200)
+  9094/tcp  Alertmanager cluster   *
+  9100/tcp  node_exporter          *        без auth
+  9115/tcp  blackbox_exporter      160.45   без auth
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Prometheus (9090) и Alertmanager (9093) открыты в сеть БЕЗ АУТЕНТИФИКАЦИИ.
+           Prometheus раскрывает полную ТОПОЛОГИЮ/инвентарь инфраструктуры (все таргеты,
+           метрики, лейблы), Alertmanager позволяет смотреть/глушить алерты.
+           ДЕЙСТВИЕ: ограничить доступ до сервера grafana/мониторинг-сегмента (фаервол/
+           reverse-proxy с auth). Проверить, что НЕ включён --web.enable-admin-api
+           (иначе удаление данных по сети).
+
+  [ВЫС-2]  omicron-sudo = NOPASSWD ALL с ~6 nologin ex-staff — чистка.
+
+  [СРЕД-3] fail2ban НЕ активен — включить (защита SSH/веб).
+
+  [СРЕД-4] 158 ожидающих обновлений; unattended-upgrades НЕ включён; uptime 357д.
+           node/blackbox-экспортеры без auth — ограничить.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL); ufw активен; SSH захардене; docker не запущен.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: у mpeshkov здесь NOPASSWD sudo. Аудит без изменений.
+НЕ ПРОВЕРЕНО: точный набор web-флагов Prometheus, конфиг targets, authorized_keys.
+==========================================================================

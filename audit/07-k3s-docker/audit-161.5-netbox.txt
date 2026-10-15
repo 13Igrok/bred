@@ -1,0 +1,67 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.5  (netbox)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : netbox
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-40   Uptime: 328 дней
+  Роль     : NetBox — система документирования сети (IPAM/DCIM): полный инвентарь сети,
+             IP-план, устройства, возможно секреты. Стек в Docker (9 контейнеров):
+             NetBox (NGINX Unit) + PostgreSQL + Redis. Веб опубликован на 8080.
+
+ДОСТУП
+  SSH порт 22 (НЕ 1221) по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.161.5
+  mpeshkov uid 1009, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл 38 байт (вероятно NOPASSWD ALL).
+Члены omicron-sudo (7): epetrov, itronin, gmasich, inebalzin, pkuzmin, root, ansible.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(+docker, docker АКТИВЕН). mpeshkov — readonly.
+Сервисный: netbox(uid113, nologin — хорошо). Nologin uid>=1000: epetrov, itronin, inebalzin.
+
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка. Подрядчиков нет.
+  [СРЕД] docker.service АКТИВЕН + ansible в docker -> живой privesc до root.
+  [+]    SSH захардене (root off, пароли off). ufw АКТИВЕН. fail2ban АКТИВЕН.
+         netbox-сервис под непривилегированным nologin-юзером. Postgres/Redis — только
+         внутри docker (наружу не выставлены).
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+ufw активен, НО docker публикует порты в обход ufw (docker-proxy).
+Внешняя доступность (проба VPN): 22, 8080, 9100, 10050 — OPEN.
+  22/tcp    SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  8080/tcp  NetBox web (NGINX Unit) 0.0.0.0  OPEN  редирект на /login (auth ЕСТЬ); /api ->403
+  9100/tcp  node_exporter           *        OPEN  без auth
+  10050/tcp zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+  (PostgreSQL/Redis — внутри docker, на хост НЕ опубликованы — хорошо)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [СРЕД-1] NetBox web (8080) доступен по сети через docker (ufw НЕ фильтрует
+           docker-published порты). Аутентификация ВКЛЮЧЕНА (302 -> /login, /api ->403) —
+           открытой двери нет. НО NetBox хранит полный инвентарь/IPAM (и, возможно,
+           secrets-модуль) -> ограничить доступ до админ/сетевого сегмента (DOCKER-USER),
+           использовать HTTPS.
+
+  [СРЕД-2] docker.service активен + ansible в docker = живой privesc до root.
+
+  [СРЕД-3] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка.
+           133 ожидающих обновления; unattended-upgrades НЕ включён.
+
+  [НИЗ-4]  node_exporter(9100)/zabbix(10050) без ограничений. NetBox web без TLS (8080 http).
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL); аутентификация NetBox включена; Postgres/Redis не выставлены
+      наружу; netbox под nologin-юзером; SSH захардене; ufw+fail2ban активны.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), NetBox admin-пользователи/API-токены/
+  secrets-модуль, docker-compose, версия NetBox, authorized_keys.
+==========================================================================

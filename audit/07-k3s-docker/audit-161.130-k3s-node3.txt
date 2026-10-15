@@ -1,0 +1,57 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.130  (k3s-node3)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : k3s-node3
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-41   Uptime: 292 дня
+  Роль     : Узел кластера K3s — CONTROL-PLANE/server (k3s active, k3s-agent inactive).
+             Третий server-узел -> HA-кластер K3s из 3 серверов (кворум etcd):
+             node1(161.110), node2(161.120), node3(161.130). docker.service НЕактивен.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.130
+  mpeshkov uid 1009, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ  (идентично node1/node2)
+--------------------------------------------------------------------------
+omicron-sudo(gid 1001), файл 38 байт (вероятно NOPASSWD ALL). Члены (5): epetrov,
+  itronin, gmasich, root, ansible.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), ansible(+docker, docker inactive).
+  pkuzmin — bash, НЕ в sudo. mpeshkov — readonly.
+Nologin uid>=1000: epetrov, itronin, inebalzin.
+
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 2 nologin ex-staff — чистка. Подрядчиков нет.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. docker inactive.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (K8s control-plane открыт в сеть, с аутентификацией)
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 1221, 6443, 10250, 2379, 2380 — OPEN.
+  1221   SSH                     ключи-only, root off — ок
+  6443   kube-apiserver          анонимно -> 401 (auth есть)
+  10250  kubelet API             auth
+  2379   etcd (client)           mTLS
+  2380   etcd (peer)             mTLS
+  2112   k3s metrics
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [СРЕД-1] Хостового фаервола нет: control-plane (6443/10250/2379/2380) открыт всей сети.
+           Auth/mTLS работают, но ограничить фаерволом до узлов кластера.
+  [СРЕД-2] omicron-sudo (вероятно NOPASSWD ALL) с 2 nologin ex-staff — чистка.
+  [НИЗ-3]  unattended-upgrades НЕ включён.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL) и ПОЛНОСТЬЮ пропатчен (0 обновлений); K8s-порты с auth
+      (API 401, etcd mTLS); docker НЕактивен (нет живого privesc); SSH захардене;
+      fail2ban активен; чистый админ-набор.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), RBAC/сетевые политики, etcd, версия K3s.
+==========================================================================

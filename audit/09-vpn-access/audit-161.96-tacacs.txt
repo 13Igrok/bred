@@ -1,0 +1,47 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.96  (tacacs.360pro.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : tacacs.360pro.online
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-34   Uptime: 352 дня
+  Роль     : TACACS+ сервер (tac_plus, TCP:49) — AAA для администрирования сетевых
+             устройств (аутентификация/авторизация/учёт входа админов на маршрутизаторы/
+             коммутаторы). КРИТИЧНЫЙ узел: конфиг содержит shared-secret и учётки доступа
+             к сетевому оборудованию. docker установлен, НЕ запущен.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.96
+
+1. АДМИНСКИЕ УЧЁТКИ
+  sudo(27) пуста. omicron-sudo(gid 1001, вероятно NOPASSWD ALL), 8 членов:
+    epetrov, itronin, gmasich, inebalzin, pkuzmin, root, ansible, rtaktarov.
+  Действующие bash+sudo: root, gmasich(omiplat.ru), pkuzmin(360pro.online),
+    rtaktarov(r.taktarov@rocketcom.ru), ansible(+docker, docker inactive). mpeshkov — readonly.
+  Nologin uid>=1000: epetrov, itronin, inebalzin.
+  [СРЕД] omicron-sudo=NOPASSWD с 3 nologin ex-staff — чистка.
+  [+]   SSH захардене (root off, пароли off). fail2ban АКТИВЕН. docker не запущен.
+
+2. ПОРТЫ
+  Хостового фаервола НЕТ. Внешняя доступность (VPN): 1221, 49, 10050 — OPEN.
+  1221/tcp  SSH                    ключи-only, root off — ок
+  49/tcp    TACACS+ (tac_plus)     0.0.0.0  AAA сетевых устройств
+  10050/tcp zabbix-agent           0.0.0.0  ограничить Server=
+
+3. НАХОДКИ
+  [ВЫС-1] КРИТИЧНАЯ AAA-роль: TACACS+ управляет админ-доступом ко всем сетевым устройствам.
+          Компрометация = вход на роутеры/коммутаторы. Конфиг tac_plus (shared-secret,
+          учётки/пароли устройств) — усиленная защита хоста, минимум админов, фаервол,
+          ограничить :49 до management-сети устройств.
+  [ВЫС-2] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка.
+  [СРЕД-3] Хостового фаервола нет; 205 ожидающих обновлений; unattended НЕ включён;
+          zabbix(10050) без ограничения.
+  [+] ПЛЮСЫ: Debian 12 (не EOL); SSH захардене; fail2ban активен; docker не запущен;
+      минимальная экспозиция (только SSH+TACACS+zabbix).
+
+НЕ ПРОВЕРЕНО (read-only): /etc/tac_plus*.conf (secret/учётки устройств), omicron-sudo
+  (NOPASSWD?), authorized_keys.
+==========================================================================

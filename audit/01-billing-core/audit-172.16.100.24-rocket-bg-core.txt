@@ -1,0 +1,105 @@
+==========================================================================
+ АУДИТ ХОСТА  172.16.100.24  (rocket-bg-core.rocket.local)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo), доступ ПРЯМОЙ (без pivot)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : rocket-bg-core.rocket.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL, LTS завершилась 08.2026
+  Kernel   : 5.10.0-35-amd64 (самое свежее из парка bg-core)   Virt: VMware VM
+  Uptime   : 278 дней
+  Роль     : БИЛЛИНГ-ЯДРО BGBilling домена rocket (4-й bg-core)
+             Java (от root): BGBillingServer, BGScheduler, BGTVAccess, BGTVAccounting
+             + ActiveMQ + nginx. (WildFly/TFTP нет; docker-демон НЕ запущен.)
+
+ДОСТУП
+  SSH порт 22 напрямую по ключу id_peshkov_rsa (=Peshkov2.ppk). Доступен и с рабочей
+  машины (VPN), и с fwatcher. pivot не нужен.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@172.16.100.24
+  mpeshkov uid 1019, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Админ-права — кастомная omicron-sudo(gid 1001)
+через /etc/sudoers.d/omicron-sudo (содержимое read-only юзеру недоступно).
+
+Учётки с login-shell (bash) и sudo:
+  УЧЁТКА     UID   ВЛАДЕЛЕЦ / ДОМЕН              ПРАВА                  АКТИВНОСТЬ
+  root       0     -                             omicron-sudo
+  gmasich    1004  g.masich@omiplat.ru           omicron-sudo, bash     активен, с 192.168.156.190
+  rtaktarov  1005  r.taktarov@rocketcom.ru       omicron-sudo, bash
+  pkuzmin    1012  p.kuzmin@360pro.online        omicron-sudo, bash
+  avasilev   1018  a.vasilev@360pro.online       omicron-sudo, bash
+  ansible    1017  сервисный                     omicron-sudo + docker   docker.service НЕ запущен
+  mpeshkov   1019  m.peshkov@360pro.online (я)   только omicron-readonly
+
+ПОЛНЫЙ состав группы omicron-sudo (16 членов):
+  aglukhov, epetrov, itronin, gmasich, bitel, ishatohin, userobaba, akudryaeva,
+  oborovkov, obobrovkov, vklimansky, root, pkuzmin, ansible, avasilev, rtaktarov
+
+  ЗАМЕЧАНИЯ:
+  [!] 10 из 16 членов omicron-sudo — учётки без интерактивного входа (nologin):
+      aglukhov, epetrov, itronin, bitel, ishatohin, userobaba, akudryaeva,
+      oborovkov, obobrovkov, vklimansky. Логиниться не могут, но остаются в
+      админ-группе. ПОД ЧИСТКУ. (bitel — сервисная учётка вендора BGBilling.)
+      В /etc/passwd также nologin inebalzin.
+  [!] Кросс-доменный админ-разброс: sudo у учёток из omiplat.ru (gmasich),
+      rocketcom.ru (rtaktarov), 360pro.online (pkuzmin, avasilev).
+  [!] ansible в группе docker -> потенциальный privesc до root ЕСЛИ поднять docker
+      (сейчас docker.service inactive — риск латентный).
+  [i] gmasich — «устаревший админ», фигурирует и на POWER-BI и на всех bg-core.
+  [+] SSH захардене: PermitRootLogin no, PasswordAuthentication no. SUID-набор чист.
+      fail2ban активен.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (внешняя доступность проверена с рабочей машины через VPN — ВСЕ OPEN)
+--------------------------------------------------------------------------
+  ПОРТ       СЛУЖБА                 BIND            КОММЕНТАРИЙ
+  22/tcp     SSH (OpenSSH)          0.0.0.0         ключи-only, root off — ок
+  80,443/tcp nginx                  0.0.0.0         веб-периметр
+  8080/tcp   BGBilling (Java)       0.0.0.0
+  8098/tcp   Java-сервис            172.16.100.24
+  1981,1982  BG-сервисы             0.0.0.0
+  9066/tcp   сервис                 0.0.0.0
+  8161/tcp   ActiveMQ web-консоль   *               401 (auth требуется) — ок
+  61616/tcp  ActiveMQ OpenWire      *               !!! КРИТ-1
+  61613/tcp  ActiveMQ STOMP         *
+  61614/tcp  ActiveMQ STOMP+WS      *               вся линейка брокера наружу
+  1883/tcp   ActiveMQ MQTT          *
+  5672/tcp   ActiveMQ AMQP          *
+  9100/tcp   node_exporter          *               БЕЗ аутентификации наружу
+  10050/tcp  zabbix-agent           0.0.0.0         ограничить Server=
+  (TFTP, WildFly-порты — отсутствуют)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [КРИТ-1] ActiveMQ 5.17.3 (/opt/activemq, activemq-all-5.17.3.jar), OpenWire 61616 +
+           STOMP/MQTT/AMQP ОТКРЫТЫ ПО СЕТИ. Версия 5.17.3 уязвима к CVE-2023-46604
+           (RCE, CVSS 10.0) — фикс только в 5.17.6+. Java идёт ОТ ROOT => RCE-root.
+           ДЕЙСТВИЕ: обновить ActiveMQ до 5.17.6+/5.18.3+/6.x; закрыть транспортные
+           порты брокера (61616/61613/61614/1883/5672) фаерволом до доверенных хостов.
+
+  [ВЫС-2]  BG-Java приложения и ActiveMQ работают ОТ ROOT — любая RCE = сразу root.
+           ДЕЙСТВИЕ: вынести под сервисные учётки (как сделано на bg-core-omiplat).
+
+  [ВЫС-3]  omicron-sudo раздут устаревшими/сервисными учётками (10 nologin из 16).
+           ansible в docker (латентный privesc). ДЕЙСТВИЕ: ревизия и чистка.
+
+  [СРЕД-4] 66 ожидающих обновлений, ВСЕ security; unattended-upgrades нет; Debian 11 EOL.
+           ДЕЙСТВИЕ: обновиться; план миграции на 12/13.
+           (Обновления по парку bg-core: 110.7=78, 160.101=101, 160.54=226, 172.16.100.24=66.)
+
+  [НИЗ-5]  node_exporter (9100) без аутентификации наружу; zabbix (10050) без
+           ограничения Server. ДЕЙСТВИЕ: ограничить фаерволом/конфигом.
+
+  [+] Плюсы: web-консоль ActiveMQ требует auth (admin:admin отклонён); SSH захардене;
+      SUID чист; docker-демон не запущен; ядро самое свежее из парка.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (нужен доступ с sudo / вне фокуса):
+  содержимое sudoers/omicron-sudo (NOPASSWD?), credentials.properties ActiveMQ,
+  /var/log/auth.log, приватные authorized_keys, world-writable в /opt.
+==========================================================================

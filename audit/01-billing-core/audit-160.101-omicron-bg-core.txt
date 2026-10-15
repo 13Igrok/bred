@@ -1,0 +1,103 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.101  (omicron-bg-core.omicron.local)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo), доступ ПРЯМОЙ (без pivot)
+==========================================================================
+
+ХОСТ
+  hostname : omicron-bg-core.omicron.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL, LTS завершилась 08.2026
+  Kernel   : 5.10.0-34-amd64    Virt: VMware VM
+  Uptime   : 278 дней
+  Роль     : БИЛЛИНГ-ЯДРО BGBilling домена omicron (аналог bg-core-flash 192.168.110.7)
+             Java (все от root): BGBillingServer, BGScheduler, BGTVAccess,
+             BGTVAccounting + ActiveMQ + nginx. Служба bgbilling.service.
+
+ДОСТУП
+  SSH порт 22 напрямую по ключу id_peshkov_rsa (=Peshkov2.ppk). Подсеть 160.x
+  маршрутизируется через VPN — pivot НЕ нужен.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.101
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Админ-права даёт кастомная группа omicron-sudo(gid 1001)
+через /etc/sudoers.d/omicron-sudo (содержимое read-only юзеру недоступно).
+
+Учётки с login-shell (bash) и sudo:
+  УЧЁТКА     UID   ВЛАДЕЛЕЦ / ДОМЕН              ПРАВА                  АКТИВНОСТЬ (last)
+  root       0     -                             omicron-sudo           -
+  gmasich    1004  g.masich@omiplat.ru           omicron-sudo, bash     очень активен, 192.168.158.22 (по 06.09)
+  rtaktarov  1005  r.taktarov@rocketcom.ru       omicron-sudo, bash     192.168.158.7
+  pkuzmin    1011  p.kuzmin@360pro.online        omicron-sudo, bash     192.168.158.109 (02-03.09)
+  avasilev   1017  a.vasilev@360pro.online       omicron-sudo, bash
+  ansible    1016  сервисный                     omicron-sudo + DOCKER   автоматизация
+  mpeshkov   1018  m.peshkov@360pro.online (я)   только omicron-readonly
+
+ПОЛНЫЙ состав группы omicron-sudo (15 членов, читается здесь):
+  aglukhov, epetrov, itronin, gmasich, userobaba, ishatohin, akudryaeva,
+  oborovkov, obobrovkov, vklimansky, root, pkuzmin, ansible, avasilev, rtaktarov
+
+  ЗАМЕЧАНИЯ:
+  [!] 9 из 15 членов omicron-sudo — учётки бывших сотрудников с shell nologin
+      (aglukhov, epetrov, itronin, userobaba, ishatohin, akudryaeva, oborovkov,
+      obobrovkov, vklimansky). Логиниться по SSH не могут, но остаются в админ-
+      группе — грязь и риск при смене shell/восстановлении учётки. ПОД ЧИСТКУ.
+  [!] Кросс-доменный админ-разброс: sudo имеют учётки из omiplat.ru (gmasich),
+      rocketcom.ru (rtaktarov), 360pro.online (pkuzmin, avasilev).
+  [!] ansible в группе docker -> тривиальная эскалация до root (плюс sudo).
+  [i] gmasich — «устаревший админ», фигурирует и на POWER-BI и на bg-core-flash.
+  [+] SSH захардене: PermitRootLogin no, PasswordAuthentication no.
+  [+] SUID-набор чистый. fail2ban + auditd активны.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (LISTEN + внешняя доступность, проверено с рабочей машины через VPN)
+--------------------------------------------------------------------------
+  Все перечисленные порты ДОСТУПНЫ СНАРУЖИ (0.0.0.0 / *):
+  ПОРТ       СЛУЖБА                 КОММЕНТАРИЙ
+  22/tcp     SSH (OpenSSH)          ключи-only, root off — ок
+  80,443/tcp nginx                  веб-периметр
+  8080/tcp   BGBilling (Java)
+  8098/tcp   Java-сервис            (на 110.7 был закрыт извне — здесь ОТКРЫТ)
+  1981,1982  BG-сервисы
+  9066/tcp   сервис
+  8161/tcp   ActiveMQ web-консоль   401; admin:admin отклонён (ок)
+  61616/tcp  ActiveMQ OpenWire      !!! КРИТ-1
+  61613/tcp  ActiveMQ STOMP         вся транспортная линейка брокера наружу
+  61614/tcp  ActiveMQ STOMP+WS
+  1883/tcp   ActiveMQ MQTT
+  5672/tcp   ActiveMQ AMQP
+  9100/tcp   node_exporter          БЕЗ аутентификации (/metrics любому)
+  10050/tcp  zabbix-agent           ограничить Server=
+  TFTP (69)  -- НЕ запущен (в отличие от 110.7)
+
+--------------------------------------------------------------------------
+3. КРИТИЧНЫЕ НАХОДКИ
+--------------------------------------------------------------------------
+  [КРИТ-1] ActiveMQ 5.18.1 (/opt/activemq/apache-activemq-5.18.1, current->5.18.1),
+           OpenWire 61616 + STOMP/MQTT/AMQP ОТКРЫТЫ ПО СЕТИ. Версия 5.18.1 всё ещё
+           уязвима к CVE-2023-46604 (RCE, CVSS 10.0) — фикс только в 5.18.3+.
+           Java идёт ОТ ROOT => прямой RCE-root.
+           ДЕЙСТВИЕ: обновить ActiveMQ до 5.18.3+/6.x; закрыть транспортные порты
+           брокера (61616/61613/61614/1883/5672) фаерволом до доверенных хостов.
+           NB: каталог kahadb-corrupt-20260831 — был сбой/повреждение KahaDB 31.08.
+
+  [ВЫС-2]  Java-приложения и ActiveMQ работают ОТ ROOT — нарушение least-privilege;
+           любая RCE = сразу root. ДЕЙСТВИЕ: вынести под сервисные учётки.
+
+  [ВЫС-3]  omicron-sudo раздут устаревшими учётками (9 nologin ex-staff, см. разд.1).
+           ДЕЙСТВИЕ: вычистить группу, оставить только действующих админов.
+
+  [СРЕД-4] 101 ожидающее обновление, 100 security; unattended-upgrades не установлен;
+           Debian 11 EOL. ДЕЙСТВИЕ: обновиться, план миграции на 12/13.
+
+  [НИЗ-5]  node_exporter (9100) без аутентификации наружу; zabbix (10050) без
+           ограничения Server; 8098 открыт извне. ДЕЙСТВИЕ: ограничить фаерволом.
+
+  [+] В ОТЛИЧИЕ от bg-core-flash (110.7) — чисто: НЕТ world-writable файлов в
+      /opt/bgbilling (0 файлов/0 каталогов), НЕТ /opt/dump.sql, TFTP не запущен.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (нужен доступ с sudo):
+  содержимое /etc/sudoers и sudoers.d/omicron-sudo (наличие NOPASSWD),
+  credentials.properties ActiveMQ, /var/log/auth.log, приватные authorized_keys.
+==========================================================================

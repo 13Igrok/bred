@@ -1,0 +1,67 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.173  (nginx-proxy-omiplat)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : nginx-proxy-omiplat
+  OS       : Debian GNU/Linux 13 (trixie)  -- АКТУАЛЬНАЯ   Kernel: 6.12   Uptime: 97 дней
+  Роль     : Публичный web/API-шлюз (нативный nginx) домена omiplat. Vhosts:
+             api.omiplat.ru, lk.omiplat.ru (личный кабинет), mob.omiplat.ru
+             -> проксируют на BGBilling bg-core-omiplat (192.168.160.54:8080):
+             платежи (alfabank/14, sberbank/7), contract, executer JSON API
+             (getUserEmail — PII, webHooks.Verification), mpsexecuter, TV-upsale, ЛК, mob.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.173
+  mpeshkov uid 1011, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+ДВЕ группы: native sudo(27) -> debian (установочная, nologin);
+            omicron-sudo(gid 1001): itronin, gmasich, inebalzin, pkuzmin, ansible, root, avasilev.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  avasilev(a.vasilev@360pro.online), ansible(+docker, docker inactive). mpeshkov — readonly.
+Nologin uid>=1000: itronin, inebalzin, debian.
+
+  [СРЕД] debian в native sudo; omicron-sudo (вероятно NOPASSWD ALL) с 2 nologin — чистка.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. Без подрядчиков.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 1221, 80, 443, 8098 — OPEN.
+  1221/tcp   SSH               0.0.0.0           ключи-only, root off — ок
+  80,443/tcp nginx (шлюз)      0.0.0.0           api/lk/mob.omiplat.ru
+  8098/tcp   nginx stub_status 192.168.161.173   !!! статус nginx БЕЗ auth, открыт в сеть
+  25 exim                       127.0.0.1        ок
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Публичный web/API-шлюз к биллингу: api/lk/mob.omiplat.ru -> bg-core-omiplat
+           160.54:8080 (HTTP к бэкенду). Наружу — платёжные callbacks (alfabank/sberbank),
+           личный кабинет, эндпоинты с PII (executer .../getUserEmail), вебхуки.
+           ДЕЙСТВИЕ: rate-limit/WAF на платежи и executer-API; проверить авторизацию
+           чувствительных путей; защитить канал к бэкенду.
+
+  [СРЕД-2] nginx stub_status (8098) открыт в сеть БЕЗ аутентификации — раскрывает метрики
+           nginx (соединения/запросы). ДЕЙСТВИЕ: allow 127.0.0.1/мониторинг, deny остальное.
+
+  [НИЗ-3]  В /etc/nginx/conf.d/ лежат бэкап-конфиги (*.bak-*, *.pre-acme, *.20260723-*) —
+           гигиена; убрать из served-каталога (nginx грузит только *.conf, но хранить рядом
+           старые конфиги не стоит).
+
+  [СРЕД-4] debian в native sudo; omicron-sudo с 2 nologin; нет хостового фаервола.
+
+  [+] ПЛЮСЫ: Debian 13 (актуальная) и ПОЛНОСТЬЮ пропатчен (0 обновлений); нативный nginx
+      (нет docker-privesc); SSH захардене; fail2ban активен; без подрядчиков.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), полные vhost'ы (авторизация путей,
+  TLS/ACME), authorized_keys.
+==========================================================================

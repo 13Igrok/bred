@@ -1,0 +1,85 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.7  (git)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : git
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-37
+  Роль     : GitLab (self-hosted, omnibus) — хранилище исходного кода. Компоненты:
+             gitlab-workhorse, gitlab-kas, gitlab-runner (CI!), gitlab-exporter,
+             nginx, PostgreSQL. + Docker Registry (порт 5000) + docker.service активен.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.7
+  mpeshkov uid 1011, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл 38 байт (вероятно NOPASSWD ALL).
+
+Члены omicron-sudo (9): epetrov, itronin, gmasich, inebalzin, pkuzmin, ansible, root,
+  valeriy, sgaregin
+
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(сервисный, +docker), mpeshkov(readonly),
+  valeriy  (Valery BITEL, bitel@bgbilling.ru — ВНЕШНИЙ ВЕНДОР BGBilling),
+  sgaregin (sgaregin@example.com — домен-заглушка).
+Nologin uid>=1000: epetrov, itronin, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] На сервере ИСХОДНОГО КОДА (GitLab) полный sudo имеют ВНЕШНИЕ/непонятные учётки:
+        valeriy (вендор BGBilling, bitel@bgbilling.ru) и sgaregin (example.com).
+        Доступ к исходникам + root = максимальный риск. Подтвердить/ограничить/удалить.
+  [ВЫС] docker.service АКТИВЕН + ansible в группе docker -> ЖИВОЙ privesc до root.
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff (epetrov, itronin,
+         inebalzin) — под чистку.
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 1221, 5000, 8022, 8030 — OPEN.
+  TCP:
+  1221   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  5000   Docker Registry         0.0.0.0  OPEN  !!! КРИТ (см. ниже)
+  8030   GitLab web (nginx/TLS)  host IP  OPEN  редирект на https://:8030/users/sign_in
+  8022   GitLab SSH (git)        host IP  OPEN  git-доступ по SSH
+  8031,8032  GitLab доп.         host IP  (снаружи закрыты)
+  631 CUPS / 40423               127.0.0.1  ок
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [КРИТ-1] Docker Registry (5000) АНОНИМНО доступен по сети (подтверждено и локально,
+           и снаружи с VPN): /v2/_catalog отдаёт список репозиториев БЕЗ аутентификации:
+             authsite/rocket, pet/ankey, pet/api-gateway(+core/priority),
+             pet/mobile-bff, pet/outfile, pet/push-worker,
+             pet/voice-analytics(+tunnel).
+           Любой в сети может перечислить и, вероятно, СКАЧАТЬ образы (исходники/секреты/
+           конфиги внутри). ДЕЙСТВИЕ: включить аутентификацию registry (token/basic),
+           закрыть 5000 фаерволом до CI/доверенных хостов.
+
+  [ВЫС-2]  Внешние/вендорские учётки valeriy(bitel@bgbilling.ru) и sgaregin(example.com)
+           с sudo на GitLab (исходный код). Ревизия/ограничение/удаление.
+
+  [ВЫС-3]  docker.service активен + ansible в docker = живой privesc до root.
+
+  [СРЕД-4] Хостового фаервола нет; GitLab web(8030)/SSH(8022)/Registry(5000) открыты в сеть.
+           unattended-upgrades НЕ включён; 174 ожидающих обновления.
+
+  [СРЕД-5] gitlab-runner на том же хосте, что GitLab (CI-раннер co-located). Проверить
+           исполнитель (docker/shell): shell-executor даёт CI-задачам доступ к хосту.
+
+  [+] ПЛЮСЫ: SSH захардене; fail2ban активен; GitLab web редиректит на HTTPS;
+      PostgreSQL/CUPS на localhost; mpeshkov реально read-only (docker-сокет закрыт).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), версия GitLab, конфиг registry auth,
+  исполнитель gitlab-runner, /var/opt/gitlab секреты, authorized_keys.
+==========================================================================

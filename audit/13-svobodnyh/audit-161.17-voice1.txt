@@ -1,0 +1,62 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.17  (voice1)
+ Дата: 2026-09-14   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : voice1
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-41   Uptime: 116 дней
+  Роль     : Голосовая платформа / voice-analytics (Docker, ~13 контейнеров): микросервисы
+             (8000-8008), PostgreSQL, Redis, nginx. Вероятно ASR/аналитика звонков
+             (ср. pet/voice-analytics в GitLab-registry на 161.7). docker.service активен.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa. mpeshkov в omicron-sudo -> NOPASSWD root.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.17
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. omicron-sudo(gid 1001) = %omicron-sudo ALL=(ALL) NOPASSWD: ALL (подтв.).
+Члены omicron-sudo (10): epetrov, itronin, gmasich, inebalzin, pkuzmin, root, ansible,
+  mpeshkov, sgaregin, valeriy.
+Действующие (bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online), ansible(+docker),
+  valeriy (Valery BITEL, bitel@bgbilling.ru — ВНЕШНИЙ ВЕНДОР BGBilling),
+  sgaregin (sgaregin@example.com — домен-заглушка), mpeshkov.
+Группа docker: ansible, sgaregin (docker.service АКТИВЕН). Nologin: epetrov, itronin,
+  inebalzin, dbtunnel.
+
+  [ВЫС] Внешние/вендорские valeriy(bitel@bgbilling.ru) и sgaregin(example.com) с NOPASSWD
+        root на платформе голосовых данных. Плюс sgaregin в группе docker + docker активен
+        = root-эквивалент. ДЕЙСТВИЕ: подтвердить необходимость, ограничить/убрать по завершении.
+  [СРЕД] docker активен + ansible/sgaregin в docker = живой privesc.
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (docker-published на 0.0.0.0, ufw НЕ фильтрует; всё OPEN снаружи)
+--------------------------------------------------------------------------
+  1221 SSH; 80 nginx (дефолт "Welcome to nginx!"); 443/8443 HTTPS;
+  8000 (voice app) / 8001 / 8002 / 8003 / 8006 / 8007 / 8008 — микросервисы;
+  5432 PostgreSQL  |  6379 Redis  — !!! СУБД/кэш voice-данных В СЕТИ;
+  9100 node_exporter; 8009/8010/631 — localhost.
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  PostgreSQL(5432) и Redis(6379) открыты в сеть (docker-published). БД голосовой
+           аналитики (вероятно записи/транскрипты звонков = чувствительные/ПДн).
+           ДЕЙСТВИЕ: bind 127.0.0.1, включить auth Redis, фаервол.
+  [ВЫС-2]  Внешний вендор valeriy(BGBilling) + sgaregin с NOPASSWD root; sgaregin в docker
+           (docker активен). Ревизия/ограничение root-доступа сторонних.
+  [СРЕД-3] Множество app-портов (8000-8008/8443) в сеть; 80 отдаёт дефолтную страницу nginx
+           (мисконфиг). docker+ansible/sgaregin = privesc.
+  [СРЕД-4] 254 обновления; unattended нет; хостового фаервола нет.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL); SSH захардене; fail2ban активен.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: mpeshkov здесь NOPASSWD sudo. Аудит без изменений. Команды к БД не выполнял.
+НЕ ПРОВЕРЕНО: auth Postgres/Redis, docker-compose, содержимое voice-данных, authorized_keys.
+==========================================================================

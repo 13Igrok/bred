@@ -1,0 +1,59 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.46  (nomoney-rocketcom)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : nomoney-rocketcom
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-44   Uptime: 139 дней
+  Роль     : Captive-портал "нет средств" для абонентов rocketcom с нулевым балансом.
+             nginx/1.22.1 + php-fpm 8.2, root /var/www/rocket, server_name nomoney.rocketcom.ru.
+             Есть detection-эндпоинты (/connecttest.txt, /gen_204, /generate_204) для
+             ОС-проверок связи -> редирект абонента на страницу пополнения баланса.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.46
+  mpeshkov uid 1011, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+ДВЕ группы: native sudo(27) -> debian (установочная, nologin);
+            omicron-sudo(gid 1001): epetrov, itronin, gmasich, iverbitsky, inebalzin,
+            pkuzmin, ansible, root, rtaktarov.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  rtaktarov(r.taktarov@rocketcom.ru — профильный админ домена), ansible(+docker, docker inactive).
+  mpeshkov — readonly.
+Nologin uid>=1000: epetrov, itronin, iverbitsky, inebalzin, debian.
+
+  [СРЕД] debian в native sudo; omicron-sudo (вероятно NOPASSWD ALL) с 4 nologin ex-staff — чистка.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. Без подрядчиков.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба с mgmt-VPN): только 1221 — OPEN. (80/443 слушают, но
+  на mgmt-VPN недоступны — портал отдаётся в абонентскую сеть.)
+  1221/tcp   SSH            0.0.0.0   ключи-only, root off — ок
+  80,443/tcp nginx (портал) 0.0.0.0   nomoney.rocketcom.ru (страница пополнения)
+  10050/tcp  zabbix-agent   0.0.0.0   ограничить Server=
+  631 CUPS                  127.0.0.1 ок
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [СРЕД-1] debian в native sudo; omicron-sudo (вероятно NOPASSWD ALL) с 4 nologin
+           ex-staff (epetrov, itronin, iverbitsky, inebalzin) — чистка.
+  [СРЕД-2] Хостового фаервола нет (80/443 нужны абонентам, SSH/10050 ограничить).
+  [НИЗ-3]  php-fpm 8.2 обслуживает портал — держать в актуальном состоянии (сейчас 0 обновлений).
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL) и ПОЛНОСТЬЮ пропатчен (0 обновлений); нативный nginx+php
+      (не docker); SSH захардене; fail2ban активен; профильный админ rocketcom (rtaktarov).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), содержимое /var/www/rocket, полный vhost,
+  authorized_keys.
+==========================================================================

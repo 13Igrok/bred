@@ -1,0 +1,67 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.100  (MultiFactorRA)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : MultiFactorRA
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-37   Uptime: 236 дней
+  Роль     : Агент двухфакторной аутентификации MultiFactor — RADIUS-adapter (.NET/dotnet,
+             /opt/multifactor/radius/multifactor-radius-adapter, юзер mfa).
+             multifactor-radius.service (enabled). Обеспечивает MFA для VPN/RADIUS-клиентов.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.100
+  mpeshkov uid 1010, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+ДВЕ группы с правами:
+  - native sudo(27): член -> inebalzin  (!!! нештатно, см. ниже)
+  - omicron-sudo(gid 1001): epetrov, itronin, gmasich, inebalzin, pkuzmin, root, ansible
+
+Действующие (login-shell bash + sudo): root, gmasich(g.masich@omiplat.ru),
+  pkuzmin(p.kuzmin@360pro.online), ansible(+docker, docker inactive). mpeshkov — readonly.
+Сервисный: mfa(uid995, /bin/sh — агент MultiFactor).
+Nologin uid>=1000: epetrov, itronin, inebalzin, il167.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] inebalzin (nologin, бывший сотрудник) состоит в НАТИВНОЙ группе sudo(27) И в
+        omicron-sudo. Штатная sudo-группа на прочих хостах парка пуста — здесь аномалия.
+        Удалить inebalzin из sudo/omicron-sudo.
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с nologin ex-staff (epetrov, itronin, inebalzin).
+  [+]   SSH захардене (Port 1221, root off, пароли off). ufw АКТИВЕН. fail2ban АКТИВЕН.
+        Агент MFA работает под непривилегированным mfa (не root) — хорошо.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (ufw активен, минимальная экспозиция)
+--------------------------------------------------------------------------
+Внешняя доступность (проба VPN, TCP): 1221, 10050 — OPEN.
+  1221/tcp   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  10050/tcp  zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+  631/tcp    CUPS                    127.0.0.1     ок
+  UDP: RADIUS-adapter (обычно 1812/udp) — обслуживает VPN/RADIUS-клиентов; ufw активен,
+       доступ контролируется (UDP снаружи через /dev/tcp не проверить).
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  inebalzin (nologin ex-staff) в НАТИВНОЙ sudo(27) + omicron-sudo — аномалия
+           (на других хостах native sudo пуст). Удалить.
+  [СРЕД-2] omicron-sudo (вероятно NOPASSWD ALL) с nologin ex-staff — чистка.
+  [СРЕД-3] 198 ожидающих обновлений; unattended-upgrades НЕ включён. Debian 12 (не EOL).
+  [НИЗ-4]  zabbix(10050) без ограничения Server.
+
+  [+] ПЛЮСЫ: ufw АКТИВЕН (минимальная экспозиция: только SSH+zabbix наружу); fail2ban активен;
+      MFA-агент под непривилегированным юзером mfa; SSH захардене.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: это агент MFA/2FA — критичный для безопасности VPN/RADIUS компонент. Стоит
+  проверить (нужен sudo): конфиг multifactor-radius-adapter (API-ключ MultiFactor, shared
+  secret RADIUS, к каким NAS/VPN подключён), актуальность dotnet-рантайма.
+НЕ ПРОВЕРЕНО (read-only): sudoers/omicron-sudo (NOPASSWD?), конфиг MFA-адаптера, UDP-порты,
+  authorized_keys.
+==========================================================================

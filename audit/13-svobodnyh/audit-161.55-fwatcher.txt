@@ -1,0 +1,74 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.55  (fwatcher)
+ Дата: 2026-09-14   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : fwatcher
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-43   Uptime: 143 дня   RAM: 15 GiB
+  Роль     : ДВОЙНАЯ — (1) Flussonic Watcher 26.02 (видеонаблюдение/стриминг + flussonic-central,
+             PostgreSQL-бэкенд); (2) PIVOT-хост для доступа в подсеть 192.168.161.x
+             (Exchange EX1-*/EX2-FLASH через ProxyJump).
+  Сервисы  : flussonic.service, flussonic-watcher.service (active), central, watcher-go,
+             streamer, epmd, postgresql. Docker не запущен.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk). Прописан в ~/.ssh/config как "fwatcher".
+  mpeshkov uid 1010 в omicron-sudo(1001) -> NOPASSWD root.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001).
+ПОДТВЕРЖДЕНО (прочитал): /etc/sudoers.d/omicron-sudo = %omicron-sudo ALL=(ALL) NOPASSWD: ALL.
+
+Члены omicron-sudo (8): epetrov, itronin, gmasich, inebalzin, pkuzmin, ansible, root, mpeshkov
+
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(+docker, inactive), mpeshkov.
+Прочие shell: postgres(uid117, /bin/bash — служебный СУБД).
+Nologin uid>=1000: epetrov, itronin, inebalzin, debian(шаблонная, НЕ в sudo).
+
+  ЗАМЕЧАНИЯ:
+  [СРЕД] omicron-sudo = NOPASSWD ALL; 3 nologin ex-staff (epetrov, itronin, inebalzin)
+         в админ-группе — чистка. Внешних подрядчиков нет.
+  [i]   ansible в docker (docker inactive). Это pivot-хост -> компрометация root здесь
+        = доступ в 161.x-сегмент (Exchange). Держать состав админов минимальным.
+  [+]   SSH захардене (Port 1221, root off, пароли off). ufw АКТИВЕН. fail2ban АКТИВЕН.
+        debian-учётка без sudo.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (ufw активен; стриминговые порты Flussonic пропущены наружу)
+--------------------------------------------------------------------------
+Внешняя доступность (проба VPN): 1221, 80, 443, 554, 9019, 9020, 10050 — OPEN.
+  TCP:
+  1221   SSH                       0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443 Flussonic Watcher (web)   0.0.0.0  OPEN  веб-интерфейс видеонаблюдения
+  554    RTSP (streamer)           0.0.0.0  OPEN  приём/раздача потоков
+  9019   flussonic-central (API)   *        OPEN  API центрального узла
+  9020   watcher-go                *        OPEN  API/сервис Watcher
+  10050  zabbix-agent              0.0.0.0  OPEN  ограничить Server=
+  5432   PostgreSQL                127.0.0.1      ок (localhost)
+  4369   epmd (Erlang) / 36759     127.0.0.1      ок (localhost)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [СРЕД-1] omicron-sudo = NOPASSWD ALL с 3 nologin ex-staff. Учитывая, что это PIVOT
+           в 161.x (Exchange), состав root-доступа критичен — минимизировать/чистить.
+
+  [СРЕД-2] Flussonic Watcher web(80/443) + API(9019/9020) + RTSP(554) открыты в сеть.
+           Проверить: включена ли аутентификация Watcher UI/API, ограничен ли RTSP(554)
+           источниками (камеры), актуальны ли пароли. Публичный API видеонаблюдения =
+           доступ к камерам/архиву при слабой аутентификации.
+
+  [НИЗ-3]  48+ ожидающих обновлений (в т.ч. security); unattended-upgrades НЕ включён.
+           Debian 12 (не EOL). zabbix(10050) без ограничения Server.
+
+  [+] ПЛЮСЫ: ufw и fail2ban активны; SSH захардене; PostgreSQL на localhost;
+      docker не запущен; без внешних подрядчиков; Flussonic 26.02 — свежая версия.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: у mpeshkov здесь NOPASSWD sudo. Аудит без изменений. Хост — рабочий pivot.
+==========================================================================

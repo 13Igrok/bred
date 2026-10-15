@@ -1,0 +1,65 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.18  (ns1.omicron.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : ns1.omicron.online
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL   Kernel: 5.10.0-37   Uptime: 270 дней
+  Роль     : Авторитетный DNS-сервер (PowerDNS, pdns_server) для omicron.online.
+             Бэкенд MySQL (3306). API/веб PowerDNS на 8080/8081. docker.service активен.
+             КРИТИЧНЫЙ инфра-узел (компрометация = перехват/подмена DNS домена).
+
+ДОСТУП
+  SSH порт 1221 ТОЛЬКО через pivot fwatcher (с mgmt-VPN напрямую НЕдоступен — сегментация).
+  ssh -i ~/.ssh/id_peshkov_rsa -o ProxyCommand="ssh -W %h:%p fwatcher" -p 1221 mpeshkov@192.168.161.18
+  mpeshkov uid 1010, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл (вероятно NOPASSWD ALL).
+Члены omicron-sudo (8): aglukhov, epetrov, itronin, gmasich, inebalzin, pkuzmin, ansible, root.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(+docker, docker АКТИВЕН). mpeshkov — readonly.
+Nologin uid>=1000: aglukhov, epetrov, itronin, inebalzin.
+Группа docker: aglukhov, ansible.
+
+  ЗАМЕЧАНИЯ:
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 4 nologin ex-staff — чистка.
+  [СРЕД] docker.service АКТИВЕН + ansible в docker = живой privesc до root. Плюс в группе
+         docker числится aglukhov (nologin ex-staff) — убрать.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive). Хост доступен только внутри 161.x
+(с mgmt-VPN всё закрыто — сегментация, ПЛЮС).
+  53/tcp+udp  DNS (PowerDNS)      0.0.0.0   основная служба
+  3306/tcp    MySQL (PDNS backend) 0.0.0.0  !!! БД зон DNS открыта в сегменте
+  8080/8081   PowerDNS API/веб    0.0.0.0   управление зонами по HTTP API
+  1221/tcp    SSH                 0.0.0.0   ключи-only, root off — ок
+  44785       localhost
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  MySQL (3306) — бэкенд PowerDNS с данными ВСЕХ зон — слушает на 0.0.0.0
+           (в пределах сегмента 161.x). Доступ к БД = подмена DNS-записей.
+           ДЕЙСТВИЕ: bind-address=127.0.0.1.
+  [ВЫС-2]  PowerDNS API/веб (8080/8081) на 0.0.0.0 — управление зонами. ПРОВЕРИТЬ, что
+           включён api-key и webserver-allow-from ограничен (иначе правка DNS по сети).
+           bind на localhost/доверенные хосты.
+  [СРЕД-3] docker активен + ansible (и nologin aglukhov) в группе docker = privesc-риск.
+  [СРЕД-4] omicron-sudo (вероятно NOPASSWD) с 4 nologin ex-staff — чистка.
+  [СРЕД-5] Debian 11 EOL (LTS до 08.2026) — план миграции. Хостового фаервола нет.
+
+  [+] ПЛЮСЫ: сетевая сегментация (недоступен с mgmt-VPN, только через pivot);
+      SSH захардене; fail2ban активен; 0 ожидающих обновлений.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), pdns.conf (api-key/allow-from,
+  gmysql), зоны, ns2 (реплика?), authorized_keys.
+==========================================================================

@@ -1,0 +1,69 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.19  (grafana)
+ Дата: 2026-09-14   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : grafana
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-44   Uptime: 142 дня
+  Роль     : Сервер мониторинга Grafana. Контейнер grafana/grafana:13.0.1-security-01
+             (docker, публикует 3000->3000). Датасорсы (Prometheus/Zabbix и т.п.) —
+             удалённые (на хосте только Grafana + node_exporter + zabbix-agent).
+
+ДОСТУП
+  SSH порт 22 (НЕ 1221) по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.19
+  mpeshkov uid 1016 в omicron-sudo(1001) -> NOPASSWD root (не readonly!).
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001).
+ПОДТВЕРЖДЕНО (прочитал): /etc/sudoers.d/omicron-sudo = %omicron-sudo ALL=(ALL) NOPASSWD: ALL.
+
+Члены omicron-sudo (15): aglukhov, vitek, epetrov, itronin, gmasich, ishatohin,
+  userobaba, akudryaeva, oborovkov, obobrovkov, inebalzin, pkuzmin, root, ansible, mpeshkov
+
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(сервисный, +docker), mpeshkov.
+Nologin uid>=1000 (часть — в omicron-sudo): aglukhov, vitek, epetrov, itronin,
+  ishatohin, userobaba, akudryaeva, oborovkov, obobrovkov, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo = NOPASSWD ALL, 15 членов — ~10 nologin ex-staff. Сильно раздут.
+        Чистка.
+  [ВЫС] docker.service АКТИВЕН; в группе docker — сервисные omicron и ansible ->
+        ЖИВОЙ privesc до root.
+  [+]   SSH захардене (root off, пароли off). fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 22, 3000, 9100, 10050 — OPEN.
+  TCP:
+  22     SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  3000   Grafana (docker)        0.0.0.0  OPEN  HTTP (нет TLS); аутентификация ТРЕБУЕТСЯ
+  9100   node_exporter           *        OPEN  без auth
+  10050  zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  omicron-sudo = NOPASSWD ALL с ~10 nologin ex-staff (15 членов). Чистка.
+  [ВЫС-2]  docker активен + сервисные учётки (omicron, ansible) в группе docker =
+           живой privesc до root.
+  [СРЕД-3] Grafana (3000) открыта в сеть по HTTP без TLS. Плюс: анонимный доступ
+           ВЫКЛЮЧЕН (/api/org -> 401, редирект на /login), версия 13.0.1-security-01
+           свежая. ДЕЙСТВИЕ: включить HTTPS, ограничить доступ по IP.
+  [СРЕД-4] Хостового фаервола нет; node_exporter(9100)/zabbix(10050) без ограничений.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL) и ПОЛНОСТЬЮ пропатчен (0 обновлений); Grafana свежая
+      с включённой аутентификацией; SSH захардене; fail2ban активен.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: у mpeshkov здесь NOPASSWD sudo. Аудит без изменений.
+НЕ ПРОВЕРЕНО: датасорсы/дашборды Grafana, секреты подключений, unattended (не включён).
+==========================================================================

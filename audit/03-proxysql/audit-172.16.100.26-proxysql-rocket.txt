@@ -1,0 +1,36 @@
+==========================================================================
+ АУДИТ ХОСТА  172.16.100.26  (ProxySQL, домен rocket)   [ЧАСТИЧНО — нет доступа к ОС]
+ Дата: 2026-09-14   Аудитор: mpeshkov
+ Фокус: админские учётки и порты
+==========================================================================
+
+СТАТУС ДОСТУПА
+  ProxySQL-хост (порты 6032/6033/6070/6080), rocket-подсеть 172.16.100.x.
+  SSH:1221 (publickey-only, OpenSSH 8.4/Debian11), ключ id_peshkov_rsa ОТКЛОНЁН —
+  учётка mpeshkov на этом хосте НЕ заведена. Шелла нет -> аудит УЧЁТОК ОС невозможен.
+
+ИДЕНТИФИКАЦИЯ
+  ОС      : Debian 11 (OpenSSH_8.4p1 Debian-5+deb11u1). PTR нет.
+  Роль    : ProxySQL — прокси MySQL перед БД BGBilling домена rocket (rocketcom),
+            бэкенд bg-core rocket (172.16.100.24). Сигнатура портов идентична другим
+            proxysql-узлам (flash 110.20, omicron 160.103, omiplat 160.70).
+
+ПОРТЫ (внешний скан с VPN)
+  1221/tcp  SSH (publickey-only)        OPEN
+  6032/tcp  ProxySQL ADMIN (MySQL-proto) OPEN  !!! ВЫС: админ-интерфейс в сети
+  6033/tcp  ProxySQL client (MySQL)     OPEN
+  6070/tcp  ProxySQL SQLite3/restapi    OPEN
+  6080/tcp  ProxySQL web UI             OPEN
+  9100/tcp  node_exporter               OPEN
+
+НАХОДКИ (по доступным данным)
+  [ВЫС-1]  ProxySQL admin (6032) открыт в сеть (доступен с mgmt-VPN, в отличие от
+           proxysql-omiplat) -> контроль прокси + креды БД BGBilling rocket. Проверить
+           admin-пароль (не admin/admin), bind localhost/mgmt, фаервол. (Не подбирал.)
+  [ВЫС-2]  Client 6033/web 6080 открыты в сеть — ограничить до app-хостов.
+  [i]      SSH только по ключу (хорошо), но mpeshkov не авторизован — для аудита ОС
+           нужен рабочий аккаунт/ключ.
+
+НЕ ВЫПОЛНЕНО (нет доступа): админ-учётки ОС, omicron-sudo, пароль ProxySQL admin,
+  mysql_users/бэкенды, версия. Нужен SSH-доступ.
+==========================================================================

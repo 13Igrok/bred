@@ -1,0 +1,95 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.49  (bitrix-to-erp-integrade)
+ DNS/роль: интеграционный сервер Bitrix <-> ERP
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo), доступ ПРЯМОЙ
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : bitrix-to-erp-integrade
+  OS       : Debian GNU/Linux 13 (trixie)  -- АКТУАЛЬНАЯ, не EOL
+  Kernel   : 6.12.90+deb13.1-amd64   Virt: VMware VM   Uptime: 13 дней (загрузка 25.08)
+  Роль     : интеграция Bitrix24 <-> ERP (по имени хоста). На момент аудита
+             интеграционная служба НЕ развёрнута: /opt пуст, нет systemd-юнитов
+             integr/bitrix/erp/1c, нет cron-задач. Похоже, хост в стадии настройки
+             (подрядчиком avk). Запущен ПОЛНЫЙ ДЕСКТОП (GNOME/GDM, graphical.target).
+
+ДОСТУП
+  SSH порт 1221 (НЕ 22) по ключу id_peshkov_rsa (=Peshkov2.ppk). Доступен локально и с fwatcher.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.49
+  mpeshkov uid 1011, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Здесь ДВЕ группы с админ-правами (в отличие от bg-* парка, где sudo пуста):
+  - native sudo(27): члены -> debian
+  - native adm(4):  члены -> debian
+  - кастомная omicron-sudo(gid 1001): itronin, gmasich, inebalzin, pkuzmin, ansible, root, avk
+  (содержимое /etc/sudoers.d недоступно read-only юзеру — стало строже, чем на bg-*.)
+
+Учётки с login-shell (bash):
+  УЧЁТКА    UID   ВЛАДЕЛЕЦ / ДОМЕН                              ПРАВА
+  root      0     -                                             omicron-sudo
+  gmasich   1003  g.masich@omiplat.ru                           omicron-sudo
+  pkuzmin   1007  p.kuzmin@360pro.online                        omicron-sudo
+  ansible   1008  сервисный                                     omicron-sudo + docker
+  avk       1010  AVK (ВНЕШНИЙ ПОДРЯДЧИК, avk@it-solution.ru,   omicron-sudo, bash
+                  "it-solution.ru / yug-telekom-k", Individual access)
+  mpeshkov  1011  m.peshkov@360pro.online (я)                   только omicron-readonly
+
+Прочие в омикрон-sudo (nologin): itronin, inebalzin.
+Учётка debian: uid 1009, shell /usr/sbin/nologin, но состоит в native sudo и adm.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] ВНЕШНИЙ ПОДРЯДЧИК 'avk' (avk@it-solution.ru, сторонняя организация) имеет
+        интерактивный вход (bash) И админ-права (omicron-sudo) на хосте, который
+        должен связывать Bitrix и ERP (доступ к бизнес-данным двух систем).
+        ДЕЙСТВИЕ: подтвердить необходимость, ограничить по времени/области,
+        включить усиленный аудит его действий; по завершении работ — удалить.
+  [СРЕД] Учётка 'debian' (штатная установочная) в группах native sudo+adm. Shell
+        nologin (интерактивно войти нельзя), но членство в sudo — гигиена: удалить
+        учётку/убрать из sudo.
+  [СРЕД] itronin, inebalzin — nologin, но в omicron-sudo (устаревшие). Под чистку.
+  [НИЗ] ansible в группе docker -> латентный privesc (docker.service inactive).
+  [i]   gmasich — «устаревший админ», фигурирует на POWER-BI и по всему bg-* парку.
+  [+]   SSH захардене: Port 1221, PermitRootLogin no, PasswordAuthentication no.
+        SUID-набор чист. fail2ban активен. unattended-upgrades ВКЛЮЧЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (минимальная экспозиция — заметно лучше bg-* парка)
+--------------------------------------------------------------------------
+  TCP наружу:
+    1221/tcp  SSH (OpenSSH)   0.0.0.0   единственный сетевой порт; ключи-only, root off
+  TCP только localhost:
+    25/tcp    exim4 (MTA)     127.0.0.1 / ::1
+    631/tcp   CUPS (печать)   127.0.0.1 / ::1   -- не нужен на сервере
+  UDP: только эфемерные + mDNS (avahi). Веб/СУБД/интеграционных портов НЕТ.
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Внешний подрядчик avk с sudo и интерактивным входом (см. разд.1).
+  [СРЕД-2] Штатная учётка 'debian' в native sudo+adm (nologin) — убрать.
+  [СРЕД-3] omicron-sudo содержит устаревшие nologin (itronin, inebalzin) — чистка.
+  [СРЕД-4] На сервере запущен ПОЛНЫЙ ДЕСКТОП (GNOME/GDM, graphical.target) +
+           avahi-daemon (mDNS) + CUPS (631) + wpa_supplicant + pipewire. Лишняя
+           поверхность атаки для интеграционного сервера. ДЕЙСТВИЕ: перевести в
+           multi-user.target, снести desktop/CUPS/avahi/wpa_supplicant.
+  [НИЗ-5]  ansible в docker (латентный privesc). CUPS/exim на localhost — ок, но
+           CUPS стоит убрать.
+  [НИЗ-6]  79 ожидающих обновлений (0 security). Накатить в плановом окне.
+
+  [+] ПЛЮСЫ (заметно лучше bg-* парка): Debian 13 (не EOL); 0 security-обновлений;
+      unattended-upgrades включён; минимальная сетевая экспозиция (только SSH:1221);
+      SSH захардене; SUID чист; sudoers.d закрыт от чтения.
+
+  [i] Интеграция Bitrix<->ERP на момент аудита НЕ развёрнута (/opt пуст, нет юнитов/
+      cron). Хост, вероятно, в стадии настройки. Повторить аудит после развёртывания
+      (появятся сервисные порты/учётки/секреты подключения к Bitrix и ERP).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (нужен доступ с sudo / вне фокуса):
+  содержимое sudoers/sudoers.d (NOPASSWD?), домашний каталог avk, секреты интеграции,
+  /var/log/auth.log, приватные authorized_keys.
+==========================================================================

@@ -1,0 +1,77 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.68  (oms)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : oms
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-40   Uptime: 290 дней
+  Роль     : NOC/управление сетью. Observium (мониторинг по SNMP: nginx+php-fpm+MariaDB,
+             snmpd/snmpbulkwalk) + RANCID (бэкап конфигов сетевых устройств) + vsftpd (FTP).
+             ВЫСОКОЦЕННЫЙ узел: RANCID хранит учётные данные ко ВСЕМ сетевым устройствам.
+
+ДОСТУП
+  SSH порт 22 (НЕ 1221) по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.68
+  mpeshkov uid 1014, группа omicron-readonly(1013) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл (вероятно NOPASSWD ALL).
+Члены omicron-sudo (9): epetrov, itronin, gmasich, inebalzin, pkuzmin, userobaba, root,
+  ansible, rtaktarov.
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  userobaba(Ura Serobaba, u.serobaba@360pro.online — ДЕЙСТВУЮЩИЙ пользователь; на других
+    хостах эта учётка nologin, здесь активна),
+  rtaktarov(r.taktarov@rocketcom.ru), ansible(+docker, docker inactive). mpeshkov — readonly.
+Сервисные shell-учётки: observium(/bin/sh), rancid(/bin/bash — доступ к сетевым устройствам),
+  ftpuser(/bin/bash, ~43 МБ данных).
+Nologin uid>=1000: epetrov, itronin, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff (epetrov, itronin,
+         inebalzin) — чистка.
+  [i]   userobaba здесь — РЕАЛЬНАЯ активная учётка (Ura Serobaba), а не ex-staff (уточнение
+        к прочим хостам, где она nologin).
+  [НИЗ] ftpuser с интерактивным /bin/bash — для FTP-аккаунта лучше ограниченный shell.
+  [+]   SSH захардене (PermitRootLogin no, PasswordAuthentication no). fail2ban АКТИВЕН.
+        RANCID .cloginrc (креды устройств) — 0640 rancid:rancid, мне НЕ читается (хорошо).
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 22, 80, 21, 9100 — OPEN.
+  22/tcp    SSH               0.0.0.0  OPEN  ключи-only, root off — ок
+  80/tcp    Observium (nginx) 0.0.0.0  OPEN  веб-мониторинг (проверить auth)
+  21/tcp    vsftpd (FTP)      0.0.0.0  OPEN  !!! PLAIN FTP наружу
+  9100/tcp  node_exporter     *        OPEN  без auth
+  (MariaDB — локально; snmpd/161 udp — для опроса устройств)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  vsftpd (21) — ОТКРЫТЫЙ PLAIN FTP в сети. Пароли/данные в открытом виде.
+           Вероятно используется сетевыми устройствами (заливка конфигов/прошивок).
+           ДЕЙСТВИЕ: перевести на SFTP/FTPS, ограничить источники (VLAN устройств),
+           проверить, не разрешён ли анонимный доступ; ftpuser -> ограниченный shell.
+
+  [ВЫС-2]  Узел RANCID = «ключи от сетевого королевства»: хранит учётки ко всем
+           маршрутизаторам/коммутаторам (.cloginrc). Компрометация oms = доступ ко всей
+           сетевой инфраструктуре. ДЕЙСТВИЕ: усиленная защита/аудит доступа к хосту,
+           минимизация админов, фаервол.
+
+  [СРЕД-3] Observium web (80) — проверить аутентификацию (не анонимный ли доступ к NMS).
+  [СРЕД-4] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка.
+  [СРЕД-5] Хостового фаервола нет; node_exporter(9100) без auth.
+  [НИЗ-6]  31 ожидающее обновление; unattended-upgrades НЕ включён.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL); SSH захардене; fail2ban активен; .cloginrc защищён (0640).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), конфиг vsftpd (анонимность/chroot),
+  Observium auth, содержимое /home/ftpuser, authorized_keys.
+==========================================================================

@@ -1,0 +1,258 @@
+==================================================================
+k3s audit - 2026-10-12 08:27:27
+==================================================================
+HIGH:  22   MED: 191   INFO:  40
+------------------------------------------------------------------
+HIGH [nodes] k3s-node5: control-plane not Ready (Unknown), pressures=[]
+HIGH [workload] longhorn-system/engine-image-ei-51cc7b9c-48hn9: privileged container engine-image-ei-51cc7b9c
+HIGH [workload] longhorn-system/engine-image-ei-51cc7b9c-8dvkv: privileged container engine-image-ei-51cc7b9c
+HIGH [workload] longhorn-system/engine-image-ei-51cc7b9c-kk5mf: privileged container engine-image-ei-51cc7b9c
+HIGH [workload] longhorn-system/engine-image-ei-51cc7b9c-x8ssf: privileged container engine-image-ei-51cc7b9c
+HIGH [workload] longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9: privileged container instance-manager
+HIGH [workload] longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e: privileged container instance-manager
+HIGH [workload] longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b: privileged container instance-manager
+HIGH [workload] longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124: privileged container instance-manager
+HIGH [workload] longhorn-system/longhorn-csi-plugin-6572c: privileged container node-driver-registrar
+HIGH [workload] longhorn-system/longhorn-csi-plugin-6572c: privileged container longhorn-csi-plugin
+HIGH [workload] longhorn-system/longhorn-csi-plugin-kqzxr: privileged container node-driver-registrar
+HIGH [workload] longhorn-system/longhorn-csi-plugin-kqzxr: privileged container longhorn-csi-plugin
+HIGH [workload] longhorn-system/longhorn-csi-plugin-msx2b: privileged container node-driver-registrar
+HIGH [workload] longhorn-system/longhorn-csi-plugin-msx2b: privileged container longhorn-csi-plugin
+HIGH [workload] longhorn-system/longhorn-csi-plugin-w6drk: privileged container node-driver-registrar
+HIGH [workload] longhorn-system/longhorn-csi-plugin-w6drk: privileged container longhorn-csi-plugin
+HIGH [workload] longhorn-system/longhorn-manager-8ljf7: privileged container longhorn-manager
+HIGH [workload] longhorn-system/longhorn-manager-d584c: privileged container longhorn-manager
+HIGH [workload] longhorn-system/longhorn-manager-p4dk4: privileged container longhorn-manager
+HIGH [workload] longhorn-system/longhorn-manager-qddkx: privileged container longhorn-manager
+HIGH [rbac] cluster-admin: clusterrole grants */* (full access)
+MED  [workload] default/node-debugger-k3s-node1-j8x74: container debugger has no resource limits
+MED  [workload] default/node-debugger-k3s-node1-j8x74: hostPath volume host-root
+MED  [workload] default/node-debugger-k3s-node1-j8x74: hostNetwork pod outside kube-system
+MED  [workload] default/node-debugger-k3s-node2-rm5qw: container debugger has no resource limits
+MED  [workload] default/node-debugger-k3s-node2-rm5qw: hostPath volume host-root
+MED  [workload] default/node-debugger-k3s-node2-rm5qw: hostNetwork pod outside kube-system
+MED  [workload] default/node-debugger-k3s-node3-cdfrl: container debugger has no resource limits
+MED  [workload] default/node-debugger-k3s-node3-cdfrl: hostPath volume host-root
+MED  [workload] default/node-debugger-k3s-node3-cdfrl: hostNetwork pod outside kube-system
+MED  [workload] default/node-debugger-k3s-node4-wqtrh: container debugger has no resource limits
+MED  [workload] default/node-debugger-k3s-node4-wqtrh: hostPath volume host-root
+MED  [workload] default/node-debugger-k3s-node4-wqtrh: hostNetwork pod outside kube-system
+MED  [workload] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t: container gitlab-agent has no resource limits
+MED  [workload] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl: container gitlab-agent has no resource limits
+MED  [workload] kube-system/helm-install-traefik-crd-mrnlf: container helm has no resource limits
+MED  [workload] kube-system/helm-install-traefik-h95zl: container helm has no resource limits
+MED  [workload] kube-system/kube-vip-ds-7wgkr: container kube-vip has no resource limits
+MED  [workload] kube-system/kube-vip-ds-7wgkr: hostNetwork pod outside kube-system
+MED  [workload] kube-system/kube-vip-ds-hrt5d: container kube-vip has no resource limits
+MED  [workload] kube-system/kube-vip-ds-hrt5d: hostNetwork pod outside kube-system
+MED  [workload] kube-system/kube-vip-ds-j4hkf: container kube-vip has no resource limits
+MED  [workload] kube-system/kube-vip-ds-j4hkf: hostNetwork pod outside kube-system
+MED  [workload] kube-system/kube-vip-ds-rcgz9: container kube-vip has no resource limits
+MED  [workload] kube-system/kube-vip-ds-rcgz9: hostNetwork pod outside kube-system
+MED  [workload] kube-system/kube-vip-ds-sj956: container kube-vip has no resource limits
+MED  [workload] kube-system/kube-vip-ds-sj956: hostNetwork pod outside kube-system
+MED  [workload] kube-system/local-path-provisioner-869c44bfbd-44zp8: container local-path-provisioner has no resource limits
+MED  [workload] kube-system/metrics-server-7bfffcd44-9d4vv: container metrics-server has no resource limits
+MED  [workload] kube-system/traefik-865bd56545-lcl29: container traefik has no resource limits
+MED  [workload] longhorn-system/csi-attacher-7b994cbfbf-7bh9j: container csi-attacher has no resource limits
+MED  [workload] longhorn-system/csi-attacher-7b994cbfbf-7bh9j: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-attacher-7b994cbfbf-k8q58: container csi-attacher has no resource limits
+MED  [workload] longhorn-system/csi-attacher-7b994cbfbf-k8q58: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-attacher-7b994cbfbf-w6qsq: container csi-attacher has no resource limits
+MED  [workload] longhorn-system/csi-attacher-7b994cbfbf-w6qsq: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-provisioner-d79dfd48f-qm465: container csi-provisioner has no resource limits
+MED  [workload] longhorn-system/csi-provisioner-d79dfd48f-qm465: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-provisioner-d79dfd48f-s2hd5: container csi-provisioner has no resource limits
+MED  [workload] longhorn-system/csi-provisioner-d79dfd48f-s2hd5: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-provisioner-d79dfd48f-z85hc: container csi-provisioner has no resource limits
+MED  [workload] longhorn-system/csi-provisioner-d79dfd48f-z85hc: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-resizer-9cc4b6d5c-55gkf: container csi-resizer has no resource limits
+MED  [workload] longhorn-system/csi-resizer-9cc4b6d5c-55gkf: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-resizer-9cc4b6d5c-c5c7k: container csi-resizer has no resource limits
+MED  [workload] longhorn-system/csi-resizer-9cc4b6d5c-c5c7k: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-resizer-9cc4b6d5c-krc25: container csi-resizer has no resource limits
+MED  [workload] longhorn-system/csi-resizer-9cc4b6d5c-krc25: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-snapshotter-7746d5794b-4n8qp: container csi-snapshotter has no resource limits
+MED  [workload] longhorn-system/csi-snapshotter-7746d5794b-4n8qp: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-snapshotter-7746d5794b-grwng: container csi-snapshotter has no resource limits
+MED  [workload] longhorn-system/csi-snapshotter-7746d5794b-grwng: hostPath volume socket-dir
+MED  [workload] longhorn-system/csi-snapshotter-7746d5794b-n2wgf: container csi-snapshotter has no resource limits
+MED  [workload] longhorn-system/csi-snapshotter-7746d5794b-n2wgf: hostPath volume socket-dir
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-48hn9: container engine-image-ei-51cc7b9c has no resource limits
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-48hn9: hostPath volume data
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-8dvkv: container engine-image-ei-51cc7b9c has no resource limits
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-8dvkv: hostPath volume data
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-kk5mf: container engine-image-ei-51cc7b9c has no resource limits
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-kk5mf: hostPath volume data
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-x8ssf: container engine-image-ei-51cc7b9c has no resource limits
+MED  [workload] longhorn-system/engine-image-ei-51cc7b9c-x8ssf: hostPath volume data
+MED  [workload] longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9: container instance-manager has no resource limits
+MED  [workload] longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9: hostPath volume host
+MED  [workload] longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9: hostPath volume engine-binaries
+MED  [workload] longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9: hostPath volume unix-domain-socket
+MED  [workload] longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e: container instance-manager has no resource limits
+MED  [workload] longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e: hostPath volume host
+MED  [workload] longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e: hostPath volume engine-binaries
+MED  [workload] longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e: hostPath volume unix-domain-socket
+MED  [workload] longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b: container instance-manager has no resource limits
+MED  [workload] longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b: hostPath volume host
+MED  [workload] longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b: hostPath volume engine-binaries
+MED  [workload] longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b: hostPath volume unix-domain-socket
+MED  [workload] longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124: container instance-manager has no resource limits
+MED  [workload] longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124: hostPath volume host
+MED  [workload] longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124: hostPath volume engine-binaries
+MED  [workload] longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124: hostPath volume unix-domain-socket
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: container node-driver-registrar has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: container longhorn-liveness-probe has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: container longhorn-csi-plugin has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume kubernetes-csi-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume registration-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume socket-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume pods-mount-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume host-dev
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume host-proc
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume host-sys
+MED  [workload] longhorn-system/longhorn-csi-plugin-6572c: hostPath volume lib-modules
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: container node-driver-registrar has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: container longhorn-liveness-probe has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: container longhorn-csi-plugin has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume kubernetes-csi-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume registration-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume socket-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume pods-mount-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume host-dev
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume host-proc
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume host-sys
+MED  [workload] longhorn-system/longhorn-csi-plugin-kqzxr: hostPath volume lib-modules
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: container node-driver-registrar has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: container longhorn-liveness-probe has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: container longhorn-csi-plugin has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume kubernetes-csi-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume registration-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume socket-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume pods-mount-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume host-dev
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume host-proc
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume host-sys
+MED  [workload] longhorn-system/longhorn-csi-plugin-msx2b: hostPath volume lib-modules
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: container node-driver-registrar has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: container longhorn-liveness-probe has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: container longhorn-csi-plugin has no resource limits
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume kubernetes-csi-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume registration-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume socket-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume pods-mount-dir
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume host-dev
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume host-proc
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume host-sys
+MED  [workload] longhorn-system/longhorn-csi-plugin-w6drk: hostPath volume lib-modules
+MED  [workload] longhorn-system/longhorn-driver-deployer-74755cdf4-6l9rh: container longhorn-driver-deployer has no resource limits
+MED  [workload] longhorn-system/longhorn-driver-deployer-74755cdf4-6l9rh: container wait-longhorn-manager has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-8ljf7: container longhorn-manager has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-8ljf7: container pre-pull-share-manager-image has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-8ljf7: hostPath volume boot
+MED  [workload] longhorn-system/longhorn-manager-8ljf7: hostPath volume dev
+MED  [workload] longhorn-system/longhorn-manager-8ljf7: hostPath volume proc
+MED  [workload] longhorn-system/longhorn-manager-8ljf7: hostPath volume longhorn
+MED  [workload] longhorn-system/longhorn-manager-d584c: container longhorn-manager has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-d584c: container pre-pull-share-manager-image has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-d584c: hostPath volume boot
+MED  [workload] longhorn-system/longhorn-manager-d584c: hostPath volume dev
+MED  [workload] longhorn-system/longhorn-manager-d584c: hostPath volume proc
+MED  [workload] longhorn-system/longhorn-manager-d584c: hostPath volume longhorn
+MED  [workload] longhorn-system/longhorn-manager-p4dk4: container longhorn-manager has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-p4dk4: container pre-pull-share-manager-image has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-p4dk4: hostPath volume boot
+MED  [workload] longhorn-system/longhorn-manager-p4dk4: hostPath volume dev
+MED  [workload] longhorn-system/longhorn-manager-p4dk4: hostPath volume proc
+MED  [workload] longhorn-system/longhorn-manager-p4dk4: hostPath volume longhorn
+MED  [workload] longhorn-system/longhorn-manager-qddkx: container longhorn-manager has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-qddkx: container pre-pull-share-manager-image has no resource limits
+MED  [workload] longhorn-system/longhorn-manager-qddkx: hostPath volume boot
+MED  [workload] longhorn-system/longhorn-manager-qddkx: hostPath volume dev
+MED  [workload] longhorn-system/longhorn-manager-qddkx: hostPath volume proc
+MED  [workload] longhorn-system/longhorn-manager-qddkx: hostPath volume longhorn
+MED  [workload] longhorn-system/longhorn-ui-6d647ddcc5-nxxn6: container longhorn-ui has no resource limits
+MED  [workload] longhorn-system/longhorn-ui-6d647ddcc5-xjn99: container longhorn-ui has no resource limits
+MED  [workload] vault/vault-0: container vault-unseal has no resource limits
+MED  [workload] vault/vault-0: container vault has no resource limits
+MED  [workload] vault/vault-1: container vault-unseal has no resource limits
+MED  [workload] vault/vault-1: container vault has no resource limits
+MED  [workload] vault/vault-2: container vault-unseal has no resource limits
+MED  [workload] vault/vault-2: container vault has no resource limits
+MED  [rbac] admin: can read secrets cluster-wide
+MED  [rbac] edit: can read secrets cluster-wide
+MED  [rbac] gitlab-agent-k3s-agent:k3s-agent-gitlab-agent:ocs: can read secrets cluster-wide
+MED  [rbac] longhorn-role: can read secrets cluster-wide
+MED  [rbac] traefik-kube-system: can read secrets cluster-wide
+MED  [health] default/rocket-auth-88bd56474-52jj6: container rocket-auth waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=rocket-auth pod=rocket-auth-88bd56474-
+MED  [health] default/rocket-auth-88bd56474-52jj6: 85072 restarts
+MED  [health] default/rocket-auth-88bd56474-7rjwl: 85096 restarts
+MED  [health] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t: container gitlab-agent waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=gitlab-agent pod=k3s-agent-gitlab-agen
+MED  [health] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t: 78369 restarts
+MED  [health] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl: container gitlab-agent waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=gitlab-agent pod=k3s-agent-gitlab-agen
+MED  [health] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl: 79014 restarts
+MED  [health] kube-system/kube-vip-ds-7wgkr: 106 restarts
+MED  [health] kube-system/kube-vip-ds-hrt5d: 106 restarts
+MED  [health] kube-system/kube-vip-ds-j4hkf: container kube-vip waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=kube-vip pod=kube-vip-ds-j4hkf_kube-sy
+MED  [health] kube-system/kube-vip-ds-j4hkf: 12630 restarts
+MED  [health] kube-system/kube-vip-ds-rcgz9: 123 restarts
+MED  [health] kube-system/kube-vip-ds-sj956: 110 restarts
+MED  [health] kube-system/metrics-server-7bfffcd44-9d4vv: 4 restarts
+MED  [health] longhorn-system/csi-attacher-7b994cbfbf-7bh9j: 49 restarts
+MED  [health] longhorn-system/csi-attacher-7b994cbfbf-k8q58: 42 restarts
+MED  [health] longhorn-system/csi-attacher-7b994cbfbf-w6qsq: 40 restarts
+MED  [health] longhorn-system/csi-provisioner-d79dfd48f-qm465: 34 restarts
+MED  [health] longhorn-system/csi-provisioner-d79dfd48f-s2hd5: 38 restarts
+MED  [health] longhorn-system/csi-provisioner-d79dfd48f-z85hc: 46 restarts
+MED  [health] longhorn-system/csi-resizer-9cc4b6d5c-55gkf: 43 restarts
+MED  [health] longhorn-system/csi-resizer-9cc4b6d5c-c5c7k: 42 restarts
+MED  [health] longhorn-system/csi-resizer-9cc4b6d5c-krc25: 42 restarts
+MED  [health] longhorn-system/csi-snapshotter-7746d5794b-4n8qp: 33 restarts
+MED  [health] longhorn-system/csi-snapshotter-7746d5794b-grwng: 30 restarts
+MED  [health] longhorn-system/csi-snapshotter-7746d5794b-n2wgf: 55 restarts
+MED  [health] longhorn-system/longhorn-csi-plugin-6572c: 4 restarts
+MED  [health] longhorn-system/longhorn-csi-plugin-kqzxr: 4 restarts
+MED  [health] longhorn-system/longhorn-csi-plugin-msx2b: 4 restarts
+MED  [health] longhorn-system/longhorn-csi-plugin-w6drk: 4 restarts
+MED  [health] mail/mailserver-360pro-6c779f4664-rzfm2: 3 restarts
+INFO [nodes] k3s-node1: control-plane k3s/kubelet v1.33.6+k3s1
+INFO [nodes] k3s-node2: control-plane k3s/kubelet v1.33.6+k3s1
+INFO [nodes] k3s-node3: control-plane k3s/kubelet v1.33.6+k3s1
+INFO [nodes] k3s-node4: control-plane k3s/kubelet v1.33.6+k3s1
+INFO [nodes] k3s-node5: control-plane k3s/kubelet v1.33.6+k3s1
+INFO [secrets] ankey/ankey-backup-29859780-rfsd9: reads env:PGPASSWORD->ankey-secrets
+INFO [secrets] ankey/ankey-backup-29861220-cb82x: reads env:PGPASSWORD->ankey-secrets
+INFO [secrets] ankey/ankey-backup-29862660-mwdrm: reads env:PGPASSWORD->ankey-secrets
+INFO [secrets] ankey/ankeyd-79759885d4-m9kxn: reads envFrom:ankey-secrets
+INFO [secrets] ankey/postgres-0: reads env:POSTGRES_PASSWORD->ankey-secrets
+INFO [secrets] api-gateway/api-gateway-84d9d9c94b-hwzmt: reads envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/api-gateway-84d9d9c94b-txf7m: reads envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/core-5cf57d46c9-d8c7p: reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/core-5cf57d46c9-t6hbm: reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/mobile-bff-5545698b57-tntvw: reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/mobile-bff-5545698b57-w8cwq: reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/priority-c4bc8697c-8w9dp: reads envFrom:api-gateway-secrets
+INFO [secrets] api-gateway/priority-c4bc8697c-mldsj: reads envFrom:api-gateway-secrets
+INFO [secrets] default/rocket-auth-88bd56474-52jj6: reads env:BGBILLING_URL->rocket-auth-secrets, env:BGBILLING_API_KEY->rocket-auth-secrets
+INFO [secrets] default/rocket-auth-88bd56474-7rjwl: reads env:BGBILLING_URL->rocket-auth-secrets, env:BGBILLING_API_KEY->rocket-auth-secrets
+INFO [secrets] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t: reads volume:k3s-agent-gitlab-agent-token
+INFO [secrets] gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl: reads volume:k3s-agent-gitlab-agent-token
+INFO [secrets] longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/longhorn-manager-8ljf7: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/longhorn-manager-d584c: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/longhorn-manager-p4dk4: reads volume:longhorn-grpc-tls
+INFO [secrets] longhorn-system/longhorn-manager-qddkx: reads volume:longhorn-grpc-tls
+INFO [secrets] mail/mailserver-360pro-6c779f4664-rzfm2: reads env:LDAP_BIND_PW->mailserver-360pro-secrets, env:DOVECOT_MASTER_PW->mailserver-360pro-secrets
+INFO [secrets] mail/password-expiry-notify-29861640-h86nn: reads env:LDAP_BIND_PW->mailserver-360pro-secrets
+INFO [secrets] mail/sogo-687f78bf47-v7zcb: reads env:SOGO_DB_PASSWORD->sogo-secrets, env:SOGO_LDAP_BIND_PW->sogo-secrets
+INFO [secrets] mail/sogo-db-6557d865c-pjrg5: reads env:POSTGRES_PASSWORD->sogo-secrets
+INFO [secrets] outfile/outfile-664bcbb68-jrsps: reads env:OUTFILE_LDAP_BIND_DN->outfile-ldap, env:OUTFILE_LDAP_BIND_PASSWORD->outfile-ldap
+INFO [secrets] vault/vault-0: reads env:UNSEAL_KEY_1->vault-unseal-keys, env:UNSEAL_KEY_2->vault-unseal-keys, env:UNSEAL_KEY_3->vault-unseal-keys
+INFO [secrets] vault/vault-1: reads env:UNSEAL_KEY_1->vault-unseal-keys, env:UNSEAL_KEY_2->vault-unseal-keys, env:UNSEAL_KEY_3->vault-unseal-keys
+INFO [secrets] vault/vault-2: reads env:UNSEAL_KEY_1->vault-unseal-keys, env:UNSEAL_KEY_2->vault-unseal-keys, env:UNSEAL_KEY_3->vault-unseal-keys
+INFO [helm] namespaces/gitlab-agent-k3s-agent: releases: k3s-agent
+INFO [helm] namespaces/kube-system: releases: traefik, traefik-crd

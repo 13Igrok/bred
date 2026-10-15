@@ -1,0 +1,108 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.219  (callcenter-deb2)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : callcenter-deb2
+  OS       : Debian GNU/Linux 12 (bookworm)  -- поддерживаемая
+  Kernel   : 6.1.0-52   Virt: VM   Uptime: 10 дней
+  Роль     : Телефонная платформа call-центра на базе ITGRIX (Asterisk + web).
+             Стек под юзером asterisk: asterisk, itgrix_bx/itgrix_bx_super, apache2,
+             node (PM2), php, pnp_server; БД MariaDB; redis (localhost).
+             Второй call-центр (ср. 192.168.160.35 call-center — там CentOS7/FreePBX).
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.160.219
+  mpeshkov uid 1011, группа omicron-readonly(1004) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001).
+Файл /etc/sudoers.d/omicron-sudo (38 байт) из-под read-only НЕ читается, но размер
+идентичен подтверждённым на 160.110/160.35 => почти наверняка "%omicron-sudo
+ALL=(ALL) NOPASSWD: ALL" (полный root без пароля).
+
+Члены omicron-sudo (9): epetrov, itronin, gmasich, inebalzin, pkuzmin, root,
+  ansible, avoitov, atarasov
+
+Действующие (login-shell bash + sudo):
+  root
+  gmasich   (g.masich@omiplat.ru)
+  pkuzmin   (p.kuzmin@360pro.online)
+  avoitov   (a.voitov@360pro.online, Individual access)
+  atarasov  (Artem Tarasov "Call center", cc@cc.ru — внешний/непонятный домен)
+  ansible   (сервисный, + группа docker)
+  mpeshkov (я, только readonly)
+
+Прочие shell-учётки: asterisk(uid995, bash — служебный, стек ITGRIX; НЕ в sudo, но
+  имеет ОГРАНИЧЕННЫЙ sudo через /etc/sudoers.d/itgrix_bx — Cmnd_Alias со списком
+  конкретных команд echo/cat/mkdir/chown для бэкапов/интеграции, НЕ полный root).
+Nologin uid>=1000: epetrov, itronin, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo (вероятно NOPASSWD ALL) с внешним atarasov(cc@cc.ru) — полный root.
+        Проверить статус этой учётки/подрядчика.
+  [СРЕД] 3 nologin-учётки бывших сотрудников (epetrov, itronin, inebalzin) в omicron-sudo.
+         ПОД ЧИСТКУ.
+  [i]   Кросс-доменный админ-разброс (omiplat/360pro/cc.ru). atarasov присутствует и на
+        call-center 160.35.
+  [+]   SSH захардене (sshd_config): Port 1221, PermitRootLogin no, PasswordAuthentication no.
+        unattended-upgrades ВКЛЮЧЕН. sudo для asterisk — ограниченный (itgrix_bx), не root.
+        sudo-группа sudo пуста.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (!!! ХОСТОВОГО ФАЕРВОЛА НЕТ: nftables/firewalld/ufw — все inactive)
+--------------------------------------------------------------------------
+Всё, что слушает на 0.0.0.0/*, реально доступно в сеть.
+Внешняя доступность (проба с VPN): 1221, 80, 443, 3306, 10050 — OPEN.
+  TCP:
+  1221   SSH                            0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443 apache2 (веб ITGRIX)           *        OPEN
+  3306   MariaDB                        *        OPEN  !!! ВЫС: СУБД открыта в сеть
+  8001,8003,8077,8078,8177,8178 ITGRIX web-сервисы  *  слушают на всех интерфейсах
+  1720   H.323                          0.0.0.0        legacy-телефония, лишний/риск
+  4445                                  0.0.0.0
+  8088   Asterisk HTTP/ARI              0.0.0.0        (снаружи в пробе closed — возм. upstream ACL)
+  10050  zabbix-agent2                  *        OPEN  ограничить Server=
+  5038   Asterisk AMI                   127.0.0.1      ХОРОШО (localhost; ср. 160.35 — там в сети)
+  4573   AGI                            127.0.0.1
+  8089   Asterisk HTTPS/ARI             127.0.0.1
+  6379   redis / 631 CUPS / 25 exim     127.0.0.1
+  UDP:
+  5060   SIP (asterisk)                 0.0.0.0        ограничить до транков/пиров
+  4569   IAX2                           0.0.0.0
+  69     TFTP                           0.0.0.0        провижининг телефонов; ограничить
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  ХОСТОВОГО ФАЕРВОЛА НЕТ (nft/firewalld/ufw выключены). Все службы, включая
+           MariaDB(3306) и ITGRIX web (8001-8178), H.323(1720), открыты в сеть.
+           ДЕЙСТВИЕ: поднять nftables/firewalld, оставить только нужное.
+
+  [ВЫС-2]  MariaDB (3306) открыт в сеть (подтверждено снаружи). bind-address=127.0.0.1.
+
+  [ВЫС-3]  fail2ban В СОСТОЯНИИ FAILED — защита от брутфорса/регистрационных атак не
+           работает. ДЕЙСТВИЕ: починить и запустить (важно для SIP/веб).
+
+  [ВЫС-4]  omicron-sudo (вероятно NOPASSWD ALL) с внешним atarasov(cc@cc.ru) + 3 nologin
+           ex-staff. Ревизия/чистка.
+
+  [СРЕД-5] SIP 5060 / IAX 4569 / TFTP 69 / H.323 1720 открыты всем — toll-fraud/
+           регистрационные атаки. Ограничить источники; H.323 отключить, если не нужен.
+
+  [НИЗ-6]  zabbix(10050) без ограничения Server; CUPS(631) на localhost — убрать.
+
+  [+] ПЛЮСЫ (лучше 160.35): Debian 12 (не EOL); unattended-upgrades включён;
+      Asterisk AMI на localhost (не в сети); asterisk-юзер с ОГРАНИЧЕННЫМ sudo (itgrix_bx),
+      а не полным root; SSH захардене.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): точное содержимое omicron-sudo (NOPASSWD?), полный itgrix_bx,
+  manager.conf/sip.conf (ACL/секреты), джейлы fail2ban, число обновлений (сбор прервался),
+  /var/log, authorized_keys.
+==========================================================================

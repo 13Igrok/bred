@@ -1,0 +1,40 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.48  (speedtest / speedtest.360pro.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : speedtest  (speedtest.360pro.online — "Сервис измерения скорости, внутр. использование")
+  OS       : Debian GNU/Linux 13 (trixie)  -- АКТУАЛЬНАЯ   Kernel: 6.12   Uptime: 47 дней (новый)
+  Роль     : Внутренний speedtest-сервис (nginx фронт + apache2 backend). docker активен.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.48
+
+1. АДМИНСКИЕ УЧЁТКИ
+  ДВЕ группы: native sudo(27) -> debian (nologin); omicron-sudo(gid 1001): itronin, gmasich,
+    inebalzin, pkuzmin, ansible, root, rtaktarov.
+  Действующие bash+sudo: root, gmasich(omiplat.ru), pkuzmin(360pro.online),
+    rtaktarov(r.taktarov@rocketcom.ru), ansible(+docker, docker активен). mpeshkov — readonly.
+  Nologin uid>=1000: itronin, inebalzin, debian.
+  [СРЕД] debian в native sudo; omicron-sudo (вероятно NOPASSWD ALL) с 2 nologin — чистка.
+  [СРЕД] docker активен + ansible в docker = живой privesc.
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+2. ПОРТЫ
+  Внешняя доступность (VPN): 1221, 80, 443 — OPEN. 8080/25/631/36329 — localhost.
+  1221 SSH; 80/443 nginx (speedtest web); 8080 localhost (apache backend).
+
+3. НАХОДКИ
+  [СРЕД-1] debian в native sudo + omicron-sudo с 2 nologin — чистка.
+  [СРЕД-2] docker активен + ansible в docker = живой privesc.
+  [i]     Веб speedtest — внутренний; проверить, что доступ только из внутренней сети.
+
+  [+] ПЛЮСЫ (лучший «гигиенический» профиль из осмотренных):
+      - Debian 13 (актуальная) и ПОЛНОСТЬЮ пропатчен (0 обновлений);
+      - !!! nftables АКТИВЕН — ЕДИНСТВЕННЫЙ хост с реально включённым хостовым фаерволом;
+      - unattended-upgrades ВКЛЮЧЁН (автообновления);
+      - fail2ban активен; SSH захардене.
+==========================================================================

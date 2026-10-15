@@ -1,0 +1,74 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.32  (relay1.360pro.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : relay1.360pro.online
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-43   Uptime: 212 дней
+  Роль     : Почтовый сервер/релей — Postfix (с postscreen anti-spam) + SOGo (groupware/
+             webmail, nginx) + IMAPS. МУЛЬТИ-IP: 5 интерфейсов/адресов, каждый со своим
+             SMTP (по домену/бренду для доставляемости):
+               ens192 192.168.161.32   ens33 .162   ens34 .163   ens35 .164   ens36 .165
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.32
+  mpeshkov uid 1010, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл — из-под readonly каталог
+/etc/sudoers.d не читается (нет прав), но политика по парку = %omicron-sudo NOPASSWD: ALL.
+
+Члены omicron-sudo (7): epetrov, itronin, gmasich, inebalzin, pkuzmin, ansible, root
+
+Действующие (login-shell bash + sudo): root, gmasich(g.masich@omiplat.ru),
+  pkuzmin(p.kuzmin@360pro.online), ansible(+docker, docker inactive). mpeshkov — readonly.
+Nologin uid>=1000: epetrov, itronin, inebalzin, debian(шаблонная).
+
+  ЗАМЕЧАНИЯ:
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка.
+         Внешних подрядчиков НЕТ.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН
+         (важно для 587/993/25 от брутфорса).
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive). Почтовые порты открыты в сеть
+(нужны сервису), веб SOGo — тоже.
+Внешняя доступность (проба VPN): 25, 80, 443, 465, 587, 993 — OPEN.
+  25/tcp    SMTP (Postfix)     на всех 5 IP (161.32/.162/.163/.164/.165)   входящая почта (MX)
+  465/tcp   SMTPS (submission) 0.0.0.0   отправка (TLS)
+  587/tcp   Submission         0.0.0.0   отправка (STARTTLS)
+  993/tcp   IMAPS              0.0.0.0   доступ к ящикам
+  80/tcp    nginx -> редирект на https://.../SOGo
+  443/tcp   nginx / SOGo (webmail/groupware)
+  10050     zabbix-agent       0.0.0.0   ограничить Server=
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  ОТКРЫТЫЙ РЕЛЕЙ? Проверить недоступные из-под readonly настройки Postfix
+           (mynetworks, smtpd_relay_restrictions, smtpd_recipient_restrictions).
+           inet_interfaces=all + мульти-IP: важно убедиться, что сервер НЕ пересылает
+           почту от посторонних (open relay). Проверить также, что 587/465 требуют
+           SMTP AUTH + TLS. (postscreen присутствует — anti-spam фронт есть.)
+
+  [СРЕД-2] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка.
+
+  [СРЕД-3] Хостового фаервола нет. Почтовые порты нужны наружу, НО веб SOGo (80/443) и
+           IMAPS/submission стоит ограничить/защитить (гео/IP, rate-limit, fail2ban-джейлы).
+
+  [НИЗ-4]  zabbix(10050) без ограничения Server; unattended-upgrades НЕ включён.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL) и ПОЛНОСТЬЮ пропатчен (0 обновлений); Postfix с postscreen;
+      SSH захардене; fail2ban активен; без внешних подрядчиков.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), postfix main.cf/master.cf (relay/AUTH/TLS),
+  SOGo/Dovecot конфиг и аутентификация, DKIM/SPF/DMARC, домены на 5 IP, authorized_keys.
+==========================================================================

@@ -1,0 +1,40 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.45  (voice2)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+ХОСТ
+  hostname : voice2
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-39   Uptime: 144 дня
+  Роль     : Голосовая платформа/voice-analytics (Docker, ~13 контейнеров) — второй узел,
+             близнец voice1 (161.17). Микросервисы + PostgreSQL + Redis. docker активен.
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.45
+
+1. АДМИНСКИЕ УЧЁТКИ
+  native sudo(27) -> debian(nologin); omicron-sudo(gid 1001, вероятно NOPASSWD ALL), 9 членов:
+    epetrov, itronin, gmasich, inebalzin, pkuzmin, ansible, root, sgaregin, valeriy.
+  Действующие bash+sudo: root, gmasich(omiplat.ru), pkuzmin(360pro.online), ansible(+docker),
+    valeriy(Valery BITEL, bitel@bgbilling.ru — ВНЕШНИЙ ВЕНДОР), sgaregin(example.com). mpeshkov — readonly.
+  Группа docker: ansible, sgaregin (docker АКТИВЕН -> sgaregin = root-эквивалент).
+  Nologin: epetrov, itronin, inebalzin, debian, dbtunnel.
+  [ВЫС] Вендор valeriy(BGBilling) + sgaregin с NOPASSWD root; sgaregin в docker (docker активен).
+        debian в native sudo. Ревизия/ограничение внешнего root-доступа.
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+2. ПОРТЫ (docker-published, наружу; ufw НЕ фильтрует)
+  Внешняя доступность (VPN): 443, 5432, 6379, 8000, 8001, 8443, 9100 — OPEN. SSH 1221.
+  5432 PostgreSQL | 6379 Redis — !!! СУБД/кэш voice-данных В СЕТИ.
+  443/8443 web; 8000/8001 микросервисы; 9100 node_exporter.
+
+3. НАХОДКИ
+  [ВЫС-1] PostgreSQL(5432)+Redis(6379) открыты в сеть (данные голосовой аналитики — записи/
+          транскрипты, ПДн). bind 127.0.0.1, auth Redis, фаервол.
+  [ВЫС-2] Вендор valeriy(BGBilling) + sgaregin с NOPASSWD root; sgaregin в docker (root-экв).
+          debian в native sudo. Ревизия root-доступа сторонних.
+  [СРЕД-3] docker+ansible/sgaregin=privesc; 195 обновлений; unattended нет; нет фаервола.
+  [+] ПЛЮСЫ: Debian 12 (не EOL); SSH захардене; fail2ban активен.
+
+НЕ ПРОВЕРЕНО (read-only): auth Postgres/Redis, omicron-sudo(NOPASSWD?), voice-данные, authorized_keys.
+==========================================================================

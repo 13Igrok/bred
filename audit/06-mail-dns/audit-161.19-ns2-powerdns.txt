@@ -1,0 +1,55 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.19  (ns2.omicron.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : ns2.omicron.online
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL   Kernel: 5.10.0-37   Uptime: 271 день
+  Роль     : Авторитетный DNS-сервер PowerDNS (реплика ns1) для omicron.online.
+             Бэкенд MySQL(3306), API/веб 8080/8081. docker.service активен.
+             Точный близнец ns1 (192.168.161.18).
+
+ДОСТУП
+  SSH порт 1221 ТОЛЬКО через pivot fwatcher (с mgmt-VPN напрямую НЕдоступен — сегментация).
+  ssh -i ~/.ssh/id_peshkov_rsa -o ProxyCommand="ssh -W %h:%p fwatcher" -p 1221 mpeshkov@192.168.161.19
+  mpeshkov — omicron-readonly, read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ  (идентично ns1)
+--------------------------------------------------------------------------
+omicron-sudo(gid 1001): aglukhov, epetrov, itronin, gmasich, inebalzin, pkuzmin, ansible, root.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(+docker, docker АКТИВЕН). mpeshkov — readonly.
+Nologin uid>=1000: aglukhov, epetrov, itronin, inebalzin.
+Группа docker: aglukhov(nologin), ansible.
+
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 4 nologin ex-staff — чистка.
+  [СРЕД] docker активен + ansible/aglukhov в docker = живой privesc до root.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (только в сегменте 161.x; с mgmt-VPN закрыто — сегментация, плюс)
+--------------------------------------------------------------------------
+  53/tcp+udp  DNS (PowerDNS)       0.0.0.0
+  3306/tcp    MySQL (PDNS backend)  0.0.0.0  !!! БД зон DNS открыта в сегменте
+  8080/8081   PowerDNS API/веб     0.0.0.0  управление зонами
+  1221/tcp    SSH                  0.0.0.0   ключи-only, root off — ок
+  Хостового фаервола НЕТ.
+
+--------------------------------------------------------------------------
+3. НАХОДКИ  (те же, что у ns1)
+--------------------------------------------------------------------------
+  [ВЫС-1]  MySQL (3306) — бэкенд зон DNS — на 0.0.0.0. bind-address=127.0.0.1.
+  [ВЫС-2]  PowerDNS API/веб (8080/8081) на 0.0.0.0 — проверить api-key/webserver-allow-from.
+  [СРЕД-3] docker активен + ansible/aglukhov(nologin) в docker = privesc.
+  [СРЕД-4] omicron-sudo с 4 nologin; Debian 11 EOL; хостового фаервола нет.
+
+  [+] ПЛЮСЫ: сегментация (только через pivot); SSH захардене; fail2ban активен; 0 обновлений.
+
+  ПАРА ns1(161.18)+ns2(161.19) — оба с одинаковыми проблемами; закрывать вместе.
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), pdns.conf (api-key/allow-from/mysql),
+  зоны, репликация ns1<->ns2, authorized_keys.
+==========================================================================

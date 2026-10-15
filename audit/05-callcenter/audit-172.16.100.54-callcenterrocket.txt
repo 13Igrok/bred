@@ -1,0 +1,86 @@
+==========================================================================
+ АУДИТ ХОСТА  172.16.100.54  (CALLCENTERROCKET)
+ [запрошен как 192.168.100.54 — тот адрес МЁРТВ (весь сегмент 100.x недоступен);
+  по контексту и шаблону — это 172.16.100.54, домен rocket]
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : CALLCENTERROCKET
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-30   Uptime: 342 дня
+  Роль     : Телефонная платформа call-центра ITGRIX (Asterisk + web), домен rocket.
+             Стек под asterisk (apache2, node/PM2, php, pnp_server), MySQL, redis(localhost).
+             5-й call-центр (ср. 160.35 CentOS7, 160.219 deb2, 110.29 flash, 160.217 omiplat).
+  ПРИМ.    : hostname не в /etc/hosts (sudo: "unable to resolve host").
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@172.16.100.54
+  mpeshkov uid 1009, группа omicron-readonly(1004) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1002), файл 38 байт (не читается из-под
+readonly; размер = подтверждённым NOPASSWD ALL на 160.110/160.35 -> вероятно то же).
+
+Члены omicron-sudo (7): epetrov, itronin, gmasich, root, ansible, iverbitsky, atarasov
+(состав идентичен CALLCENTEROMIPLAT 160.217.)
+
+Действующие (login-shell bash + sudo):
+  root
+  gmasich   (g.masich@omiplat.ru)
+  atarasov  (Artem Tarasov "Call center", cc@cc.ru — внешний/непонятный домен)
+  ansible   (сервисный, + группа docker)
+  mpeshkov (я, только readonly)
+
+Особенности:
+  - iverbitsky — в omicron-sudo, НО shell nologin.
+  - pkuzmin — bash, но НЕ в omicron-sudo (только omicron).
+Прочие shell: asterisk(uid999, служебный, стек ITGRIX; НЕ в sudo).
+Nologin uid>=1000: epetrov, itronin, iverbitsky, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo (вероятно NOPASSWD ALL) с внешним atarasov(cc@cc.ru) — полный root.
+  [СРЕД] 3 nologin в omicron-sudo (epetrov, itronin, iverbitsky) — под чистку.
+  [НИЗ] hostname не резолвится (нет в /etc/hosts).
+  [+]  SSH захардене (Port 1221, root off, пароли off). sudo-группа пуста.
+       fail2ban АКТИВЕН. ufw АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (ufw активен; 3306 закрыт снаружи, AMI/ARI/H.323 — нет)
+--------------------------------------------------------------------------
+Внешняя доступность (проба VPN): 1221, 80, 443, 5038, 8088, 1720, 10050 — OPEN.
+  3306 — CLOSED снаружи (MySQL на localhost + ufw) — ХОРОШО.
+  TCP:
+  1221   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443 apache2 (веб ITGRIX)    *        OPEN
+  8089   Asterisk HTTPS/ARI      *
+  5038   Asterisk AMI            0.0.0.0  OPEN  !!! ВЫС: управляющий интерфейс АТС в сети
+  8088   Asterisk HTTP/ARI       0.0.0.0  OPEN
+  1720   H.323                   0.0.0.0  OPEN  legacy — лишний/риск
+  10050  zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+  3306   MySQL                   127.0.0.1      ХОРОШО (localhost)
+  4573   AGI / 25 exim / 6379 redis   127.0.0.1  ок
+  UDP:
+  5060   SIP / 4569 IAX2 / 69 TFTP      0.0.0.0  телефония+провижининг — ограничить
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Asterisk AMI (5038/tcp) открыт в сеть (подтверждено). Управление АТС;
+           брутфорс/утечка = toll-fraud. bind 127.0.0.1 / ACL manager.conf; ufw.
+  [ВЫС-2]  219 ожидающих обновлений; unattended-upgrades НЕ включён (uptime 342д).
+           Накатить + reboot; включить unattended.
+  [СРЕД-3] omicron-sudo (вероятно NOPASSWD ALL) с внешним atarasov + 3 nologin ex-staff.
+  [СРЕД-4] ARI 8088/8089, H.323 1720, SIP 5060/IAX 4569/TFTP 69 открыты в сеть.
+           Ограничить до транков/пиров; H.323 отключить, если не нужен.
+  [НИЗ-5]  zabbix(10050) без ограничения Server; hostname не в /etc/hosts.
+
+  [+] ПЛЮСЫ: MySQL на localhost; fail2ban АКТИВЕН; ufw закрывает 3306; Debian 12 (не EOL).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), правила ufw, manager.conf/sip.conf,
+  джейлы fail2ban, authorized_keys.
+==========================================================================

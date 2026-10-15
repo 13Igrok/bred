@@ -1,0 +1,7 @@
+# Публичные (внешние) IP — собрано 2026-10-13 14:19
+# Источник: reteiltelecom_ansible/inventory/0-all
+
+79.174.86.171    :1221   node5.k3s          [k3s_group]
+185.70.104.43    :1221   gpu-voice          [test_group]
+
+Всего публичных: 2

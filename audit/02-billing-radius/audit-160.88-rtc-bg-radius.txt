@@ -1,0 +1,75 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.88  (rtc-bg-radius.rtc.local)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo), доступ ПРЯМОЙ
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : rtc-bg-radius.rtc.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL, LTS завершилась 08.2026
+  Kernel   : 5.10.0-21-amd64   Virt: VMware VM   Uptime: 416 дней
+  Роль     : RADIUS/AAA-сервер интернет-абонентов (BGBilling Inet), домен rtc (rocket-telecom)
+             Java (от root): BGInetAccess (RADIUS-auth), BGInetAccounting.
+             Аналог bg-radius-flash(110.8)/omicron-bg-radius(160.102)/bg-radius-omiplat(160.55)/
+             rocket-bg-radius(172.16.100.27). ActiveMQ/nginx/СУБД НЕТ; docker НЕ запущен.
+
+ДОСТУП
+  SSH порт 22 напрямую по ключу id_peshkov_rsa (=Peshkov2.ppk). pivot не нужен.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.88
+  mpeshkov uid 1017, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Админ-права — кастомная omicron-sudo(gid 1001)
+через /etc/sudoers.d/omicron-sudo (содержимое read-only юзеру недоступно).
+
+Учётки с login-shell (bash) и sudo:
+  root, gmasich(omiplat.ru), rtaktarov(rocketcom.ru), pkuzmin(360pro.online),
+  ansible(сервисный, +docker — docker.service НЕ запущен). mpeshkov — только readonly.
+  (нет avasilev и нет bitel на этом узле.)
+
+ПОЛНЫЙ состав группы omicron-sudo (14 членов):
+  aglukhov, epetrov, itronin, gmasich, ishatohin, userobaba, akudryaeva,
+  oborovkov, obobrovkov, vklimansky, root, pkuzmin, ansible, rtaktarov
+  (ЗАМЕТКА: здесь дубля 'agluchov' НЕТ — в отличие от omicron/omiplat/rocket radius.)
+
+  ЗАМЕЧАНИЯ:
+  [!] 9 из 14 членов omicron-sudo — nologin ex-staff (aglukhov, epetrov, itronin,
+      ishatohin, userobaba, akudryaeva, oborovkov, obobrovkov, vklimansky).
+      В админ-группе, логиниться не могут. ПОД ЧИСТКУ. (в passwd также nologin inebalzin.)
+  [!] Кросс-доменный админ-разброс: omiplat.ru (gmasich), rocketcom.ru (rtaktarov),
+      360pro.online (pkuzmin).
+  [!] ansible в группе docker -> латентный privesc до root (docker.service inactive).
+  [i] gmasich — «устаревший админ», фигурирует и на POWER-BI и на всех bg-*.
+  [+] SSH захардене: PermitRootLogin no, PasswordAuthentication no. SUID чист. fail2ban.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (внешняя доступность TCP проверена с рабочей машины через VPN — OPEN)
+--------------------------------------------------------------------------
+  TCP:  22 (SSH), 1951 (BGInet упр.-консоль БЕЗ auth — подтверждено "Help: help..."),
+        1952 (BGInet), 9100 (node_exporter, без auth), 10050 (zabbix).
+  UDP:  1812 (RADIUS-auth), 1813 (RADIUS-acct), 2001 (BGInet) — все 0.0.0.0.
+  (nginx/ActiveMQ/СУБД портов нет.)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  1951/tcp — управляющий интерфейс BGInet БЕЗ аутентификации, наружу.
+           Привязать к localhost/фаервол; выяснить набор команд.
+  [ВЫС-2]  RADIUS 1812/1813 (+2001) UDP на 0.0.0.0 — ограничить до NAS/BRAS,
+           проверить shared-secret (read-only недоступен).
+  [ВЫС-3]  Java BGInetAccess/BGInetAccounting работают ОТ ROOT — RCE = сразу root.
+  [ВЫС-4]  omicron-sudo раздут (9 nologin из 14); ansible в docker. Ревизия/чистка.
+  [СРЕД-5] 173 ожидающих обновления, 133 security; unattended нет; ядро 5.10.0-21;
+           uptime 416 дней; Debian 11 EOL. Обновиться + reboot.
+  [НИЗ-6]  node_exporter (9100) без auth наружу; zabbix (10050) без ограничения Server.
+
+  [+] Плюсы: SSH захардене; SUID чист; docker не запущен; нет лишних web/брокер сервисов;
+      нет дубля-опечатки agluchov (учётки чуть чище, чем на других radius).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (нужен доступ с sudo / вне фокуса):
+  содержимое sudoers/omicron-sudo, RADIUS clients/secrets, команды порта 1951,
+  /var/log/auth.log, приватные authorized_keys.
+==========================================================================

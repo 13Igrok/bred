@@ -1,0 +1,100 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.110.29  (CALLCENTERFLASH)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : CALLCENTERFLASH
+  OS       : Debian GNU/Linux 12 (bookworm)  -- поддерживаемая
+  Kernel   : 6.1.0-30   Virt: VM   Uptime: 346 дней
+  Роль     : Телефонная платформа call-центра ITGRIX (Asterisk + web), домен flash.
+             Стек под юзером asterisk: asterisk, apache2, node(PM2), php, pnp_server;
+             БД MySQL/MariaDB; redis(localhost). Третий call-центр
+             (ср. 160.35 call-center/CentOS7, 160.219 callcenter-deb2/ITGRIX).
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk). Доступен через VPN и с fwatcher.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.110.29
+  mpeshkov uid 1012, группа omicron-readonly(1004) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1002), файл 38 байт (из-под readonly
+не читается, размер = подтверждённым NOPASSWD ALL на 160.110/160.35 -> вероятно то же).
+
+Члены omicron-sudo (7): epetrov, itronin, gmasich, root, ansible, sgaregin, iverbitsky
+
+Действующие (login-shell bash + sudo):
+  root
+  gmasich   (g.masich@omiplat.ru)
+  sgaregin  (Sergey Garegin, sgaregin@example.com — домен-заглушка/непонятный)
+  ansible   (сервисный, + группа docker)
+  mpeshkov (я, только readonly)
+
+ОСОБЕННОСТИ состава (отличия от других call-центров):
+  - iverbitsky — в omicron-sudo, НО shell nologin (войти не может).
+  - pkuzmin — имеет bash, но НЕ в omicron-sudo здесь (только группа omicron).
+  - atarasov (cc@cc.ru) здесь ОТСУТСТВУЕТ (в отличие от 160.35 и 160.219).
+Прочие shell: asterisk(uid999, служебный, стек ITGRIX; НЕ в sudo, отдельного
+  itgrix_bx sudoers здесь НЕТ).
+Nologin uid>=1000: epetrov, itronin, inebalzin, iverbitsky.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo (вероятно NOPASSWD ALL). sgaregin с доменом-заглушкой
+        example.com — уточнить принадлежность учётки.
+  [СРЕД] 3 nologin в omicron-sudo (epetrov, itronin, iverbitsky) — под чистку.
+  [i]   Кросс-доменный разброс (omiplat/360pro). ansible + docker (docker inactive).
+  [+]   SSH захардене (Port 1221, root off, пароли off). sudo-группа sudo пуста.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (ufw АКТИВЕН, но чувствительные порты РАЗРЕШЕНЫ наружу — см. пробу)
+--------------------------------------------------------------------------
+Фаерволы: ufw ACTIVE (nftables/firewalld inactive). НО внешняя проба с VPN показывает,
+что ufw пропускает БД/AMI/H.323 наружу.
+Внешняя доступность (проба с VPN): 1221, 80, 443, 3306, 5038, 8088, 10050, 1720, 8001 — OPEN.
+  TCP:
+  1221   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443 apache2 (веб ITGRIX)    *        OPEN
+  3306   MySQL/MariaDB           0.0.0.0  OPEN  !!! ВЫС: СУБД открыта в сеть
+  5038   Asterisk AMI            0.0.0.0  OPEN  !!! ВЫС: управляющий интерфейс АТС в сети
+  8088   Asterisk HTTP/ARI       0.0.0.0  OPEN  веб-интерфейс Asterisk в сети
+  1720   H.323                   0.0.0.0  OPEN  legacy-телефония — лишний/риск
+  8001,8003,8089 ITGRIX web      *        (8001 OPEN)
+  10050  zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+  4573   AGI / 25 exim / 6379 redis   127.0.0.1  ок
+  UDP:
+  5060   SIP / 4569 IAX2 / 69 TFTP      0.0.0.0  телефония+провижининг — ограничить
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Asterisk AMI (5038/tcp) открыт в сеть (подтверждено снаружи). Управление АТС;
+           брутфорс/утечка = контроль над телефонией, toll-fraud.
+           ДЕЙСТВИЕ: bind 127.0.0.1 / ACL в manager.conf; закрыть в ufw.
+
+  [ВЫС-2]  MySQL/MariaDB (3306) открыт в сеть. bind-address=127.0.0.1 / правило ufw.
+
+  [ВЫС-3]  ufw активен, НО пропускает 3306/5038/8088/1720 наружу — правила слишком
+           широкие. ДЕЙСТВИЕ: пересмотреть политику ufw (default deny incoming +
+           точечные allow только для нужного).
+
+  [ВЫС-4]  fail2ban В СОСТОЯНИИ FAILED — защиты от брутфорса/регистрационных атак нет.
+           Починить (важно для SIP/веб/AMI).
+
+  [СРЕД-5] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff и учёткой sgaregin
+           с доменом-заглушкой example.com. Ревизия/чистка.
+
+  [СРЕД-6] SIP 5060/IAX 4569/TFTP 69/H.323 1720 открыты всем. Ограничить до транков/пиров;
+           H.323 отключить, если не используется.
+
+  [НИЗ-7]  zabbix(10050) без ограничения Server; unattended-upgrades НЕ включён.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL) и ПОЛНОСТЬЮ пропатчен (0 ожидающих обновлений!);
+      ufw в принципе включён; SSH захардене; redis/AGI/exim на localhost.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): точное omicron-sudo (NOPASSWD?), правила ufw (нужен sudo),
+  manager.conf/sip.conf (ACL/секреты), джейлы fail2ban, authorized_keys.
+==========================================================================

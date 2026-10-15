@@ -1,0 +1,36 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.100  (wiki2)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+ХОСТ
+  hostname : wiki2
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-48   Uptime: 102 дня
+  Роль     : Wiki-сервис (веб-приложение в Docker за nginx; 2 контейнера + backend :8080).
+             На IP отдаёт 403 (доступ по конкретному vhost/ограничен). docker активен.
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.160.100
+
+1. АДМИНСКИЕ УЧЁТКИ
+  native sudo(27) -> debian(nologin); omicron-sudo(gid 1001, вероятно NOPASSWD ALL), 8 членов:
+    itronin, gmasich, inebalzin, pkuzmin, ansible, root, avoitov, avasilev.
+  Действующие bash+sudo: root, gmasich(omiplat.ru), pkuzmin(360pro.online), avoitov(360pro.online),
+    avasilev(360pro.online), ansible(+docker, docker активен). mpeshkov — readonly.
+  Nologin: itronin, inebalzin, debian.
+  [СРЕД] debian в native sudo; omicron-sudo с 2 nologin — чистка. Внешних подрядчиков НЕТ.
+  [СРЕД] docker активен + ansible в docker = живой privesc.
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. unattended-upgrades ВКЛЮЧЁН.
+
+2. ПОРТЫ (минимум)
+  Внешняя доступность (VPN): 1221 SSH, 80 nginx(wiki), 10050 zabbix. 8080/631 localhost.
+
+3. НАХОДКИ
+  [СРЕД-1] debian в native sudo + omicron-sudo с 2 nologin — чистка.
+  [СРЕД-2] docker активен + ansible в docker = живой privesc.
+  [НИЗ-3]  56 обновлений; веб отдаёт 403 на IP (доступ ограничен vhost — это скорее плюс);
+           zabbix(10050) без ограничения.
+  [+] ПЛЮСЫ: Debian 12 (не EOL); unattended-upgrades ВКЛЮЧЁН; fail2ban активен; SSH захардене;
+      минимальная экспозиция; без внешних подрядчиков.
+НЕ ПРОВЕРЕНО (read-only): движок вики и его auth, omicron-sudo(NOPASSWD?), docker-compose, authorized_keys.
+==========================================================================

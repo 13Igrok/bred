@@ -1,0 +1,98 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.110  (bitrix.360pro.online)
+ Дата: 2026-09-07   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo!)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : bitrix.360pro.online
+  OS       : CentOS Stream release 9   (актуальная, не EOL)
+  Kernel   : 5.14.0-661.el9   Virt: VM   Uptime: 142 дня
+  Роль     : self-hosted Битрикс24 (BitrixVM/Bitrix Environment).
+             Стек: httpd(apache)+nginx, MySQL (основная БД Bitrix), PostgreSQL,
+             Redis, push-server (node), под пользователем bitrix(uid 600).
+  ВАЖНО    : раньше по этому хосту НЕ было SSH-доступа (только веб-периметр).
+             Теперь есть SSH на порту 1221, и mpeshkov в omicron-sudo с ПОЛНЫМ root.
+
+ДОСТУП
+  SSH порт 1221 (НЕ 22) по ключу id_peshkov_rsa (=Peshkov2.ppk). Доступен через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.160.110
+  mpeshkov uid 1004, gid omicron(1004), группа omicron-sudo(1005) -> NOPASSWD root.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа wheel(10) ПУСТАЯ. Админ-права даёт omicron-sudo(gid 1005).
+ПОДТВЕРЖДЕНО (прочитал через sudo): /etc/sudoers.d/omicron-sudo =
+    %omicron-sudo ALL=(ALL) NOPASSWD: ALL
+=> ВСЕ члены omicron-sudo получают ПОЛНЫЙ root БЕЗ ПАРОЛЯ.
+
+Члены omicron-sudo (5): ansible, gmasich, root, epetrov, mpeshkov.
+  УЧЁТКА    UID   ВЛАДЕЛЕЦ / ДОМЕН                    ПРАВА
+  root      0     -                                   omicron-sudo (NOPASSWD ALL)
+  gmasich   1001  g.masich@omiplat.ru                 omicron-sudo, bash
+  ansible   1002  сервисный                           omicron-sudo + docker, bash
+  epetrov   ----  бывший сотрудник                    omicron-sudo, НО shell nologin
+  mpeshkov  1004  m.peshkov@360pro.online (я)         omicron-sudo, bash
+
+Прочие shell-учётки (сервисные): bitrix(600), postgres(26).
+Nologin uid>=1000: admin (панель Bitrix?), epetrov.
+Файлы sudoers.d: bitrix (штатный BitrixVM), omicron, omicron-readonly, omicron-sudo,
+  wheel-nopasswd (%wheel NOPASSWD ALL — латентно, wheel пуст).
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo = NOPASSWD: ALL — компрометация ЛЮБОГО его члена = мгновенный
+        root без пароля. Среди членов gmasich (учётка домена omiplat, «устаревший
+        админ») и сервисный ansible. Минимизировать состав, по возможности требовать
+        пароль для sudo, разделить права.
+  [СРЕД] epetrov — бывший сотрудник (nologin), но остаётся в omicron-sudo. Удалить.
+  [СРЕД] ansible в группе docker -> латентный privesc (проверить, запущен ли docker).
+  [i]   Набор админов здесь МЕНЬШЕ, чем в bg-* парке (нет rtaktarov/pkuzmin/avasilev/bitel).
+  [+]   SSH захардене (sshd -T): Port 1221, PermitRootLogin no, PasswordAuthentication no,
+        PubkeyAuthentication yes. wheel пуст.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+firewalld АКТИВЕН и реально фильтрует (многие 0.0.0.0-биндинги закрыты снаружи).
+
+Эффективно ОТКРЫТО НАРУЖУ (firewalld default zone + подтверждено пробой с VPN):
+  80/tcp, 443/tcp   - веб Битрикс24 (http/https)
+  1221/tcp          - SSH (ключи-only, root off)
+  8890,8891/tcp     - Bitrix push-server (открыты в firewalld)
+  8893,8894/tcp     - Bitrix push-server (OPEN, подтверждено снаружи)
+
+Слушают на 0.0.0.0/*, но ЗАКРЫТЫ firewalld снаружи (проверено — closed с VPN):
+  3306, 33060 (MySQL/MySQLX)  -- БиндЯтся на * , но извне недоступны. Всё же
+                                 рекомендуется bind-address=127.0.0.1.
+  8010-8015, 9010, 9011, 8070 (Bitrix/node сервисы), 10050 (zabbix)
+Только localhost: 5432 (PostgreSQL), 6379 (Redis), 631 (CUPS), 8888.
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  omicron-sudo = NOPASSWD: ALL (полный root без пароля) + в составе учётка
+           стороннего домена gmasich и сервисный ansible. См. разд.1.
+
+  [ВЫС-2]  fail2ban В СОСТОЯНИИ FAILED с 2026-04-17 (~5 месяцев не работает).
+           Защита от брутфорса/боты не действует, есть пробел в мониторинге.
+           ДЕЙСТВИЕ: починить и запустить fail2ban.
+
+  [СРЕД-3] MySQL 3306/33060 слушают на всех интерфейсах (снаружи прикрыты firewalld,
+           но внутри сети доступны). ДЕЙСТВИЕ: bind-address=127.0.0.1.
+
+  [СРЕД-4] epetrov (бывший сотрудник, nologin) в omicron-sudo. Удалить.
+
+  [НИЗ-5]  ansible в docker; CUPS(631) на localhost (не нужен на сервере);
+           wheel-nopasswd латентно (wheel пуст).
+
+  [НИЗ-6]  2 security-обновления (dnf). Накатить в плановом окне.
+
+  [+] ПЛЮСЫ: CentOS Stream 9 актуальна; firewalld активен и реально фильтрует БД/сервисы;
+      SSH захардене; мало security-обновлений; админ-набор небольшой.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: у mpeshkov здесь ЕСТЬ NOPASSWD sudo (в отличие от прочих хостов, где
+read-only). Аудит проведён БЕЗ внесения изменений. Наличие sudo позволило прочитать
+sudoers/firewalld/sshd напрямую.
+==========================================================================

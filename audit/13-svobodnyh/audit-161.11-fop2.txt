@@ -1,0 +1,70 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.11  (fop2.360pro.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : fop2.360pro.online
+  OS       : Debian GNU/Linux 13 (trixie)  -- АКТУАЛЬНАЯ   Kernel: 6.12
+  Роль     : FOP2 (Flash Operator Panel 2) — панель оператора/супервизора Asterisk.
+             Apache 2.4.66 (веб-панель) + fop2_server (демон) + MySQL (localhost).
+             Подключается к Asterisk-АТС call-центров по AMI. Локального Asterisk нет.
+
+ДОСТУП
+  SSH порт 1221 (в /etc/ssh/sshd_config.d/port.conf) по ключу id_peshkov_rsa.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.11
+  mpeshkov uid 1010, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл 38 байт (вероятно NOPASSWD ALL).
+
+Члены omicron-sudo (7): epetrov, itronin, gmasich, root, ansible, iverbitsky, atarasov
+
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), atarasov(cc@cc.ru — внешний/непонятный домен),
+  ansible(сервисный, +docker). mpeshkov — только readonly.
+Особенности: iverbitsky в sudo, но nologin; pkuzmin bash, но НЕ в omicron-sudo.
+Прочие shell: asterisk(uid995, /bin/sh — служебный, к удалённым АТС).
+Nologin uid>=1000: epetrov, itronin, iverbitsky, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo (вероятно NOPASSWD ALL) с внешним atarasov(cc@cc.ru).
+  [СРЕД] 3 nologin в omicron-sudo (epetrov, itronin, iverbitsky) — под чистку.
+  [+]  SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 1221, 80, 4445 — OPEN.
+  TCP:
+  1221   SSH               0.0.0.0  OPEN  ключи-only, root off — ок
+  80     Apache (FOP2 web) *        OPEN  !!! ТОЛЬКО HTTP, без HTTPS/443
+  4445   fop2_server       0.0.0.0  OPEN  демон FOP2 (flash/websocket) в сети
+  3306   MySQL             127.0.0.1      ХОРОШО (localhost)
+  25 exim / 631 CUPS       127.0.0.1      ок
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  FOP2 веб-панель работает ТОЛЬКО по HTTP:80 (нет HTTPS/443). Логин оператора/
+           супервизора и данные звонков/очередей идут по сети в открытом виде.
+           ДЕЙСТВИЕ: включить HTTPS (TLS) + редирект, ограничить доступ по IP.
+
+  [ВЫС-2]  Демон fop2_server (4445/tcp) открыт в сеть. Ограничить фаерволом до рабочих
+           мест операторов; проверить аутентификацию FOP2.
+
+  [СРЕД-3] omicron-sudo (вероятно NOPASSWD ALL) с внешним atarasov + 3 nologin ex-staff.
+
+  [СРЕД-4] Хостового фаервола нет (nft/ufw/firewalld off). unattended-upgrades НЕ установлен.
+
+  [+] ПЛЮСЫ: Debian 13 (актуальная) и ПОЛНОСТЬЮ пропатчен (0 обновлений); MySQL на localhost;
+      SSH захардене; fail2ban активен.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), конфиг FOP2 (пароли/AMI к АТС),
+  authorized_keys, /var/log.
+==========================================================================

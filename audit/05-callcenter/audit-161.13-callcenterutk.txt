@@ -1,0 +1,79 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.13  (CALLCENTERUTK)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : CALLCENTERUTK
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-30   Uptime: 351 день
+  Роль     : Телефонная платформа call-центра ITGRIX (Asterisk + web), домен UTK
+             (предположительно yug-telekom-k / ЮТК). Стек под asterisk, MySQL, redis(localhost).
+             7-й call-центр (160.35, 160.219, 110.29, 160.217, 172.16.100.54, 110.30, 161.13).
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.13
+  mpeshkov uid 1010, группа omicron-readonly(1004) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1002), файл 38 байт (не читается из-под
+readonly; размер = подтверждённым NOPASSWD ALL на 160.110/160.35 -> вероятно то же).
+
+Члены omicron-sudo (8): epetrov, itronin, gmasich, root, ansible, sgaregin, iverbitsky, atarasov
+(самый широкий состав среди call-центров — здесь и sgaregin, И atarasov.)
+
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), atarasov(cc@cc.ru — внешний/непонятный домен),
+  sgaregin(sgaregin@example.com — домен-заглушка), ansible(сервисный, +docker).
+  mpeshkov — только readonly.
+Особенности: iverbitsky в sudo, но nologin; pkuzmin bash, но НЕ в omicron-sudo.
+Прочие shell: asterisk(uid999, служебный; НЕ в sudo). Nologin: epetrov, itronin,
+  iverbitsky, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo (вероятно NOPASSWD ALL) с ДВУМЯ внешними/непонятными учётками
+        atarasov(cc@cc.ru) и sgaregin(example.com) — обе полный root. Проверить.
+  [СРЕД] 3 nologin в omicron-sudo (epetrov, itronin, iverbitsky) — под чистку.
+  [+]  SSH захардене (Port 1221, root off, пароли off). sudo-группа пуста.
+       fail2ban АКТИВЕН. ufw АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (ufw активен; 3306 закрыт снаружи, AMI/ARI/H.323 — нет)
+--------------------------------------------------------------------------
+Внешняя доступность (проба VPN): 1221, 80, 443, 5038, 8088, 1720, 10050 — OPEN.
+  3306 — CLOSED снаружи (MySQL на localhost + ufw) — ХОРОШО.
+  TCP:
+  1221   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443 apache2 (веб ITGRIX)    *        OPEN
+  8089   Asterisk HTTPS/ARI      *
+  5038   Asterisk AMI            0.0.0.0  OPEN  !!! ВЫС: управляющий интерфейс АТС в сети
+  8088   Asterisk HTTP/ARI       0.0.0.0  OPEN
+  1720   H.323                   0.0.0.0  OPEN  legacy — лишний/риск
+  10050  zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+  3306   MySQL                   127.0.0.1      ХОРОШО (localhost)
+  25 exim / 4573 AGI / 6379 redis   127.0.0.1  ок
+  UDP:
+  5060   SIP / 4569 IAX2 / 69 TFTP      0.0.0.0  телефония+провижининг — ограничить
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Asterisk AMI (5038/tcp) открыт в сеть. Управление АТС; toll-fraud.
+           bind 127.0.0.1 / ACL manager.conf; ufw.
+  [ВЫС-2]  219 ожидающих обновлений; unattended-upgrades НЕ включён (uptime 351д).
+           Накатить + reboot; включить unattended.
+  [СРЕД-3] omicron-sudo (вероятно NOPASSWD ALL) с ДВУМЯ внешними учётками
+           (atarasov cc@cc.ru, sgaregin example.com) + 3 nologin ex-staff.
+  [СРЕД-4] ARI 8088/8089, H.323 1720, SIP 5060/IAX 4569/TFTP 69 открыты в сеть.
+           Ограничить до транков/пиров; H.323 отключить.
+  [НИЗ-5]  zabbix(10050) без ограничения Server.
+
+  [+] ПЛЮСЫ: MySQL на localhost; fail2ban АКТИВЕН; ufw закрывает 3306; Debian 12 (не EOL).
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), правила ufw, manager.conf/sip.conf,
+  джейлы fail2ban, authorized_keys.
+==========================================================================

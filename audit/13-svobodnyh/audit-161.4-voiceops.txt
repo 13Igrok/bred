@@ -1,0 +1,37 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.4  (voiceops)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+ХОСТ
+  hostname : voiceops
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-48   Uptime: 112 дней
+  Роль     : Ops/управляющий узел голосового контура. Прикладных служб НЕ запущено
+             (/opt пуст, только cron; docker установлен, НЕ запущен). Минимальная экспозиция.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.4
+
+1. АДМИНСКИЕ УЧЁТКИ
+  native sudo(27) -> debian(nologin); omicron-sudo(gid 1001, вероятно NOPASSWD ALL), 9 членов:
+    itronin, gmasich, inebalzin, pkuzmin, ansible, root, avasilev, sgaregin, valeriy.
+  Действующие bash+sudo: root, gmasich(omiplat.ru), pkuzmin(360pro.online), avasilev(360pro.online),
+    ansible(+docker, docker inactive), valeriy(Valery BITEL, bitel@bgbilling.ru — ВЕНДОР),
+    sgaregin(example.com). mpeshkov — readonly.
+  Nologin: itronin, inebalzin, debian.
+  [ВЫС] Вендор valeriy(BGBilling) + sgaregin с NOPASSWD root; debian в native sudo. Ревизия.
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. docker не запущен.
+
+2. ПОРТЫ (минимум)
+  Внешняя доступность (VPN): 1221 SSH, 10050 zabbix — OPEN. CUPS 631 localhost. Больше НИЧЕГО.
+
+3. НАХОДКИ
+  [ВЫС-1] Вендор valeriy + sgaregin с NOPASSWD root; debian в native sudo — чистка/ревизия
+          внешнего доступа (актуально даже на ops-узле — он в том же sudo-контуре).
+  [СРЕД-2] omicron-sudo с nologin (itronin, inebalzin); zabbix(10050) без ограничения Server.
+  [+] ПЛЮСЫ: Debian 12 (не EOL) и ПОЛНОСТЬЮ пропатчен (0 обновлений); минимальная экспозиция
+      (нет открытых приложений/БД); docker не запущен; SSH захардене; fail2ban активен.
+
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo(NOPASSWD?), содержимое /home (ansible-скрипты?), authorized_keys.
+==========================================================================

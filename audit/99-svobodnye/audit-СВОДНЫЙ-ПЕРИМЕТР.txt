@@ -1,0 +1,169 @@
+==========================================================================
+ СВОДНЫЙ АУДИТ ПЕРИМЕТРА — инфраструктура 360pro/omicron
+ Дата: 07.09.2026 - 14.09.2026    Аудитор: mpeshkov
+ Метод: SSH по ключу id_peshkov_rsa (в осн. read-only, где omicron-sudo -> NOPASSWD root),
+        внешние пробы портов с рабочей машины (VPN) и с pivot fwatcher (161.55).
+ Охвачено: ~80 адресов; 78 индивидуальных отчётов audit-<ip>-*.txt в этом каталоге.
+ Отдельно: audit-СВОДНЫЙ-bg-платформа.txt (детально по 10 узлам BGBilling).
+==========================================================================
+
+СОДЕРЖАНИЕ
+  1. Классы систем и хосты
+  2. Системные (сквозные) проблемы — по приоритету
+  3. Критические точки (топ)
+  4. Недоступные / выключенные / вне управления
+  5. Первоочередной план
+
+--------------------------------------------------------------------------
+1. КЛАССЫ СИСТЕМ И ХОСТЫ
+--------------------------------------------------------------------------
+[A] BGBilling — биллинг-ядра (Debian 11 EOL, java от root, ActiveMQ уязвим CVE-2023-46604,
+    брокер/веб наружу):
+      110.7 bg-core-flash | 160.101 omicron-bg-core | 160.54 bg-core-omiplat(+WildFly)
+      172.16.100.24 rocket-bg-core | 160.87 rtc-bg-core
+[B] BGBilling Inet — RADIUS/AAA абонентов (Debian 11 EOL, BGInet от root, порт 1951 БЕЗ
+    аутентификации, RADIUS 1812/1813 наружу):
+      110.8 bg-radius-flash | 160.102 omicron-bg-radius | 160.55 bg-radius-omiplat
+      172.16.100.27 rocket-bg-radius | 160.88 rtc-bg-radius
+[C] ProxySQL — прокси к БД биллинга (Debian 11 EOL, admin 6032 в сети):
+      110.20 flash | 160.103 omicron | 160.70 omiplat(admin отфильтр., есть тест-акк
+      gmasich-test1) | 160.89 rtc | 172.16.100.26 rocket(ключ не заведён)
+[D] Публичные web/API-шлюзы (Debian 13, нативный nginx, api/lk/mob.* -> BGBilling по HTTP,
+    stub_status 8098 без auth):
+      161.172 flash | 161.173 omiplat | 161.175 rtc(rocket-telecom) | 161.176 utc(omicron.online)
+      161.174 rocket — НЕ настроен (пустой)
+[E] Call-центры — ITGRIX/Asterisk (телефония в сеть: AMI 5038/SIP/IAX/MySQL):
+      160.35 call-center(CentOS7 EOL, FreePBX, AMI+MySQL в сети, firewall off)
+      160.219 callcenter-deb2 | 110.29 CALLCENTERFLASH | 160.217 CALLCENTEROMIPLAT
+      172.16.100.54 CALLCENTERROCKET | 110.30 CALLCENTERRTC | 161.13 CALLCENTERUTK
+      Вспом.: 161.11 fop2(панель, HTTP), 161.8 rustdesk(удал.доступ)
+[F] Почта — Postfix+SOGo (мульти-IP; relay2 с интернет-ногой 155.x):
+      161.32 relay1 | 161.33 relay2 (двухдомный, DMZ-uplink)
+[G] DNS — PowerDNS (Debian 11 EOL, MySQL+API в сегменте; доступ только через pivot):
+      161.18 ns1 | 161.19 ns2
+[H] Kubernetes — кластер K3s (Debian 12, control-plane наружу с auth/mTLS, docker+ansible):
+      161.110 node1(docker on) | 161.120 node2 | 161.130 node3 | 161.140 node4
+[I] Docker web-приложения (ufw не фильтрует docker-порты!):
+      161.15 commerce(ejabberd XMPP, docker=live privesc) | 161.7 git(GitLab + АНОНИМНЫЙ
+      Docker Registry 5000; вендор valeriy+sgaregin с root) | 160.119 n8n(Postgres в сети)
+      161.5 netbox(auth ок) | 160.100 wiki2(unattended вкл)
+[J] Мониторинг:
+      160.104 zabbix-core(веб+server наружу=RCE по парку; omicron-sudo 16 членов)
+      160.45 prometheus(9090/9093 без auth; fail2ban выкл) | 160.19 grafana(auth ок, HTTP)
+      160.68 oms(Observium+RANCID+vsftpd — креды сетевых устройств; plain FTP наружу)
+[K] Доступ/AAA/VPN:
+      161.26 OpenVPN(портал управления от root) | 161.100 MultiFactorRA(2FA; inebalzin в
+      НАТИВНОЙ sudo) | 160.118 msVPN(Windows RRAS, PPTP включён) | 161.96 tacacs(AAA
+      сетевых устройств)
+[L] Голосовая аналитика (БД в сети, вендор valeriy+sgaregin с root, sgaregin в docker):
+      161.17 voice1 | 161.45 voice2 | 161.4 voiceops(чистый по экспозиции)
+[M] Хранилища/бэкапы/прочее:
+      160.135 db-backup1 + 160.136 db-backup2 — !!! БЭКАПЫ БД ПУСТЫ (см. КРИТ)
+      160.11 samba(конфиги Mikrotik+key; анон-энумерация шар) | 160.31 erp(BGERP, дампы БД
+      world-readable, MySQL+exporter в сети) | 161.49 bitrix-to-erp(подрядчик avk с sudo)
+      160.110 bitrix.360pro.online(CentOS9; omicron-sudo=NOPASSWD подтверждён; fail2ban упал)
+      161.56 fstreamer(пустой шаблон) | 161.55 fwatcher(Flussonic Watcher + PIVOT)
+[N] Веб/appliance без OS-доступа: 160.6 office(ASP.NET), 160.215 katan(SPA), 161.48
+    speedtest(ЭТАЛОН: nftables+unattended вкл!)
+[O] VMware: 160.202 vcenter.esxi.loc (6.7 EOL) | 160.200 (запись) | 160.21 vcsa.omicron.loc
+    (ВЫКЛЮЧЕН) | 160.22(выключен)
+[P] Windows/иное: 160.113 PROFILE/NPS(RADIUS) | 160.46 POWER-BI | 172.16.100.45 SCAT(биллинг/DPI)
+
+--------------------------------------------------------------------------
+2. СИСТЕМНЫЕ (СКВОЗНЫЕ) ПРОБЛЕМЫ — ПО ПРИОРИТЕТУ
+--------------------------------------------------------------------------
+[КРИТ-S1] БЭКАПЫ БД НЕ РАБОТАЮТ. db-backup1(160.135) и db-backup2(160.136): каталоги
+   /db-backups пусты, .136 занят 2.5G/491G. Резервных копий БД по факту нет -> при
+   инциденте восстанавливаться не из чего. СРОЧНО проверить задания на СУБД-серверах.
+
+[КРИТ-S2] omicron-sudo = %omicron-sudo ALL=(ALL) NOPASSWD: ALL — ПОЛНЫЙ ROOT БЕЗ ПАРОЛЯ,
+   подтверждено на 5+ хостах (160.110, 160.35, 160.31, 161.56, 161.55, 161.26, 160.19...).
+   Группа раздута «мёртвыми душами»: до 16 членов (zabbix-core), 9-11 nologin-учёток
+   бывших сотрудников (aglukhov, epetrov, itronin, ishatohin, userobaba, akudryaeva,
+   oborovkov, obobrovkov, inebalzin, vklimansky, gmasich-test1, ousepov...).
+   Кросс-доменный доступ: учётки omiplat/rocketcom/360pro имеют root везде.
+   Компрометация ЛЮБОЙ = мгновенный root на десятках хостов.
+
+[КРИТ-S3] ActiveMQ уязвим к CVE-2023-46604 (RCE 10.0) на ВСЕХ 5 bg-core, OpenWire 61616
+   открыт по сети (5.15.5/5.18.1/5.15.5/5.17.3/5.17.3). Java от root -> RCE-root.
+
+[ВЫС-S4] ВНЕШНИЕ ПОДРЯДЧИКИ С ROOT: valeriy (bitel@bgbilling.ru — вендор BGBilling) и
+   sgaregin (sgaregin@example.com) в omicron-sudo на git(161.7), voice1/2(161.17/45),
+   voiceops(161.4); sgaregin ещё и в docker (docker активен = root). avk(it-solution.ru)
+   с sudo на bitrix-to-erp(161.49). atarasov(cc@cc.ru) с sudo на call-центрах.
+
+[ВЫС-S5] docker + ansible в группе docker = живой privesc до root там, где docker.service
+   активен: commerce(161.15), git(161.7), grafana(160.19), n8n(160.119), netbox(161.5),
+   k3s-node1(161.110), ns1/ns2(161.18/19), voice1(161.17), sv1(161.12), speedtest, wiki2.
+   ufw при этом НЕ фильтрует docker-published порты (ложная защищённость).
+
+[ВЫС-S6] ПОЧТИ НИГДЕ НЕТ ХОСТОВОГО ФАЕРВОЛА: nftables/firewalld/ufw неактивны на
+   подавляющем большинстве. Исключения: speedtest(161.48, nftables) — единственный
+   с реальным фаерволом; ufw «active» на нескольких, но пропускает лишнее/не влияет на docker.
+
+[ВЫС-S7] СУБД/АДМИН-ИНТЕРФЕЙСЫ В СЕТИ: ProxySQL admin 6032 (110.20/160.103/160.89/
+   172.16.100.26), MySQL/PG/Redis/Mongo на sv1(161.12), Postgres/Redis на voice1/2 и n8n,
+   MySQL+mysqld_exporter на erp(160.31), MySQL bg-core, PowerDNS MySQL(161.18/19),
+   Zabbix/Prometheus/Alertmanager без auth (160.104/160.45).
+
+[ВЫС-S8] EOL-ОС: Debian 11 (bullseye) — все bg-core, bg-radius, ProxySQL, DNS, erp, proxysql,
+   samba(RHEL). CentOS 7 — call-center(160.35). vCenter 6.7. Патчей безопасности нет.
+
+[СРЕД-S9] fail2ban выключен/упал точечно: prometheus(160.45 выкл), bitrix(160.110 failed),
+   callcenter-deb2(160.219 failed), CALLCENTERFLASH(110.29 failed).
+
+[СРЕД-S10] unattended-upgrades почти нигде не включён. Исключения (эталон): speedtest(161.48),
+   wiki2(160.100), bitrix-to-erp(161.49). Отставание по обновлениям: 130-260 security на хост.
+
+[СРЕД-S11] Учётка 'debian' (установочный остаток, nologin) в НАТИВНОЙ группе sudo на
+   Debian 13-хостах: bitrix-to-erp(161.49), nginx-proxy-*, speedtest, wiki2, voice2 и др.
+   inebalzin в native sudo на MultiFactorRA(161.100).
+
+[СРЕД-S12] node_exporter(9100)/zabbix-agent(10050) без ограничения Server= — почти везде.
+
+--------------------------------------------------------------------------
+3. КРИТИЧЕСКИЕ ТОЧКИ (ТОП — закрывать первыми)
+--------------------------------------------------------------------------
+  1. db-backup1/2 (160.135/136) — бэкапы БД не складываются. [бизнес-риск]
+  2. GitLab 161.7 — Docker Registry (5000) АНОНИМЕН по сети: /v2/_catalog отдаёт репозитории
+     без auth (authsite/rocket, pet/api-gateway, pet/voice-analytics ...). Исходники/секреты.
+  3. sv1 (161.12) — Squid 3128 ОТКРЫТЫЙ ПРОКСИ (подтверждено) + SOCKS 1080; все СУБД
+     (MySQL/PG/Redis/Mongo) и Vite dev-серверы в сеть.
+  4. zabbix-core (160.104) — веб+server наружу -> RCE на всех хостах с агентом.
+  5. erp/BGERP (160.31) — дампы БД ERP в /opt world-readable (читаемы read-only юзером).
+  6. bg-core x5 — ActiveMQ CVE-2023-46604 (61616 наружу).
+  7. oms (160.68) + samba (160.11) + tacacs (161.96) — «ключи от сетевого королевства»
+     (RANCID/конфиги Mikrotik/TACACS+ учётки устройств); plain FTP на oms.
+  8. omicron-sudo=NOPASSWD ALL с ex-staff и внешними подрядчиками — по всему парку.
+  9. bg-core-flash (110.7) — 214 world-writable платёжных JSP + dump.sql + TFTP 0777.
+ 10. msVPN (160.118) — PPTP включён (устаревший).
+
+--------------------------------------------------------------------------
+4. НЕДОСТУПНЫЕ / ВЫКЛЮЧЕННЫЕ / ВНЕ УПРАВЛЕНИЯ
+--------------------------------------------------------------------------
+  Ключ mpeshkov не заведён (Debian, publickey/password): 110.17, 161.71, 161.72, 110.110,
+    172.16.100.25, 172.16.100.26 (proxysql-rocket).
+  DMZ/периметр (Ubuntu, вне парка): 155.253 (Apache), relay2-uplink 155.x.
+  Windows (нужны доменные креды): 160.118 msVPN, 160.113 NPS/PROFILE, 160.46 POWER-BI.
+  Иная платформа: 172.16.100.45 SCAT (CentOS, серт scat.test просрочен).
+  Выключены/недоступны: 160.2(сетевое устр-во, все порты закрыты), 160.21 vcsa.omicron.loc
+    (vCenter, выключен), 160.22(выключен), 185.221.44.3(публ. IP, портов нет),
+    bit.360pro.online->161.161(мёртвая DNS-запись).
+
+--------------------------------------------------------------------------
+5. ПЕРВООЧЕРЕДНОЙ ПЛАН (сжато)
+--------------------------------------------------------------------------
+  A. Восстановить бэкапы БД (проверить задания на всех СУБД-серверах) — сегодня.
+  B. Закрыть анонимный Docker Registry (161.7) и открытый Squid/SOCKS (161.12).
+  C. Ревизия omicron-sudo: удалить nologin ex-staff, тест-акк, вынести внешних подрядчиков
+     (valeriy/sgaregin/avk/atarasov); по возможности убрать NOPASSWD/разделить права.
+  D. Обновить ActiveMQ на bg-core + закрыть 61616/брокер фаерволом.
+  E. Убрать СУБД/admin-интерфейсы (ProxySQL 6032, MySQL/PG/Redis/Mongo) с 0.0.0.0 -> localhost
+     + DOCKER-USER iptables для docker-published портов.
+  F. Защитить мониторинг: Zabbix/Prometheus/Alertmanager за auth/reverse-proxy/фаервол.
+  G. Вынести ansible из группы docker (или обосновать) на активных docker-хостах.
+  H. Развернуть хостовой фаервол (nftables, как на speedtest) и unattended-upgrades по парку.
+  I. План миграции с Debian 11 / CentOS 7 / vCenter 6.7 (EOL).
+  J. Точечно: 110.7 world-writable платёжные JSP/dump.sql/TFTP; oms plain-FTP; msVPN PPTP;
+     erp дампы в /opt; починить fail2ban где упал; заменить просроченные/self-signed серты.
+==========================================================================

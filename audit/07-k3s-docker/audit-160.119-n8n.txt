@@ -1,0 +1,67 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.119  (n8n.360pro.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : n8n.360pro.online
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-32   Uptime: 356 дней
+  Роль     : n8n — платформа автоматизации воркфлоу/iPaaS (в Docker): n8n(node) +
+             PostgreSQL, фронт nginx (443). 2 контейнера + docker-proxy.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.160.119
+  mpeshkov uid 1009, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1001), файл 38 байт (вероятно NOPASSWD ALL).
+Члены omicron-sudo (7): epetrov, itronin, gmasich, inebalzin, pkuzmin, root, ansible.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  ansible(+docker, docker АКТИВЕН). mpeshkov — readonly.
+Nologin uid>=1000: epetrov, itronin, inebalzin.
+
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка. Подрядчиков нет.
+  [СРЕД] docker.service АКТИВЕН + ansible в docker -> живой privesc до root.
+  [+]    SSH захардене (Port 1221, root off, пароли off). ufw АКТИВЕН. fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+ufw активен, НО порты контейнеров публикует Docker (docker-proxy) — Docker пишет свои
+iptables-правила В ОБХОД ufw, поэтому опубликованные порты доступны снаружи.
+Внешняя доступность (проба VPN): 1221, 80, 443, 5432 — OPEN.
+  1221/tcp   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443/tcp nginx -> n8n (web-редактор/API)   OPEN  (страница n8n)
+  5432/tcp   PostgreSQL (docker-proxy) 0.0.0.0 OPEN  !!! ВЫС: БД n8n открыта в сеть
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  PostgreSQL n8n (5432) ОПУБЛИКОВАН docker на 0.0.0.0 и ДОСТУПЕН СНАРУЖИ.
+           В БД n8n — определения воркфлоу и УЧЁТНЫЕ ДАННЫЕ ИНТЕГРАЦИЙ (API-ключи/токены,
+           шифруются N8N_ENCRYPTION_KEY, но выставлять БД в сеть нельзя). ufw НЕ защищает
+           (docker-published порт). ДЕЙСТВИЕ: публиковать как 127.0.0.1:5432:5432 в
+           docker-compose и/или правило DOCKER-USER в iptables.
+
+  [ВЫС-2]  n8n веб-редактор (443) доступен по сети — ПРОВЕРИТЬ включённую аутентификацию
+           (n8n user management / basic auth) и что editor/API не анонимны. Через editor
+           можно исполнять код (Function/Execute Command ноды) = RCE в контейнере.
+
+  [СРЕД-3] docker.service активен + ansible в docker = живой privesc до root.
+
+  [СРЕД-4] omicron-sudo (вероятно NOPASSWD ALL) с 3 nologin ex-staff — чистка.
+           258 ожидающих обновлений; unattended-upgrades НЕ включён.
+
+  [i]     ВАЖНО про ufw+docker: ufw "active", но не фильтрует docker-published порты —
+          это ложное чувство защищённости. Использовать DOCKER-USER цепочку.
+
+  [+] ПЛЮСЫ: Debian 12 (не EOL); SSH захардене; fail2ban активен.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), аутентификация n8n, docker-compose
+  (публикация портов/секреты), N8N_ENCRYPTION_KEY, воркфлоу и их креды, authorized_keys.
+==========================================================================

@@ -1,0 +1,87 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.31  (erp.360pro.online)
+ Дата: 2026-09-14   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : erp.360pro.online
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL   Kernel: 5.10.0-12   Uptime: 304 дня
+  Роль     : ERP-система BGERP (ERP-модуль BGBilling, Java). Front nginx + MySQL 8.0.28
+             + stunnel. Java-процесс bgerp (порты 2011 localhost, 9088). Это тот ERP,
+             с которым интегрируется bitrix-to-erp (161.49).
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.160.31
+  mpeshkov uid 1019 в omicron-sudo(1002) -> NOPASSWD root (не readonly!).
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Права — omicron-sudo(gid 1002).
+ПОДТВЕРЖДЕНО (прочитал через sudo): /etc/sudoers.d/omicron-sudo =
+    %omicron-sudo ALL=(ALL) NOPASSWD: ALL   -> полный root без пароля всем членам.
+
+Члены omicron-sudo (15): aglukhov, vitek, epetrov, itronin, gmasich, ishatohin,
+  userobaba, akudryaeva, oborovkov, obobrovkov, pkuzmin, inebalzin, root, ansible, avasilev
+
+Действующие (login-shell bash + sudo):
+  root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  avasilev(a.vasilev@360pro.online), ansible(сервисный, +docker). mpeshkov — readonly.
+Nologin uid>=1000 (часть — в omicron-sudo): aglukhov, vitek, epetrov, itronin,
+  ishatohin, userobaba, akudryaeva, oborovkov, obobrovkov, inebalzin, bogdan, bogdan1.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo = NOPASSWD ALL, 15 членов — из них ~11 nologin (бывшие
+        сотрудники: aglukhov, vitek, epetrov, itronin, ishatohin, userobaba,
+        akudryaeva, oborovkov, obobrovkov, inebalzin ...). Сильно раздутый админ-доступ
+        к ERP с бизнес-данными. Срочная ревизия/чистка.
+  [i]   Новые имена vitek/bogdan/bogdan1 (nologin). Кросс-доменный разброс (omiplat/360pro).
+        ansible в docker (docker inactive).
+  [+]   SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. ufw АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (ufw активен, но пропускает СУБД и exporter наружу)
+--------------------------------------------------------------------------
+Внешняя доступность (проба VPN): 1221, 80, 443, 3306, 33060, 9088, 9104, 9100, 10050 — OPEN.
+  TCP:
+  1221   SSH                     0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443 nginx (ERP web)         0.0.0.0  OPEN
+  3306   MySQL 8.0.28            *        OPEN  !!! ВЫС: СУБД ERP открыта в сеть
+  33060  MySQL X-protocol        *        OPEN  !!! ВЫС: тоже в сеть
+  9088   BGERP (Java)            0.0.0.0  OPEN  прикладной порт наружу
+  9104   mysqld_exporter         *        OPEN  !!! метрики MySQL БЕЗ auth наружу (утечка)
+  9100   node_exporter           host IP  OPEN  без auth
+  10050  zabbix-agent            0.0.0.0  OPEN  ограничить Server=
+  8098   Java-сервис             host IP
+  2011   BGERP (Java) / 2587-2591 stunnel   127.0.0.1  ок (localhost)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [КРИТ-1] ДАМПЫ БД ERP ЛЕЖАТ В /opt, режим 0644 (world-readable) — читаются ЛЮБЫМ
+           локальным пользователем (в т.ч. read-only mpeshkov):
+             /opt/2022-08-15_20_50.db.zip   (123 МБ)
+             /opt/2022-11-22_13_01.db.zip   (277 МБ)
+             /opt/2022-11-22_13_02.zip      (56 МБ)
+           + /opt/bgerp/app-backup-pre-15214-2026-05-22_1351.tar.gz (52 МБ).
+           Утечка бизнес-данных ERP «в покое». ДЕЙСТВИЕ: убрать дампы с прод-хоста /
+           ограничить права (0600 root), перенести в защищённое хранилище.
+
+  [ВЫС-2]  MySQL (3306 + X-proto 33060) открыт в сеть (подтверждено снаружи; ufw пропускает).
+           bind-address=127.0.0.1 и/или правило ufw.
+
+  [ВЫС-3]  mysqld_exporter (9104) БЕЗ аутентификации открыт в сеть — утечка внутренних
+           метрик/структуры БД. Ограничить фаерволом/добавить auth.
+
+  [ВЫС-4]  omicron-sudo = NOPASSWD ALL, ~11 nologin ex-staff среди 15 членов. Чистка.
+
+  [СРЕД-5] Debian 11 EOL; 260+ ожидающих обновлений; unattended-upgrades НЕ включён.
+           BGERP-порт 9088 и node_exporter/zabbix открыты наружу — ограничить.
+
+  [+] ПЛЮСЫ: ufw и fail2ban активны; SSH захардене.
+
+--------------------------------------------------------------------------
+ПРИМЕЧАНИЕ: у mpeshkov здесь ЕСТЬ NOPASSWD sudo. Аудит без внесения изменений.
+==========================================================================

@@ -1,0 +1,63 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.161.172  (nginx-proxy-flash)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : nginx-proxy-flash
+  OS       : Debian GNU/Linux 13 (trixie)  -- АКТУАЛЬНАЯ   Kernel: 6.12   Uptime: 97 дней
+  Роль     : Публичный API-шлюз (нативный nginx) для домена flash-telecom.
+             vhost api.flash-telecom.ru -> проксирует на BGBilling bg-core-flash
+             (192.168.110.7:8080): платежи Сбербанк (/billing/sberbank/7), TV-upsale REST,
+             мобильное API (/billing/mobapi/16). НЕ docker.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk), через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.161.172
+  mpeshkov uid 1011, группа omicron-readonly(1003) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+ДВЕ группы: native sudo(27) -> член debian (установочная, nologin);
+            omicron-sudo(gid 1001): itronin, gmasich, inebalzin, pkuzmin, ansible, root, avasilev.
+Действующие (bash + sudo): root, gmasich(g.masich@omiplat.ru), pkuzmin(p.kuzmin@360pro.online),
+  avasilev(a.vasilev@360pro.online), ansible(+docker, docker inactive). mpeshkov — readonly.
+Nologin uid>=1000: itronin, inebalzin, debian.
+
+  [СРЕД] Учётка debian в native sudo (nologin, установочный остаток) — убрать из sudo/удалить.
+  [СРЕД] omicron-sudo (вероятно NOPASSWD ALL) с 2 nologin ex-staff (itronin, inebalzin) — чистка.
+  [+]    SSH захардене (Port 1221, root off, пароли off). fail2ban АКТИВЕН. Без подрядчиков.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ
+--------------------------------------------------------------------------
+Хостового фаервола НЕТ (nft/firewalld/ufw inactive).
+Внешняя доступность (проба VPN): 1221, 80, 443 — OPEN.
+  1221/tcp   SSH               0.0.0.0  OPEN  ключи-only, root off — ок
+  80,443/tcp nginx (API-шлюз)  0.0.0.0  OPEN  api.flash-telecom.ru
+  8098/tcp   Java-сервис       192.168.161.172  (агент BG?) — на host IP
+  25 exim / 631 CUPS           127.0.0.1  ок
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [ВЫС-1]  Публичный API-шлюз к БИЛЛИНГУ: api.flash-telecom.ru -> bg-core-flash
+           192.168.110.7:8080 (HTTP, не HTTPS к бэкенду). Экспонированы платёжные
+           (Сбербанк callback) и TV/mob API. ДЕЙСТВИЕ: убедиться, что наружу открыты
+           ТОЛЬКО нужные пути; включить rate-limiting/WAF на платёжные эндпоинты;
+           бэкенд-канал к 110.7 по возможности защитить.
+
+  [СРЕД-2] Учётка debian в native sudo; omicron-sudo с 2 nologin ex-staff — чистка.
+
+  [СРЕД-3] Хостового фаервола нет (80/443 нужны шлюзу, но SSH/8098 ограничить). 8098
+           (Java) слушает на внешнем IP — проверить назначение/ограничить.
+
+  [+] ПЛЮСЫ: Debian 13 (актуальная) и ПОЛНОСТЬЮ пропатчен (0 обновлений); нативный nginx
+      (не docker, нет docker-privesc); SSH захардене; fail2ban активен; без подрядчиков.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (read-only): omicron-sudo (NOPASSWD?), полный vhost (все пути/лимиты/TLS-цепочка),
+  что за 8098, authorized_keys.
+==========================================================================

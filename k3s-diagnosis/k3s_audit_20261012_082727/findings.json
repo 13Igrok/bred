@@ -1,0 +1,1520 @@
+[
+  {
+    "severity": "INFO",
+    "category": "nodes",
+    "subject": "k3s-node1",
+    "detail": "control-plane k3s/kubelet v1.33.6+k3s1"
+  },
+  {
+    "severity": "INFO",
+    "category": "nodes",
+    "subject": "k3s-node2",
+    "detail": "control-plane k3s/kubelet v1.33.6+k3s1"
+  },
+  {
+    "severity": "INFO",
+    "category": "nodes",
+    "subject": "k3s-node3",
+    "detail": "control-plane k3s/kubelet v1.33.6+k3s1"
+  },
+  {
+    "severity": "INFO",
+    "category": "nodes",
+    "subject": "k3s-node4",
+    "detail": "control-plane k3s/kubelet v1.33.6+k3s1"
+  },
+  {
+    "severity": "HIGH",
+    "category": "nodes",
+    "subject": "k3s-node5",
+    "detail": "control-plane not Ready (Unknown), pressures=[]"
+  },
+  {
+    "severity": "INFO",
+    "category": "nodes",
+    "subject": "k3s-node5",
+    "detail": "control-plane k3s/kubelet v1.33.6+k3s1"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node1-j8x74",
+    "detail": "container debugger has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node1-j8x74",
+    "detail": "hostPath volume host-root"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node1-j8x74",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node2-rm5qw",
+    "detail": "container debugger has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node2-rm5qw",
+    "detail": "hostPath volume host-root"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node2-rm5qw",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node3-cdfrl",
+    "detail": "container debugger has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node3-cdfrl",
+    "detail": "hostPath volume host-root"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node3-cdfrl",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node4-wqtrh",
+    "detail": "container debugger has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node4-wqtrh",
+    "detail": "hostPath volume host-root"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "default/node-debugger-k3s-node4-wqtrh",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t",
+    "detail": "container gitlab-agent has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl",
+    "detail": "container gitlab-agent has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/helm-install-traefik-crd-mrnlf",
+    "detail": "container helm has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/helm-install-traefik-h95zl",
+    "detail": "container helm has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-7wgkr",
+    "detail": "container kube-vip has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-7wgkr",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-hrt5d",
+    "detail": "container kube-vip has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-hrt5d",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-j4hkf",
+    "detail": "container kube-vip has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-j4hkf",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-rcgz9",
+    "detail": "container kube-vip has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-rcgz9",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-sj956",
+    "detail": "container kube-vip has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/kube-vip-ds-sj956",
+    "detail": "hostNetwork pod outside kube-system"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/local-path-provisioner-869c44bfbd-44zp8",
+    "detail": "container local-path-provisioner has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/metrics-server-7bfffcd44-9d4vv",
+    "detail": "container metrics-server has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "kube-system/traefik-865bd56545-lcl29",
+    "detail": "container traefik has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-7bh9j",
+    "detail": "container csi-attacher has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-7bh9j",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-k8q58",
+    "detail": "container csi-attacher has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-k8q58",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-w6qsq",
+    "detail": "container csi-attacher has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-w6qsq",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-qm465",
+    "detail": "container csi-provisioner has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-qm465",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-s2hd5",
+    "detail": "container csi-provisioner has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-s2hd5",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-z85hc",
+    "detail": "container csi-provisioner has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-z85hc",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-55gkf",
+    "detail": "container csi-resizer has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-55gkf",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-c5c7k",
+    "detail": "container csi-resizer has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-c5c7k",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-krc25",
+    "detail": "container csi-resizer has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-krc25",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-4n8qp",
+    "detail": "container csi-snapshotter has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-4n8qp",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-grwng",
+    "detail": "container csi-snapshotter has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-grwng",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-n2wgf",
+    "detail": "container csi-snapshotter has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-n2wgf",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-48hn9",
+    "detail": "container engine-image-ei-51cc7b9c has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-48hn9",
+    "detail": "privileged container engine-image-ei-51cc7b9c"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-48hn9",
+    "detail": "hostPath volume data"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-8dvkv",
+    "detail": "container engine-image-ei-51cc7b9c has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-8dvkv",
+    "detail": "privileged container engine-image-ei-51cc7b9c"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-8dvkv",
+    "detail": "hostPath volume data"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-kk5mf",
+    "detail": "container engine-image-ei-51cc7b9c has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-kk5mf",
+    "detail": "privileged container engine-image-ei-51cc7b9c"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-kk5mf",
+    "detail": "hostPath volume data"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-x8ssf",
+    "detail": "container engine-image-ei-51cc7b9c has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-x8ssf",
+    "detail": "privileged container engine-image-ei-51cc7b9c"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/engine-image-ei-51cc7b9c-x8ssf",
+    "detail": "hostPath volume data"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9",
+    "detail": "container instance-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9",
+    "detail": "privileged container instance-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9",
+    "detail": "hostPath volume host"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9",
+    "detail": "hostPath volume engine-binaries"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9",
+    "detail": "hostPath volume unix-domain-socket"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e",
+    "detail": "container instance-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e",
+    "detail": "privileged container instance-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e",
+    "detail": "hostPath volume host"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e",
+    "detail": "hostPath volume engine-binaries"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e",
+    "detail": "hostPath volume unix-domain-socket"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b",
+    "detail": "container instance-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b",
+    "detail": "privileged container instance-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b",
+    "detail": "hostPath volume host"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b",
+    "detail": "hostPath volume engine-binaries"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b",
+    "detail": "hostPath volume unix-domain-socket"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124",
+    "detail": "container instance-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124",
+    "detail": "privileged container instance-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124",
+    "detail": "hostPath volume host"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124",
+    "detail": "hostPath volume engine-binaries"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124",
+    "detail": "hostPath volume unix-domain-socket"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "container node-driver-registrar has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "privileged container node-driver-registrar"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "container longhorn-liveness-probe has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "container longhorn-csi-plugin has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "privileged container longhorn-csi-plugin"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume kubernetes-csi-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume registration-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume pods-mount-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume host-dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume host-proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume host-sys"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "hostPath volume lib-modules"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "container node-driver-registrar has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "privileged container node-driver-registrar"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "container longhorn-liveness-probe has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "container longhorn-csi-plugin has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "privileged container longhorn-csi-plugin"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume kubernetes-csi-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume registration-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume pods-mount-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume host-dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume host-proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume host-sys"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "hostPath volume lib-modules"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "container node-driver-registrar has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "privileged container node-driver-registrar"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "container longhorn-liveness-probe has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "container longhorn-csi-plugin has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "privileged container longhorn-csi-plugin"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume kubernetes-csi-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume registration-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume pods-mount-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume host-dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume host-proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume host-sys"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "hostPath volume lib-modules"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "container node-driver-registrar has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "privileged container node-driver-registrar"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "container longhorn-liveness-probe has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "container longhorn-csi-plugin has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "privileged container longhorn-csi-plugin"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume kubernetes-csi-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume registration-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume socket-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume pods-mount-dir"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume host-dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume host-proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume host-sys"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "hostPath volume lib-modules"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-driver-deployer-74755cdf4-6l9rh",
+    "detail": "container longhorn-driver-deployer has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-driver-deployer-74755cdf4-6l9rh",
+    "detail": "container wait-longhorn-manager has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "container longhorn-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "privileged container longhorn-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "container pre-pull-share-manager-image has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "hostPath volume boot"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "hostPath volume dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "hostPath volume proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "hostPath volume longhorn"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "container longhorn-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "privileged container longhorn-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "container pre-pull-share-manager-image has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "hostPath volume boot"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "hostPath volume dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "hostPath volume proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "hostPath volume longhorn"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "container longhorn-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "privileged container longhorn-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "container pre-pull-share-manager-image has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "hostPath volume boot"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "hostPath volume dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "hostPath volume proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "hostPath volume longhorn"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "container longhorn-manager has no resource limits"
+  },
+  {
+    "severity": "HIGH",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "privileged container longhorn-manager"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "container pre-pull-share-manager-image has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "hostPath volume boot"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "hostPath volume dev"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "hostPath volume proc"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "hostPath volume longhorn"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-ui-6d647ddcc5-nxxn6",
+    "detail": "container longhorn-ui has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "longhorn-system/longhorn-ui-6d647ddcc5-xjn99",
+    "detail": "container longhorn-ui has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "vault/vault-0",
+    "detail": "container vault-unseal has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "vault/vault-0",
+    "detail": "container vault has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "vault/vault-1",
+    "detail": "container vault-unseal has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "vault/vault-1",
+    "detail": "container vault has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "vault/vault-2",
+    "detail": "container vault-unseal has no resource limits"
+  },
+  {
+    "severity": "MED",
+    "category": "workload",
+    "subject": "vault/vault-2",
+    "detail": "container vault has no resource limits"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "ankey/ankey-backup-29859780-rfsd9",
+    "detail": "reads env:PGPASSWORD->ankey-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "ankey/ankey-backup-29861220-cb82x",
+    "detail": "reads env:PGPASSWORD->ankey-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "ankey/ankey-backup-29862660-mwdrm",
+    "detail": "reads env:PGPASSWORD->ankey-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "ankey/ankeyd-79759885d4-m9kxn",
+    "detail": "reads envFrom:ankey-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "ankey/postgres-0",
+    "detail": "reads env:POSTGRES_PASSWORD->ankey-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/api-gateway-84d9d9c94b-hwzmt",
+    "detail": "reads envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/api-gateway-84d9d9c94b-txf7m",
+    "detail": "reads envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/core-5cf57d46c9-d8c7p",
+    "detail": "reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/core-5cf57d46c9-t6hbm",
+    "detail": "reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/mobile-bff-5545698b57-tntvw",
+    "detail": "reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/mobile-bff-5545698b57-w8cwq",
+    "detail": "reads env:CORE_SA_SHARED_SECRET->api-gateway-secrets, envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/priority-c4bc8697c-8w9dp",
+    "detail": "reads envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "api-gateway/priority-c4bc8697c-mldsj",
+    "detail": "reads envFrom:api-gateway-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "default/rocket-auth-88bd56474-52jj6",
+    "detail": "reads env:BGBILLING_URL->rocket-auth-secrets, env:BGBILLING_API_KEY->rocket-auth-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "default/rocket-auth-88bd56474-7rjwl",
+    "detail": "reads env:BGBILLING_URL->rocket-auth-secrets, env:BGBILLING_API_KEY->rocket-auth-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t",
+    "detail": "reads volume:k3s-agent-gitlab-agent-token"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl",
+    "detail": "reads volume:k3s-agent-gitlab-agent-token"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/instance-manager-448b453c8d726bd3242f5f3f9509a2a9",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/instance-manager-47b4d17aac362ce6bd4af77a77a4852e",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/instance-manager-599a885092848feb48f03bdae9c47b9b",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/instance-manager-71e75cfb6bc069bb69ff220477c86124",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/longhorn-manager-8ljf7",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/longhorn-manager-d584c",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/longhorn-manager-p4dk4",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "longhorn-system/longhorn-manager-qddkx",
+    "detail": "reads volume:longhorn-grpc-tls"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "mail/mailserver-360pro-6c779f4664-rzfm2",
+    "detail": "reads env:LDAP_BIND_PW->mailserver-360pro-secrets, env:DOVECOT_MASTER_PW->mailserver-360pro-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "mail/password-expiry-notify-29861640-h86nn",
+    "detail": "reads env:LDAP_BIND_PW->mailserver-360pro-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "mail/sogo-687f78bf47-v7zcb",
+    "detail": "reads env:SOGO_DB_PASSWORD->sogo-secrets, env:SOGO_LDAP_BIND_PW->sogo-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "mail/sogo-db-6557d865c-pjrg5",
+    "detail": "reads env:POSTGRES_PASSWORD->sogo-secrets"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "outfile/outfile-664bcbb68-jrsps",
+    "detail": "reads env:OUTFILE_LDAP_BIND_DN->outfile-ldap, env:OUTFILE_LDAP_BIND_PASSWORD->outfile-ldap"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "vault/vault-0",
+    "detail": "reads env:UNSEAL_KEY_1->vault-unseal-keys, env:UNSEAL_KEY_2->vault-unseal-keys, env:UNSEAL_KEY_3->vault-unseal-keys"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "vault/vault-1",
+    "detail": "reads env:UNSEAL_KEY_1->vault-unseal-keys, env:UNSEAL_KEY_2->vault-unseal-keys, env:UNSEAL_KEY_3->vault-unseal-keys"
+  },
+  {
+    "severity": "INFO",
+    "category": "secrets",
+    "subject": "vault/vault-2",
+    "detail": "reads env:UNSEAL_KEY_1->vault-unseal-keys, env:UNSEAL_KEY_2->vault-unseal-keys, env:UNSEAL_KEY_3->vault-unseal-keys"
+  },
+  {
+    "severity": "MED",
+    "category": "rbac",
+    "subject": "admin",
+    "detail": "can read secrets cluster-wide"
+  },
+  {
+    "severity": "HIGH",
+    "category": "rbac",
+    "subject": "cluster-admin",
+    "detail": "clusterrole grants */* (full access)"
+  },
+  {
+    "severity": "MED",
+    "category": "rbac",
+    "subject": "edit",
+    "detail": "can read secrets cluster-wide"
+  },
+  {
+    "severity": "MED",
+    "category": "rbac",
+    "subject": "gitlab-agent-k3s-agent:k3s-agent-gitlab-agent:ocs",
+    "detail": "can read secrets cluster-wide"
+  },
+  {
+    "severity": "MED",
+    "category": "rbac",
+    "subject": "longhorn-role",
+    "detail": "can read secrets cluster-wide"
+  },
+  {
+    "severity": "MED",
+    "category": "rbac",
+    "subject": "traefik-kube-system",
+    "detail": "can read secrets cluster-wide"
+  },
+  {
+    "severity": "INFO",
+    "category": "helm",
+    "subject": "namespaces/gitlab-agent-k3s-agent",
+    "detail": "releases: k3s-agent"
+  },
+  {
+    "severity": "INFO",
+    "category": "helm",
+    "subject": "namespaces/kube-system",
+    "detail": "releases: traefik, traefik-crd"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "default/rocket-auth-88bd56474-52jj6",
+    "detail": "container rocket-auth waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=rocket-auth pod=rocket-auth-88bd56474-"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "default/rocket-auth-88bd56474-52jj6",
+    "detail": "85072 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "default/rocket-auth-88bd56474-7rjwl",
+    "detail": "85096 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t",
+    "detail": "container gitlab-agent waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=gitlab-agent pod=k3s-agent-gitlab-agen"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-b6p2t",
+    "detail": "78369 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl",
+    "detail": "container gitlab-agent waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=gitlab-agent pod=k3s-agent-gitlab-agen"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "gitlab-agent-k3s-agent/k3s-agent-gitlab-agent-v2-5995f7b6cd-k7wkl",
+    "detail": "79014 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/kube-vip-ds-7wgkr",
+    "detail": "106 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/kube-vip-ds-hrt5d",
+    "detail": "106 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/kube-vip-ds-j4hkf",
+    "detail": "container kube-vip waiting: CrashLoopBackOff:back-off 5m0s restarting failed container=kube-vip pod=kube-vip-ds-j4hkf_kube-sy"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/kube-vip-ds-j4hkf",
+    "detail": "12630 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/kube-vip-ds-rcgz9",
+    "detail": "123 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/kube-vip-ds-sj956",
+    "detail": "110 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "kube-system/metrics-server-7bfffcd44-9d4vv",
+    "detail": "4 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-7bh9j",
+    "detail": "49 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-k8q58",
+    "detail": "42 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-attacher-7b994cbfbf-w6qsq",
+    "detail": "40 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-qm465",
+    "detail": "34 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-s2hd5",
+    "detail": "38 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-provisioner-d79dfd48f-z85hc",
+    "detail": "46 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-55gkf",
+    "detail": "43 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-c5c7k",
+    "detail": "42 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-resizer-9cc4b6d5c-krc25",
+    "detail": "42 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-4n8qp",
+    "detail": "33 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-grwng",
+    "detail": "30 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/csi-snapshotter-7746d5794b-n2wgf",
+    "detail": "55 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/longhorn-csi-plugin-6572c",
+    "detail": "4 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/longhorn-csi-plugin-kqzxr",
+    "detail": "4 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/longhorn-csi-plugin-msx2b",
+    "detail": "4 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "longhorn-system/longhorn-csi-plugin-w6drk",
+    "detail": "4 restarts"
+  },
+  {
+    "severity": "MED",
+    "category": "health",
+    "subject": "mail/mailserver-360pro-6c779f4664-rzfm2",
+    "detail": "3 restarts"
+  }
+]

@@ -1,0 +1,47 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.104  (zabbix-core.omicron.local)
+ Дата: 2026-09-14   Аудитор: mpeshkov (read-only, без sudo)
+ Фокус: админские учётки и порты
+==========================================================================
+ХОСТ
+  hostname : zabbix-core.omicron.local
+  OS       : Debian GNU/Linux 12 (bookworm)   Kernel: 6.1.0-31   Uptime: 478 дней
+  Роль     : Сервер мониторинга Zabbix (zabbix_server + nginx/php-frontend + PostgreSQL).
+             Центральный мониторинг всего парка (агенты 10050 на всех хостах шлют сюда).
+ДОСТУП
+  SSH порт 22 (НЕ 1221) по ключу id_peshkov_rsa. mpeshkov omicron-readonly — read-only.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.104
+
+1. АДМИНСКИЕ УЧЁТКИ
+  sudo(27) пуста. omicron-sudo(gid 1001, вероятно NOPASSWD ALL) — 16 ЧЛЕНОВ (МАКСИМУМ в парке):
+    aglukhov, epetrov, itronin, gmasich, userobaba, ishatohin, akudryaeva, oborovkov,
+    obobrovkov, inebalzin, ousepov, pkuzmin, root, ansible, rtaktarov, ezinovyev.
+  Действующие (bash+sudo): root, gmasich(omiplat.ru), pkuzmin(360pro.online),
+    rtaktarov(rocketcom.ru), ezinovyev(Evgeniy Zinovyev, e.zinovyev@360pro.online),
+    ansible(+docker, docker inactive). mpeshkov — readonly.
+  Прочие shell: postgres(служебный), zabbix(служебный),
+    i_verbitsky_local (Ignat, ЛОКАЛЬНАЯ учётка gid 1002, /bin/bash, НЕ в sudo/omicron).
+  Nologin (в т.ч. в sudo): aglukhov, epetrov, itronin, userobaba, ishatohin, akudryaeva,
+    oborovkov, obobrovkov, inebalzin, ousepov (~10-11).
+  [ВЫС] omicron-sudo раздут до 16 (~11 nologin ex-staff) — САМЫЙ раздутый sudo в парке. Чистка.
+  [СРЕД] Отдельная локальная учётка i_verbitsky_local (gid 1002) с bash — вне omicron-модели;
+         уточнить назначение. docker+ansible (docker inactive).
+  [+]   SSH захардене (root off, пароли off). fail2ban АКТИВЕН.
+
+2. ПОРТЫ
+  Хостового фаервола НЕТ. Внешняя доступность (VPN): 22, 80, 10051, 10050, 9100 — OPEN.
+  22 SSH; 80 Zabbix web (nginx/php, HTTP); 10051 zabbix_server; 10052 (proxy) host-IP;
+  10050 zabbix_agent2; 10053; 9100 node_exporter. 5432 PostgreSQL — 127.0.0.1 (ХОРОШО).
+
+3. НАХОДКИ
+  [ВЫС-1] Zabbix — мощная платформа: через веб-админку можно ВЫПОЛНЯТЬ команды на всех
+          хостах с агентом (scripts/remote commands) -> компрометация Zabbix = RCE по парку.
+          Веб на HTTP:80 (нет TLS). ДЕЙСТВИЕ: HTTPS + ограничить доступ к веб, проверить
+          учётку Admin (не дефолт Admin/zabbix), MFA/ACL. Ограничить 10051 до агентов/прокси.
+  [ВЫС-2] omicron-sudo=NOPASSWD с 16 членами (~11 nologin) — срочная чистка.
+  [СРЕД-3] Хостового фаервола нет; 227 обновлений; unattended нет; zabbix-порты/9100 наружу.
+  [+] ПЛЮСЫ: Debian 12 (не EOL); PostgreSQL на localhost; SSH захардене; fail2ban активен.
+
+НЕ ПРОВЕРЕНО (read-only): учётка Admin Zabbix/дефолт-пароль, omicron-sudo(NOPASSWD?),
+  назначение i_verbitsky_local, authorized_keys.
+==========================================================================

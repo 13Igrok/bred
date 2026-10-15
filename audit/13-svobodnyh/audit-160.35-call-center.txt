@@ -1,0 +1,107 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.35  (call-center)
+ Дата: 2026-09-07   Аудитор: mpeshkov (в omicron-sudo -> ЕСТЬ NOPASSWD sudo)
+ Фокус: админские учётки и порты.  Аудит read-only (изменений не вносил).
+==========================================================================
+
+ХОСТ
+  hostname : call-center
+  OS       : CentOS Linux release 7.9.2009 (Core)  -- EOL с 30.06.2024 (нет обновлений!)
+  Kernel   : 3.10.0-1160.59.1.el7   Virt: VM   Uptime: 101 день
+  Роль     : Телефонная АТС call-центра — Asterisk (брендинг "Line24_PBX") + FreePBX
+             (httpd) + MySQL. node_exporter/zabbix для мониторинга.
+
+ДОСТУП
+  SSH порт 1221 по ключу id_peshkov_rsa (=Peshkov2.ppk). Доступен через VPN.
+  ssh -i ~/.ssh/id_peshkov_rsa -p 1221 mpeshkov@192.168.160.35
+  mpeshkov uid 1017, группа omicron-sudo(1004) -> NOPASSWD root.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа wheel(10) ПУСТАЯ. Права — omicron-sudo(gid 1004).
+ПОДТВЕРЖДЕНО (прочитал): /etc/sudoers.d/omicron-sudo = %omicron-sudo ALL=(ALL) NOPASSWD: ALL
+=> все члены omicron-sudo получают полный root без пароля.
+
+Члены omicron-sudo (12):
+  itronin, gmasich, rtaktarov, userobaba, akudryaeva, iverbitsky, inebalzin,
+  pkuzmin, atarasov, root, sgaregin, mpeshkov
+
+Действующие (login-shell bash + sudo):
+  root
+  gmasich    (g.masich@omiplat.ru)
+  rtaktarov  (r.taktarov@rocketcom.ru)
+  iverbitsky (i.verbitsky@360pro.online)
+  pkuzmin    (p.kuzmin@360pro.online)
+  atarasov   (Artem Tarasov "Call center", cc@cc.ru — внешний/непонятный домен)
+  sgaregin   (без описания)
+  mpeshkov (я)
+
+Прочие shell-учётки (НЕ sudo): line24(uid1000, без описания — общий PBX-аккаунт),
+  asterisk(1001, служебный), ansible(1015 — здесь НЕ в omicron-sudo; отдельный
+  /etc/sudoers.d/ansible). Nologin: epetrov, itronin, userobaba, akudryaeva, inebalzin.
+
+  ЗАМЕЧАНИЯ:
+  [ВЫС] omicron-sudo = NOPASSWD ALL. В составе:
+        - atarasov (cc@cc.ru) — внешний/сторонний домен, полный root. Проверить статус.
+        - 4 nologin-учётки бывших сотрудников (itronin, userobaba, akudryaeva,
+          inebalzin) — в админ-группе. ПОД ЧИСТКУ.
+  [СРЕД] Общий аккаунт 'line24' (uid1000, bash, без владельца) — обезличенный доступ;
+        выяснить назначение, персонализировать или отключить.
+  [i]   Кросс-доменный админ-разброс (omiplat/rocketcom/360pro + cc.ru).
+        ansible здесь вынесен из omicron-sudo (отдельная политика) — иначе, чем на прочих.
+  [+]   SSH захардене (sshd -T): Port 1221, PermitRootLogin no, PasswordAuthentication no.
+        wheel пуст. fail2ban АКТИВЕН.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ   (!!! firewalld ВЫКЛЮЧЕН — все биндинги на * реально открыты в сеть)
+--------------------------------------------------------------------------
+Внешняя доступность подтверждена пробой с рабочей машины (VPN).
+  TCP:
+  1221   SSH (host IP)                 OPEN   ключи-only, root off — ок
+  80,443 httpd (FreePBX/веб-админка)   OPEN
+  3306   MySQL                 на *    OPEN   !!! ВЫС: СУБД открыта в сеть (firewalld off)
+  5038   Asterisk AMI (Manager) на *   OPEN   !!! ВЫС: мощный управляющий интерфейс в сети
+  111    rpcbind (portmapper)  на *    OPEN   legacy, лишний
+  4573   Asterisk AGI          127.0.0.1      ок (localhost)
+  25     exim (MTA)            127.0.0.1      ок
+  9100   node_exporter (host IP)       OPEN   без auth
+  10050  zabbix-agent          на *    OPEN   ограничить Server=
+  UDP:
+  5060   SIP (asterisk)        на *           телефония — ограничить до транков/пиров
+  4569   IAX2 (asterisk)       на *           межАТС — ограничить
+  111    rpcbind; RTP-медиа диапазон (10000-20000+) на *
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [КРИТ-1] CentOS 7.9 — EOL с 30.06.2024. Обновлений безопасности НЕТ. Ядро 3.10.
+           ДЕЙСТВИЕ: план миграции на поддерживаемую ОС (Alma/Rocky 9 / Debian).
+
+  [ВЫС-2]  firewalld ВЫКЛЮЧЕН — нет хостового фаервола, все службы открыты в сеть.
+           ДЕЙСТВИЕ: включить firewalld и оставить только нужное (SSH/веб/SIP от транков).
+
+  [ВЫС-3]  Asterisk AMI (5038/tcp) открыт в сеть. AMI позволяет управлять АТС
+           (инициировать звонки, читать конфиг). Брутфорс/утечка = контроль над АТС,
+           телефонное мошенничество. ДЕЙСТВИЕ: bind 127.0.0.1 / ACL в manager.conf,
+           закрыть фаерволом.
+
+  [ВЫС-4]  MySQL (3306/tcp) открыт в сеть (firewalld off). ДЕЙСТВИЕ: bind-address=127.0.0.1
+           и/или фаервол.
+
+  [ВЫС-5]  omicron-sudo = NOPASSWD ALL с внешним atarasov(cc@cc.ru) и 4 nologin ex-staff.
+
+  [СРЕД-6] SIP 5060 / IAX 4569 UDP открыты всем — риск регистрационных атак и toll-fraud.
+           Ограничить источники до операторских транков/известных пиров;
+           включить fail2ban-джейл для Asterisk (fail2ban запущен — проверить джейлы).
+
+  [СРЕД-7] Общий аккаунт line24 (без владельца). rpcbind(111) лишний — отключить.
+
+  [НИЗ-8]  node_exporter(9100)/zabbix(10050) — ограничить доступ.
+
+  [+] Плюсы: fail2ban активен; SSH захардене.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (вне фокуса): содержимое manager.conf/sip.conf (ACL, секреты), джейлы
+  fail2ban, /etc/sudoers.d/ansible, /var/log/asterisk, authorized_keys.
+==========================================================================

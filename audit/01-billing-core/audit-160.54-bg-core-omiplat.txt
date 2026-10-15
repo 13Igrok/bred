@@ -1,0 +1,115 @@
+==========================================================================
+ АУДИТ ХОСТА  192.168.160.54  (bg-core-omiplat.omicron.local)
+ Дата: 2026-09-07   Аудитор: mpeshkov (read-only, без sudo), доступ ПРЯМОЙ (без pivot)
+ Фокус: админские учётки и порты
+==========================================================================
+
+ХОСТ
+  hostname : bg-core-omiplat.omicron.local
+  OS       : Debian GNU/Linux 11 (bullseye)  -- EOL, LTS завершилась 08.2026
+  Kernel   : 5.10.0-16-amd64  (СТАРОЕ — новее в /boot нет; uptime 351 день)
+  Virt     : VMware VM
+  Роль     : БИЛЛИНГ-ЯДРО BGBilling (BiTel) домена omiplat
+             Java (от root): BGBillingServer, BGScheduler, BGTVAccess, BGTVAccounting
+             + ActiveMQ (под своим юзером) + WildFly (JBoss) + nginx + Docker.
+
+ДОСТУП
+  SSH порт 22 напрямую по ключу id_peshkov_rsa (=Peshkov2.ppk). 160.x через VPN, pivot не нужен.
+  ssh -i ~/.ssh/id_peshkov_rsa mpeshkov@192.168.160.54
+  Учётка mpeshkov uid 1020, группа omicron-readonly(gid 1004) — read-only, без sudo.
+
+--------------------------------------------------------------------------
+1. АДМИНСКИЕ УЧЁТКИ
+--------------------------------------------------------------------------
+Группа sudo(27) ПУСТАЯ. Админ-права — кастомная omicron-sudo(gid 1001)
+через /etc/sudoers.d/omicron-sudo (содержимое read-only юзеру недоступно).
+
+Учётки с login-shell (bash) и sudo:
+  УЧЁТКА     UID   ВЛАДЕЛЕЦ / ДОМЕН              ПРАВА                  АКТИВНОСТЬ
+  root       0     -                             omicron-sudo
+  gmasich    1004  g.masich@omiplat.ru           omicron-sudo, bash     активен, 192.168.158.22
+  rtaktarov  1007  r.taktarov@rocketcom.ru       omicron-sudo, bash
+  pkuzmin    1013  p.kuzmin@360pro.online        omicron-sudo, bash
+  avasilev   1019  a.vasilev@360pro.online       omicron-sudo, bash
+  ansible    1018  сервисный                     omicron-sudo + DOCKER   автоматизация
+  mpeshkov   1020  m.peshkov@360pro.online (я)   только omicron-readonly
+
+Сервисные с shell /bin/sh (не sudo): activemq(998), wildfly(996).
+
+ПОЛНЫЙ состав группы omicron-sudo (15 членов):
+  aglukhov, epetrov, itronin, gmasich, ishatohin, userobaba, akudryaeva,
+  oborovkov, obobrovkov, vklimansky, root, pkuzmin, ansible, avasilev, rtaktarov
+
+  ЗАМЕЧАНИЯ:
+  [!] 9 из 15 членов omicron-sudo — учётки бывших сотрудников с shell nologin
+      (aglukhov, epetrov, itronin, ishatohin, userobaba, akudryaeva, oborovkov,
+      obobrovkov, vklimansky). Логиниться не могут, но остаются в админ-группе.
+      ПОД ЧИСТКУ. В /etc/passwd также лежат nologin: bitel, epetrov2, inebalzin.
+  [!] Кросс-доменный админ-разброс: sudo у учёток из omiplat.ru (gmasich),
+      rocketcom.ru (rtaktarov), 360pro.online (pkuzmin, avasilev).
+  [!] ansible в группе docker + docker.service АКТИВЕН -> тривиальный privesc до root
+      (docker-сокет), плюс sudo.
+  [i] Отдельный /etc/sudoers.d/bitel (31 байт) — исторический доступ вендора BiTel;
+      проверить содержимое (недоступно read-only).
+  [i] gmasich — «устаревший админ», фигурирует и на POWER-BI, bg-core-flash, omicron-bg-core.
+  [+] SSH захардене: PermitRootLogin no, PasswordAuthentication no. SUID-набор чист.
+      fail2ban активен.
+
+--------------------------------------------------------------------------
+2. ПОРТЫ  (внешняя доступность проверена с рабочей машины через VPN — ВСЕ OPEN)
+--------------------------------------------------------------------------
+  ПОРТ       СЛУЖБА                 BIND            КОММЕНТАРИЙ
+  22/tcp     SSH (OpenSSH)          0.0.0.0         ключи-only, root off — ок
+  80,443/tcp nginx                  0.0.0.0         веб-периметр
+  8080/tcp   BGBilling (Java)       0.0.0.0         404 на /
+  8081/tcp   WildFly HTTP           160.54          200 (статик, Last-Modified 2022)
+  8098/tcp   Java-сервис            160.54
+  8441/tcp   WildFly HTTPS          160.54
+  1981,1982  BG-сервисы             0.0.0.0
+  9066/tcp   сервис                 0.0.0.0
+  8161/tcp   ActiveMQ web-консоль   160.54          401 (auth требуется) — ок
+  61616/tcp  ActiveMQ OpenWire      *               !!! КРИТ-1
+  5672/tcp   ActiveMQ AMQP          *               брокер наружу
+  9990/tcp   WildFly MGMT-консоль   160.54          !!! /console 302, /management 401 (auth есть)
+  9100/tcp   node_exporter          *               БЕЗ аутентификации наружу
+  10050/tcp  zabbix-agent           0.0.0.0         ограничить Server=
+  (TFTP не запущен)
+
+--------------------------------------------------------------------------
+3. НАХОДКИ
+--------------------------------------------------------------------------
+  [КРИТ-1] ActiveMQ 5.15.5 (/opt/activemq/apache-activemq-5.15.5), OpenWire 61616 +
+           AMQP 5672 ОТКРЫТЫ ПО СЕТИ -> CVE-2023-46604 (RCE, CVSS 10.0).
+           NB: сам брокер здесь работает под юзером activemq (не root) — но BG-Java
+           приложения идут ОТ ROOT, а OpenWire-эксплойт может исполнять код в контексте
+           брокера. ДЕЙСТВИЕ: обновить ActiveMQ до 5.15.16+/5.18.3+; закрыть 61616/5672
+           фаерволом до доверенных хостов.
+
+  [ВЫС-2]  WildFly management-консоль (9990) и HTTPS (8441/8081) доступны по сети
+           (bound на IP хоста). /management отвечает 401 — аутентификация есть, но
+           mgmt-интерфейс должен слушать localhost/закрываться фаерволом. Проверить
+           силу пароля admin WildFly и версию (JBoss — частый вектор RCE).
+
+  [ВЫС-3]  BG-Java приложения работают ОТ ROOT — любая RCE = сразу root.
+           (ActiveMQ здесь уже вынесен под свой юзер — сделать так же для BG-приложений.)
+
+  [ВЫС-4]  omicron-sudo раздут устаревшими учётками (9 nologin ex-staff); отдельный
+           sudoers.d/bitel вендора. ДЕЙСТВИЕ: ревизия и чистка админ-доступа.
+
+  [СРЕД-5] 226 ожидающих обновлений, из них 176 security; unattended-upgrades нет;
+           ядро 5.10.0-16 (старое, не обновлялось); Debian 11 EOL.
+           ДЕЙСТВИЕ: обновиться + перезагрузка на свежее ядро; план миграции на 12/13.
+           (Худший показатель обновлений из трёх bg-core: 110.7=78, 160.101=101, 160.54=226.)
+
+  [НИЗ-6]  node_exporter (9100) без аутентификации наружу; zabbix (10050) без
+           ограничения Server; docker.service активен (лишняя поверхность, если не нужен).
+
+  [+] Плюсы: ActiveMQ под непривилегированным юзером; web-консоль ActiveMQ требует auth;
+      SSH захардене; SUID чист.
+
+--------------------------------------------------------------------------
+НЕ ПРОВЕРЕНО (нужен доступ с sudo):
+  содержимое sudoers / omicron-sudo / bitel (NOPASSWD?), credentials.properties
+  ActiveMQ, конфиг/пароль WildFly, /var/log/auth.log, приватные authorized_keys,
+  world-writable в /opt (не проверялось в этом фокус-аудите).
+==========================================================================
