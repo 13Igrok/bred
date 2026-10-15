@@ -1,0 +1,279 @@
+<mxfile host="Electron" pages="2">
+  <diagram id="p1" name="Топология k3s-prod">
+    <mxGraphModel dx="1768" dy="1094" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1150" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=22;fontStyle=1;fontColor=#1a1a1a;whiteSpace=wrap;" value="k3s-prod — топология кластера" vertex="1">
+          <mxGeometry height="32" width="800" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="t2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=0;fontColor=#666666;whiteSpace=wrap;" value="5 нод control-plane + etcd · VIP 192.168.161.101 · внешний доступ через NodePort, не через traefik (MetalLB не установлен, LoadBalancer висит в pending)" vertex="1">
+          <mxGeometry height="24" width="1400" x="20" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=15;fontStyle=1;fontColor=#666666;" value="1 · КЛИЕНТЫ" vertex="1">
+          <mxGeometry height="105" width="1540" x="20" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="Microsoft Outlook" vertex="1">
+          <mxGeometry height="50" width="330" x="45" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="Браузер — веб-почта" vertex="1">
+          <mxGeometry height="50" width="330" x="420" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="Внешние отправители и получатели&lt;br&gt;(MX, порт 25)" vertex="1">
+          <mxGeometry height="50" width="330" x="795" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="GitLab / Bitrix24 / Vault&lt;br&gt;внешние системы" vertex="1">
+          <mxGeometry height="50" width="370" x="1170" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=15;fontStyle=1;fontColor=#666666;" value="2 · ВХОД В КЛАСТЕР" vertex="1">
+          <mxGeometry height="105" width="1540" x="20" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="kube-vip 192.168.161.101&lt;br&gt;API server 6443 — сейчас на node1" vertex="1">
+          <mxGeometry height="50" width="460" x="45" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="NodePort — почта идёт МИМО traefik&lt;br&gt;25:30025  465:30465  587:30587  993:30553" vertex="1">
+          <mxGeometry height="50" width="490" x="540" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="Ingress traefik&lt;br&gt;mail. · gw01. 360pro.online · rocket.auth.local" vertex="1">
+          <mxGeometry height="50" width="475" x="1065" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=15;fontStyle=1;fontColor=#666666;" value="3 · УЗДЫ — все 5 control-plane + etcd, кворум 3 из 5" vertex="1">
+          <mxGeometry height="100" width="1540" x="20" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="n1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="k3s-node1&lt;br&gt;192.168.161.110&lt;br&gt;держит VIP&lt;br&gt;+ поды почты" vertex="1">
+          <mxGeometry height="55" width="290" x="45" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="n2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="k3s-node2&lt;br&gt;192.168.161.120&lt;br&gt;etcd" vertex="1">
+          <mxGeometry height="55" width="290" x="350" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="n3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="k3s-node3&lt;br&gt;192.168.161.130&lt;br&gt;etcd + sogo-db" vertex="1">
+          <mxGeometry height="55" width="290" x="655" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="n4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="k3s-node4&lt;br&gt;192.168.161.140&lt;br&gt;etcd" vertex="1">
+          <mxGeometry height="55" width="290" x="960" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="n5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="k3s-node5&lt;br&gt;10.10.200.120 NotReady&lt;br&gt;Площадка 2, вне кворума" vertex="1">
+          <mxGeometry height="55" width="290" x="1265" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="f4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=15;fontStyle=1;fontColor=#666666;" value="4 · ЧТО ГДЕ РАБОТАЕТ" vertex="1">
+          <mxGeometry height="300" width="1540" x="20" y="495" as="geometry" />
+        </mxCell>
+        <mxCell id="f4a" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#666666;" value="namespace mail — почта" vertex="1">
+          <mxGeometry height="265" width="515" x="40" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="m1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="mailserver-360pro 1/1 (node1)&lt;br&gt;docker-mailserver 15.1.0&lt;br&gt;postfix · dovecot · rspamd · sieve&lt;br&gt;471 ящик, хранение почты" vertex="1">
+          <mxGeometry height="70" width="460" x="60" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="sogo 1/1 (node1)&lt;br&gt;sonroyaalmerol/docker-sogo + memcached&lt;br&gt;только веб-интерфейс, свой поиск" vertex="1">
+          <mxGeometry height="55" width="460" x="60" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="sogo-db 1/1 (node3) — Postgres&lt;br&gt;копия писем для веб-поиска" vertex="1">
+          <mxGeometry height="40" width="460" x="60" y="705" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="mailserver-flash / omicron / omiplat / rocketcom&lt;br&gt;0 реплик — отключены, их PVC по 50Gi лежат" vertex="1">
+          <mxGeometry height="40" width="460" x="60" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="f4b" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#666666;" value="прикладные" vertex="1">
+          <mxGeometry height="265" width="490" x="555" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="api-gateway: api-gateway 2/2 · core · mobile-bff · priority" vertex="1">
+          <mxGeometry height="35" width="450" x="575" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="ankey: ankeyd 1/1 + postgres" vertex="1">
+          <mxGeometry height="35" width="450" x="575" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="vault 3/3 — HashiCorp Vault, NodePort 30200" vertex="1">
+          <mxGeometry height="35" width="450" x="575" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="outfile 1/1 — NodePort 30884" vertex="1">
+          <mxGeometry height="35" width="450" x="575" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="gitlab-agent-k3s-agent 0/2 — не работает" vertex="1">
+          <mxGeometry height="35" width="450" x="575" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="f4c" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#666666;" value="системные" vertex="1">
+          <mxGeometry height="265" width="480" x="1060" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="traefik 1/1 — LoadBalancer pending, MetalLB нет" vertex="1">
+          <mxGeometry height="35" width="440" x="1080" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="longhorn: manager, instance, CSI, UI" vertex="1">
+          <mxGeometry height="35" width="440" x="1080" y="605" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="coredns 1/1 · metrics-server" vertex="1">
+          <mxGeometry height="35" width="440" x="1080" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="s4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="etcd: кворум из node1–node4&lt;br&gt;выбытие 2 нод из 5 → etcd без кворума" vertex="1">
+          <mxGeometry height="45" width="440" x="1080" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=15;fontStyle=1;fontColor=#666666;" value="5 · ХРАНИЛИЩЕ (longhorn)" vertex="1">
+          <mxGeometry height="105" width="1540" x="20" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="h1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="mailserver-data 800Gi · longhorn-mail · Retain&lt;br&gt;90% занято: 704G из 788G — расширять почти некуда" vertex="1">
+          <mxGeometry height="55" width="480" x="45" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="h2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="внутри одного PVC:&lt;br&gt;/var/mail — 471 maildir · /tmp/docker-mailserver/config — user-patches.sh" vertex="1">
+          <mxGeometry height="55" width="480" x="560" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="h3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="sogo-db-data 5Gi · vault (longhorn-vault) ·&lt;br&gt;ankey postgres · longhorn-static · local-path" vertex="1">
+          <mxGeometry height="55" width="465" x="1075" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="f6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=15;fontStyle=1;fontColor=#666666;" value="6 · ВНЕШНИЕ ЗАВИСИМОСТИ" vertex="1">
+          <mxGeometry height="105" width="1540" x="20" y="970" as="geometry" />
+        </mxCell>
+        <mxCell id="x1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="dc1.360pro.online 192.168.160.60&lt;br&gt;AD/LDAP — аутентификация dovecot и SOGo&lt;br&gt;DNS — PTR-записи (dc2: 192.168.160.69)" vertex="1">
+          <mxGeometry height="55" width="480" x="45" y="1005" as="geometry" />
+        </mxCell>
+        <mxCell id="x2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="relay1 192.168.161.32 / relay2 .33&lt;br&gt;внешняя почта: Postfix upstream, MX" vertex="1">
+          <mxGeometry height="55" width="480" x="560" y="1005" as="geometry" />
+        </mxCell>
+        <mxCell id="x3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#333333;fontSize=12;verticalAlign=middle;" value="bitrix.360pro.online — задача 1943&lt;br&gt;внешний Bitrix24, к кластеру отношения не имеет" vertex="1">
+          <mxGeometry height="55" width="465" x="1075" y="1005" as="geometry" />
+        </mxCell>
+        <mxCell id="L1" edge="1" parent="1" source="f1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#777777;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" target="f2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L2" edge="1" parent="1" source="f2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#777777;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" target="f3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L3" edge="1" parent="1" source="f3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#777777;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" target="f4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L4" edge="1" parent="1" source="f4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" target="f5" value="почта">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L5" edge="1" parent="1" source="f4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" target="f6" value="AD/LDAP · почта">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L6" edge="1" parent="1" source="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;exitX=0.35;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;" target="m1" value="993 · 465 · 587 · 25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L7" edge="1" parent="1" source="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;strokeWidth=2;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;" target="m2" value="https">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L8" edge="1" parent="1" source="m1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;exitX=0.1;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;" target="x1" value="LDAP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="L9" edge="1" parent="1" source="m2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" target="x1" value="LDAP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="p2" name="Путь почты">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="p1" value="Как идёт запрос — Outlook против веб-почты" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=22;fontStyle=1;fontColor=#1a1a1a;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="900" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="Ключевое: Outlook с SOGo не связан. Он говорит с dovecot напрямую по IMAP — поэтому пути расходятся сразу на втором шаге." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#b85450;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="20" y="44" width="1400" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="laneA" value="ТРАССА A · OUTLOOK — здесь поиск ломается" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=14;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="20" y="80" width="1540" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="a_x" value="Outlook" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="45" y="112" width="200" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="a_np" value="NodePort 30553 (993)&lt;br&gt;NodePort 30465 / 30587&lt;br&gt;мимо traefik" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="285" y="112" width="240" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="a_dc" value="Dovecot 993 / 143 / 110 / 995&lt;br&gt;аутентификация → LDAP dc1&lt;br&gt;fts_xapian — отдаёт SEARCH" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="565" y="112" width="265" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="a_ml" value="maildir на PVC&lt;br&gt;/var/mail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="870" y="112" width="200" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="a_pc" value="ПОЧЕМУ НЕ РАБОТАЕТ&lt;br&gt;fts_xapian = partial=3 full=20&lt;br&gt;полный текст есть только за 3–20 дней" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="112" width="430" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" value="993" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="a_x" target="a_np">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" value="465/587" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="a_np" target="a_dc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="SEARCH" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="a_dc" target="a_ml">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b85450;strokeWidth=2;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="a_pc" target="a_dc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="laneB" value="ТРАССА B · ВЕБ-ПОЧТА — здесь всё работает" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=14;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="20" y="225" width="1540" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="b_x" value="Браузер" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="45" y="257" width="200" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="b_ing" value="Ingress mail.360pro.online&lt;br&gt;traefik → NodePort 31080" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="285" y="257" width="240" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="b_sg" value="SOGo  nginx + web + memcached&lt;br&gt;свой поиск, свой Postgres&lt;br&gt;НЕ зависит от настроек dovecot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="565" y="257" width="265" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="b_db" value="sogo-db (Postgres)&lt;br&gt;копия всех писем целиком" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="870" y="257" width="200" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="b_ok" value="ПОИСК ЕСТЬ&lt;br&gt;Postgres не ограничен&lt;br&gt;окном в 20 дней" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="257" width="430" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" value="https" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="b_x" target="b_ing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="b_ing" target="b_sg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" value="запрос" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;strokeWidth=3;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="b_sg" target="b_db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;strokeWidth=2;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="b_ok" target="b_sg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b5" value="SOGo читает те же ящики по IMAP" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="b_sg" target="a_dc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="laneC" value="ОБЩИЙ СЛОЙ — отправка, приём, конфигурация" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#999999;dashed=0;verticalAlign=top;align=left;spacingLeft=12;spacingTop=8;fontSize=14;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="20" y="370" width="1540" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="c_in" value="relay1 .32 / relay2 .33&lt;br&gt;внешняя почта, MX" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="45" y="402" width="230" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="c_px" value="Postfix  25 / 465 / 587&lt;br&gt;Rspamd, приём и отправка" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="315" y="402" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="c_lm" value="LMTP — доставка&lt;br&gt;внутри пода" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="605" y="402" width="200" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="c_dc1" value="dc1.360pro.online 192.168.160.60&lt;br&gt;AD/LDAP + DNS&lt;br&gt;аутентификация обоих клиентов" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="845" y="402" width="280" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="c_up" value="user-patches.sh на PVC&lt;br&gt;/tmp/docker-mailserver/config&lt;br&gt;при старте контейнера генерирует конфиг dovecot&lt;br&gt;правку в поде перезапишет" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#333333;fontSize=11;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1165" y="397" width="375" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" value=":25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="c_in" target="c_px">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;strokeWidth=2;dashed=0;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="c_px" target="c_lm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="maildir" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;strokeWidth=2;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;" edge="1" parent="1" source="c_lm" target="a_ml">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="LDAP" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;strokeWidth=1;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;exitX=0.2;exitY=0;entryX=0.85;entryY=1;" edge="1" parent="1" source="c_dc1" target="a_dc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="генерирует конфиг" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d79b00;strokeWidth=2;dashed=1;endArrow=block;endFill=1;fontSize=10;labelBackgroundColor=#ffffff;fontColor=#333333;exitX=0.5;exitY=0;entryX=0.95;entryY=1;" edge="1" parent="1" source="c_up" target="a_dc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="w1" value="ЧТО НУЖНО СДЕЛАТЬ (задача 1943)&lt;br&gt;&lt;br&gt;1. Расширить PVC mailserver-data — сейчас 90% (84G свободно),&lt;br&gt;    индекс xapian ≈ 40% от 704G почты, то есть нужно ~250–280G.&lt;br&gt;&lt;br&gt;2. user-patches.sh, строка 549: fts_xapian = partial=0 full=0&lt;br&gt;    (внутри пода править бессмысленно — перезапишется).&lt;br&gt;&lt;br&gt;3. Пересобрать индекс: doveadm fts rescan -u &lt;user&gt;,&lt;br&gt;    doveadm index -u &lt;user&gt; &#39;*&#39;. Всего 471 ящик — порциями.&lt;br&gt;&lt;br&gt;4. Проверка: doveadm search -u &lt;user&gt; TEXT &lt;слово из тела&lt;br&gt;    письма старше 20 дней&gt; — должен вернуть совпадение." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;verticalAlign=middle;align=left;spacingLeft=12;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="20" y="530" width="745" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="w2" value="ПУСТОЙ ЧЕРНОВИК — причина не найдена&lt;br&gt;&lt;br&gt;Серверная часть в порядке: папка \Drafts настроена,&lt;br&gt;квот нет, 0-байтных сообщений в Drafts нет.&lt;br&gt;&lt;br&gt;Нужно от жалобщика: заголовки MIME-частей письма&lt;br&gt;с вложением, IMAP-адрес в Outlook, нет ли двух&lt;br&gt;ящиков сразу (в кластере их 5 почтовых серверов).&lt;br&gt;&lt;br&gt;Риск на будущее: при 100% диска APPEND в Drafts&lt;br&gt;начнёт отдавать NO [OVERQUOTA]." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=11;verticalAlign=middle;align=left;spacingLeft=12;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="790" y="530" width="770" height="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
